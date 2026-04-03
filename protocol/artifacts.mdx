@@ -1,0 +1,88 @@
+---
+title: "Protocol Artifacts"
+description: "The machine-readable objects in the LLMO ecosystem: entity records, claim records, truth packs, and decision envelopes."
+---
+
+# Protocol Artifacts
+
+LLMO is a protocol, not just a framework. Protocols have objects. These are the objects.
+
+## Entity Record
+
+An entity record is the canonical machine-readable description of an entity.
+
+It contains:
+
+- **Entity identifier**: a stable, unique reference (domain, URI, or assigned ID)
+- **Entity type**: company, person, product, service, institution, concept
+- **Canonical name**: the authoritative name
+- **Aliases**: known alternative names, abbreviations, or former names
+- **Claims**: the set of current canonical claims about the entity
+- **Sources**: the authoritative sources for those claims
+- **Last verified**: timestamp of most recent verification
+- **Status**: active, deprecated, merged, or disputed
+
+## Claim Record
+
+A claim record is a structured assertion about an entity.
+
+It contains:
+
+- **Claim identifier**: unique reference
+- **Entity reference**: which entity this claim is about
+- **Statement**: the assertion in natural language
+- **Structured value**: the assertion in machine-parseable form where applicable
+- **Status**: true, false, outdated, ambiguous, superseded, unverifiable
+- **Source references**: which sources support this claim
+- **Freshness window**: the period during which this claim is considered current
+- **Superseded by**: reference to the replacing claim, if applicable
+- **Verification level**: self-attested, third-party verified, cryptographically signed
+- **Last verified**: timestamp
+
+## Source Record
+
+A source record describes the origin of one or more claims.
+
+It contains:
+
+- **Source identifier**: unique reference
+- **Origin**: URL, document, API, or institutional reference
+- **Trust tier**: assigned trust level based on authority, proximity, and history
+- **Timestamp**: when the source last produced or confirmed its claims
+- **Owner**: the accountable party for this source
+- **Retrievability**: whether the source is currently accessible
+- **Conflict history**: whether this source has previously contradicted other sources
+
+## Truth Pack
+
+A truth pack is the portable, machine-readable artifact that an entity publishes to declare its canonical state.
+
+It bundles:
+
+- The entity record
+- All current claim records
+- Supporting source records
+- Provenance metadata
+- Freshness timestamps
+- Supersession chains
+- Verification levels
+
+A truth pack is the atomic unit of trust in the LLMO protocol. It is what a model should retrieve, parse, and trust when reasoning about an entity.
+
+The reference implementation is `llmo.json`.
+
+## Decision Envelope
+
+A decision envelope defines the bounded context for a verified decision.
+
+It contains:
+
+- **Domain**: what area the decision applies to
+- **Risk tier**: the consequence level of errors
+- **Error bound (epsilon)**: the maximum acceptable error rate
+- **Latency constraint (tau)**: the time window for decision production
+- **Applicable policies**: which governance rules constrain this decision
+- **Required verification level**: what standard of proof is needed
+- **Escalation rules**: conditions under which human review is required
+
+The decision envelope is what the orchestration layer consults before producing a Verified Decision Unit.

@@ -1,0 +1,77 @@
+---
+title: "Versioning and Changelog"
+description: "How the LLMO protocol evolves: versioned schemas, versioned semantics, RFC process, and deprecation rules."
+---
+
+# Versioning and Changelog
+
+LLMO is a protocol. Protocols must evolve without breaking implementations. This page defines how changes are managed.
+
+## Versioning scheme
+
+LLMO uses semantic versioning: `MAJOR.MINOR.PATCH`
+
+- **MAJOR**: breaking changes to schema structure, field semantics, or validation rules
+- **MINOR**: new optional fields, new artifact types, expanded enums
+- **PATCH**: clarifications, typo fixes, documentation improvements
+
+The current protocol version is **0.1.0**.
+
+## What is versioned
+
+| Artifact | Version field | Description |
+|---|---|---|
+| **LLMO protocol** | `llmo_version` | The overall protocol version governing semantics and rules |
+| **llmo.json schema** | `schema_version` | The structural schema for truth pack artifacts |
+| **Canonical definitions** | tied to protocol version | Term definitions are stable within a major version |
+| **Validation rules** | tied to protocol version | How claims are checked is stable within a major version |
+
+## Backward compatibility
+
+Within a major version:
+
+- New optional fields may be added to schemas
+- Existing required fields will not be removed or renamed
+- Enum values may be added but not removed
+- Validation rules may be tightened but not relaxed (stricter is backward-compatible; looser is not)
+
+Across major versions:
+
+- Breaking changes are documented in the changelog
+- Migration guides are provided
+- Deprecated fields carry a deprecation notice for at least one minor version before removal
+
+## RFC process
+
+Changes to the LLMO protocol follow an RFC (Request for Comments) process:
+
+1. **Proposal**: a written document describing the change, its rationale, and its impact
+2. **Review**: community and maintainer review with explicit approval criteria
+3. **Decision**: accept, reject, or defer with documented reasoning
+4. **Implementation**: schema and documentation updates
+5. **Release**: new version published with changelog entry
+
+RFCs are numbered sequentially and archived permanently.
+
+## Deprecation rules
+
+When a field, artifact type, or validation rule is deprecated:
+
+- The deprecation is announced in the changelog
+- The deprecated element is marked in the schema with a deprecation notice
+- The deprecated element remains functional for at least one minor version
+- Removal occurs only in a major version increment
+
+## Changelog
+
+### v0.1.0 (2026-04-02)
+
+- Initial protocol specification
+- Core ontology: entity, claim, source, provenance, freshness, supersession, representation
+- Protocol artifacts: entity record, claim record, source record, truth pack, decision envelope
+- llmo.json schema v0.1.0
+- Validation rules: source weighting, claim validation, freshness checks, conflict resolution, supersession
+- Evaluation harness specification
+- Humans + Harness operating doctrine
+- Governance framework
+- Security threat model

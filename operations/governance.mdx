@@ -1,0 +1,92 @@
+---
+title: "Governance"
+description: "Trust boundaries, policy constraints, audit requirements, and constitutional design for AI-mediated systems."
+---
+
+# Governance
+
+LLMO governance defines the constraints within which machine-mediated work operates. It is not compliance theater. It is the structural boundary between useful automation and uncontrolled output.
+
+## Trust boundaries
+
+Every decision in an LLMO system operates within a defined trust boundary:
+
+- **Domain scope**: what topics or entity types the system is authorized to address
+- **Risk tier**: the consequence level of errors in this domain (low, medium, high, critical)
+- **Error bound**: the maximum acceptable error rate for verified decisions
+- **Latency constraint**: the time window within which a decision must be produced
+- **Authority level**: who or what is permitted to make, approve, or override decisions
+
+Trust boundaries are not suggestions. They are enforced by the harness.
+
+## Policy constraints
+
+Policies define what the system can and cannot do within its trust boundaries:
+
+- **Permitted actions**: what outputs the system may produce
+- **Prohibited actions**: what outputs are never acceptable regardless of model confidence
+- **Conditional actions**: outputs that require human approval before delivery
+- **Escalation triggers**: conditions that force routing to a human reviewer
+- **Refusal conditions**: states where the system must decline rather than guess
+
+Policies are versioned, auditable, and explicit. They are not embedded in prompts. They are enforced structurally by the harness.
+
+## Audit requirements
+
+Every verified decision must produce an audit trail that includes:
+
+- The input that initiated the decision
+- The sources consulted
+- The claims used in reasoning
+- The model outputs generated
+- The evaluation results
+- The policy checks applied
+- Whether human review occurred and what the outcome was
+- The final decision and its confidence level
+- Timestamps for every state transition
+
+Audit trails are not optional for high-risk domains. They are the mechanism by which accountability is maintained in systems where the reasoning agent is probabilistic.
+
+## Approval classes
+
+Not all decisions carry equal weight. LLMO governance defines approval classes:
+
+| Class | Description | Approval requirement |
+|---|---|---|
+| **Automated** | Low-risk, well-calibrated, high-confidence | Harness approves, logged |
+| **Reviewed** | Medium-risk or edge-case | Human reviews before delivery |
+| **Escalated** | High-risk, ambiguous, or novel | Senior domain expert approves |
+| **Refused** | Insufficient truth or out-of-bounds | System declines, logged |
+
+## Escalation rules
+
+Escalation is not failure. It is the system operating correctly under uncertainty.
+
+Escalation occurs when:
+
+- Model confidence falls below the threshold for the current risk tier
+- Multiple sources conflict on a material claim
+- The decision falls outside the defined domain scope
+- Policy checks identify a prohibited or conditional state
+- The harness detects potential calibration error above the acceptable delta
+
+## Red-team principles
+
+LLMO systems should be adversarially tested for:
+
+- Source poisoning: can a bad actor inject false claims into the source graph?
+- Prompt injection: can retrieval-augmented generation be manipulated?
+- Stale data exploitation: can outdated claims be surfaced to trigger bad decisions?
+- Calibration gaming: can a system be made overconfident through curated inputs?
+- Audit evasion: can the logging layer be bypassed or tampered with?
+
+## Constitutional design
+
+At the highest level, LLMO governance is constitutional. It defines not just rules but the principles from which rules are derived:
+
+- Truth integrity over output volume
+- Verified decisions over fast decisions
+- Refusal over confident wrongness
+- Auditability over convenience
+- Human accountability for high-stakes outcomes
+- Bounded autonomy, never unbounded delegation

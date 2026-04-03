@@ -1,0 +1,89 @@
+---
+title: "The Trust Layer"
+description: "LLMO as trust infrastructure for machine-mediated environments. Provenance, verification, freshness, and signed truth."
+---
+
+# The Trust Layer
+
+LLMO begins as optimization. It evolves into a trust layer.
+
+## Why visibility is not enough
+
+The internet suffers from:
+
+- SEO spam and content farming
+- Fake reviews and salted directories
+- Inconsistent or contradictory business information across platforms
+- Unverifiable claims at scale
+- Liar's dividend dynamics where bad actors benefit from ambient noise
+- Model hallucination built on unreliable source material
+- Probabilistic compression that blends good and bad sources
+
+In this environment, being visible to models is necessary but insufficient. A model that surfaces your entity but associates it with stale, conflicting, or fabricated claims is worse than a model that does not mention you at all.
+
+The system must also answer:
+
+- What is true?
+- Who said it?
+- When was it true?
+- What superseded it?
+- Can it be verified?
+- Can it be signed?
+- Can it be replayed?
+- Can a machine trust it enough to act?
+
+## From optimization to trust
+
+Optimization governs whether models see you. Trust governs whether models should believe what they see.
+
+The architecture keeps returning to a consistent set of primitives:
+
+| Primitive | Function |
+|---|---|
+| **Provenance** | Traces the chain from source to claim to representation |
+| **Signed truth** | Binds a claim to an accountable origin with cryptographic or attestation backing |
+| **Verification** | Confirms a claim against authoritative sources |
+| **Freshness** | Determines whether a claim is still within its validity window |
+| **Supersession** | Tracks which claims have been replaced by newer authoritative statements |
+| **Audit** | Provides a replayable record of how a claim was produced, verified, and used |
+| **Replay** | Re-executes decision pathways to confirm or debug prior outputs |
+
+These are not optional extensions. They are the structural requirements for any system where machines act on information at scale.
+
+## Machine trust as an economic requirement
+
+When models make or inform decisions, the cost of bad information compounds. A stale claim about a company's compliance status, surfaced confidently by a model, can trigger regulatory exposure. A hallucinated product capability, cited in a procurement workflow, can break a contract.
+
+Trust infrastructure is not a philosophical preference. It is an economic requirement for environments where machine outputs have downstream consequences.
+
+## LLMO as perception observability
+
+One component of the trust layer is the ability to observe and measure machine perception over time.
+
+This means the system can show:
+
+- How an entity appears across models
+- Where it is cited
+- Where it is omitted
+- Where it is distorted
+- Which claims are unstable
+- What changed month to month
+- Where the source graph weakened or strengthened
+- What interventions improved representation
+
+This creates a diff engine for semantic reputation and truth integrity. It converts invisible machine perception into something measurable, auditable, and correctable.
+
+## The trust artifact
+
+Ordinary content is too weak a substrate for machine trust. A better object is a structured, machine-readable, verifiable artifact that expresses:
+
+- Who an entity is
+- What is true about it
+- When that was last verified
+- Which claims are canonical
+- Which claims were superseded
+- What sources support them
+- What confidence or verification level applies
+- How machines should interpret them
+
+This is the truth pack. Its reference implementation is `llmo.json`. It is the point where LLMO stops being rhetoric and becomes protocol.

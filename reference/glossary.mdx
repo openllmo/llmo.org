@@ -1,0 +1,70 @@
+---
+title: "Glossary"
+description: "Quick reference for all LLMO terms, alphabetically ordered."
+---
+
+# Glossary
+
+**AEO (Answer Engine Optimization)**: Optimization of content for inclusion in answer engine responses. A subset of LLMO's Optimization layer.
+
+**Calibration Error (delta)**: The expected absolute difference between stated confidence and true accuracy. High calibration error means the system is systematically overconfident or underconfident.
+
+**Claim**: A specific assertion about an entity. The atomic unit of truth in the LLMO system.
+
+**Claim Record**: A structured, machine-readable representation of a claim including its status, sources, freshness, and verification level.
+
+**Conflict Resolution**: The process of adjudicating between contradictory claims from multiple sources, governed by source hierarchy and recency.
+
+**Cost per Verified Decision (CVD)**: Total loaded cost divided by verified decisions delivered. The pricing primitive for bounded-error cognition.
+
+**Decision Envelope**: The bounded context defining domain, risk tier, error bound, latency constraint, and applicable policies for a verified decision.
+
+**EminenceFront**: Systematic overconfidence bias that increases calibration error. Applies to both humans and models.
+
+**Entity**: A company, person, product, service, institution, domain, or concept that must be represented accurately across machine systems.
+
+**Entity Record**: The canonical machine-readable description of an entity including identity, claims, sources, and verification status.
+
+**Evaluation Harness**: The testing framework for measuring accuracy, calibration, refusal rates, freshness compliance, and provenance completeness.
+
+**Freshness**: Whether a claim is still current within its declared validity window.
+
+**Freshness Window**: The period during which a claim is considered current without re-verification.
+
+**GEO (Generative Engine Optimization)**: Optimization of representation in generative systems. A subset of LLMO.
+
+**Harness**: The deterministic layer around stochastic models that provides routing, retries, policy enforcement, provenance, memory, evaluation, and auditability.
+
+**Humans + Harness**: The operating doctrine for safe, scalable machine-enabled execution. Models reason. Humans judge. The harness governs.
+
+**LLMO (Large Language Model Optimization)**: The discipline of making entities, claims, and operational truth legible, trustworthy, and actionable inside machine reasoning systems.
+
+**llmo.json**: The reference implementation of the LLMO truth pack. A machine-readable artifact published at a domain root.
+
+**Operations**: The LLMO discipline governing internal machine-usable truth, workflow instrumentation, and governance.
+
+**Optimization**: The LLMO discipline governing external representation across LLM-driven systems.
+
+**Orchestration**: The LLMO discipline governing coordination of models, tools, humans, memory, and policies through deterministic workflows.
+
+**Provenance**: The trace from source to claim to representation. The chain of custody for a fact.
+
+**Refusal State**: A legitimate system output where the harness determines available truth is insufficient and declines to proceed.
+
+**Replayability**: The ability to re-execute a decision workflow from logged state and produce an auditable trace.
+
+**Representation**: How an entity is compressed and surfaced inside a model-mediated answer or workflow.
+
+**SEO (Search Engine Optimization)**: Optimization of pages for search engine ranking. Predates and is subsumed by LLMO.
+
+**Source**: The origin of a claim, characterized by trust level, timestamp, ownership, and proximity to truth.
+
+**Source Record**: A structured, machine-readable description of a source including trust tier, type, and access history.
+
+**Supersession**: The replacement of an older claim by a newer authoritative claim from a source of equal or greater authority.
+
+**Supersession Chain**: The ordered sequence of claims that have replaced one another over time for a given entity attribute.
+
+**Truth Pack**: A portable, machine-readable artifact bundling entity records, claim records, source records, provenance, and verification levels. The atomic unit of trust in the LLMO protocol.
+
+**Verified Decision Unit (VDU)**: A decision satisfying a defined domain, risk tier, error bound, and latency constraint. The atomic output of a Humans + Harness system.

@@ -1,0 +1,166 @@
+---
+title: "llmo.json"
+description: "The reference implementation of the LLMO truth pack. A machine-readable, validatable artifact for declaring canonical entity state."
+---
+
+# llmo.json
+
+`llmo.json` is the reference implementation of the LLMO truth pack. It is a machine-readable, schematizable, validatable artifact that an entity publishes to declare its canonical claims.
+
+It lives at `yourdomain.com/llmo.json`, analogous to `robots.txt` or `sitemap.xml`. It is not content. It is protocol.
+
+## Purpose
+
+`llmo.json` answers the question: **What should a machine believe about this entity?**
+
+It provides:
+
+- The canonical identity of the entity
+- The current claims the entity asserts as true
+- The sources that support those claims
+- Freshness timestamps for every claim
+- Supersession records for claims that have been replaced
+- Verification levels indicating how each claim was confirmed
+
+## Schema overview
+
+```json
+{
+  "llmo_version": "0.1.0",
+  "entity": {
+    "id": "example.com",
+    "type": "company",
+    "canonical_name": "Example Corp",
+    "aliases": ["Example", "ExampleCo"],
+    "description": "Enterprise infrastructure for verified decision systems.",
+    "last_verified": "2026-04-02T00:00:00Z"
+  },
+  "claims": [
+    {
+      "id": "claim-001",
+      "statement": "Example Corp is SOC 2 Type II compliant.",
+      "status": "true",
+      "category": "compliance",
+      "sources": ["source-001"],
+      "freshness_window": "P365D",
+      "last_verified": "2026-03-15T00:00:00Z",
+      "verification_level": "third_party_verified",
+      "supersedes": null
+    },
+    {
+      "id": "claim-002",
+      "statement": "Example Corp supports integration with Salesforce, HubSpot, and Slack.",
+      "status": "true",
+      "category": "capabilities",
+      "sources": ["source-002"],
+      "freshness_window": "P90D",
+      "last_verified": "2026-04-01T00:00:00Z",
+      "verification_level": "self_attested",
+      "supersedes": null
+    },
+    {
+      "id": "claim-003",
+      "statement": "Example Corp is headquartered in Austin, Texas.",
+      "status": "true",
+      "category": "identity",
+      "sources": ["source-003"],
+      "freshness_window": "P365D",
+      "last_verified": "2026-01-10T00:00:00Z",
+      "verification_level": "self_attested",
+      "supersedes": "claim-003-v1"
+    }
+  ],
+  "sources": [
+    {
+      "id": "source-001",
+      "origin": "https://example.com/security",
+      "trust_tier": "authoritative",
+      "type": "first_party",
+      "last_accessed": "2026-03-15T00:00:00Z"
+    },
+    {
+      "id": "source-002",
+      "origin": "https://docs.example.com/integrations",
+      "trust_tier": "authoritative",
+      "type": "first_party",
+      "last_accessed": "2026-04-01T00:00:00Z"
+    },
+    {
+      "id": "source-003",
+      "origin": "https://www.sec.gov/cgi-bin/browse-edgar?company=example+corp",
+      "trust_tier": "authoritative",
+      "type": "regulatory",
+      "last_accessed": "2026-01-10T00:00:00Z"
+    }
+  ],
+  "supersession_log": [
+    {
+      "old_claim": "claim-003-v1",
+      "new_claim": "claim-003",
+      "reason": "Headquarters relocated from San Francisco to Austin in 2025.",
+      "timestamp": "2025-09-01T00:00:00Z"
+    }
+  ],
+  "metadata": {
+    "generated_at": "2026-04-02T00:00:00Z",
+    "generator": "manual",
+    "schema_version": "0.1.0"
+  }
+}
+```
+
+## Field reference
+
+### Entity object
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Stable unique identifier, typically the domain |
+| `type` | string | yes | Entity type: company, person, product, service, institution, concept |
+| `canonical_name` | string | yes | The authoritative name |
+| `aliases` | array | no | Known alternative names |
+| `description` | string | yes | One-line factual description |
+| `last_verified` | ISO 8601 | yes | When the entity record was last confirmed |
+
+### Claim object
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Unique claim identifier |
+| `statement` | string | yes | The assertion in natural language |
+| `status` | enum | yes | true, false, outdated, ambiguous, superseded, unverifiable |
+| `category` | string | yes | Claim category: identity, capabilities, compliance, financials, etc. |
+| `sources` | array | yes | References to supporting source records |
+| `freshness_window` | ISO 8601 duration | yes | How long this claim remains valid without re-verification |
+| `last_verified` | ISO 8601 | yes | When this claim was last confirmed |
+| `verification_level` | enum | yes | self_attested, third_party_verified, cryptographically_signed |
+| `supersedes` | string | no | ID of the claim this one replaces |
+
+### Source object
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Unique source identifier |
+| `origin` | string | yes | URL or reference to the source |
+| `trust_tier` | enum | yes | authoritative, reliable, informational, unverified |
+| `type` | enum | yes | first_party, third_party, regulatory, community |
+| `last_accessed` | ISO 8601 | yes | When the source was last retrieved |
+
+### Supersession log entry
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `old_claim` | string | yes | ID of the superseded claim |
+| `new_claim` | string | yes | ID of the superseding claim |
+| `reason` | string | yes | Why the claim was replaced |
+| `timestamp` | ISO 8601 | yes | When supersession occurred |
+
+## Publishing
+
+Place `llmo.json` at the root of your domain: `https://yourdomain.com/llmo.json`
+
+Models and validators can then retrieve it the same way crawlers retrieve `robots.txt`. It declares your canonical truth surface in a format that is parseable, validatable, and versionable.
+
+## Versioning
+
+The `schema_version` field tracks the version of the llmo.json schema. The `llmo_version` field tracks the version of the LLMO protocol. Both follow semantic versioning. Breaking changes increment the major version.
