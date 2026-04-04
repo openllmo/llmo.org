@@ -1,0 +1,97 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "LLMO",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#0D1117",
+    "light": "#E6EDF3",
+    "dark": "#0D1117",
+    "anchors": {
+      "from": "#0D1117",
+      "to": "#30363D"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "LLMO.org",
+      "url": "https://llmo.org"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Get Started",
+    "url": "https://llmo.org"
+  },
+  "tabs": [
+    {
+      "name": "Framework",
+      "url": "framework"
+    },
+    {
+      "name": "Protocol",
+      "url": "protocol"
+    },
+    {
+      "name": "Operations",
+      "url": "operations"
+    },
+    {
+      "name": "Reference",
+      "url": "reference"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Start Here",
+      "pages": [
+        "introduction",
+        "why-llmo",
+        "llmo-vs-seo-aeo-geo"
+      ]
+    },
+    {
+      "group": "Framework",
+      "pages": [
+        "framework/the-three-os",
+        "framework/ontology",
+        "framework/canonical-definitions",
+        "framework/trust-layer"
+      ]
+    },
+    {
+      "group": "Protocol",
+      "pages": [
+        "protocol/artifacts",
+        "protocol/llmo-json",
+        "protocol/validation",
+        "protocol/versioning"
+      ]
+    },
+    {
+      "group": "Operations",
+      "pages": [
+        "operations/humans-and-harness",
+        "operations/governance",
+        "operations/security",
+        "operations/evaluation-harness"
+      ]
+    },
+    {
+      "group": "Reference",
+      "pages": [
+        "reference/glossary",
+        "reference/schema",
+        "reference/changelog",
+        "about"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "website": "https://llmo.org",
+    "github": "https://github.com/llmo-org",
+    "x": "https://x.com/thegigachav"
+  }
+}
