@@ -11,69 +11,165 @@
     "tabs": [
       {
         "tab": "Start Here",
+        "icon": "rocket",
         "groups": [
           {
-            "group": "Start Here",
+            "group": "Overview",
             "pages": [
-              "introduction",
-              "why-llmo",
-              "llmo-vs-seo-aeo-geo"
+              {
+                "page": "What is LLMO?",
+                "path": "introduction",
+                "icon": "book-open"
+              },
+              {
+                "page": "Why LLMO?",
+                "path": "why-llmo",
+                "icon": "lightbulb"
+              },
+              {
+                "page": "LLMO vs SEO, AEO, and GEO",
+                "path": "llmo-vs-seo-aeo-geo",
+                "icon": "scale-balanced"
+              }
             ]
           }
         ]
       },
       {
         "tab": "Framework",
+        "icon": "cube",
         "groups": [
           {
-            "group": "Framework",
+            "group": "Core Architecture",
             "pages": [
-              "framework/the-three-os",
-              "framework/ontology",
-              "framework/canonical-definitions",
-              "framework/trust-layer"
+              {
+                "page": "The Three O's",
+                "path": "framework/the-three-os",
+                "icon": "layer-group"
+              },
+              {
+                "page": "Ontology",
+                "path": "framework/ontology",
+                "icon": "sitemap"
+              },
+              {
+                "page": "Canonical Definitions",
+                "path": "framework/canonical-definitions",
+                "icon": "book"
+              },
+              {
+                "page": "Trust Layer",
+                "path": "framework/trust-layer",
+                "icon": "shield-halved"
+              }
             ]
           }
         ]
       },
       {
         "tab": "Protocol",
+        "icon": "file-code",
         "groups": [
           {
-            "group": "Protocol",
+            "group": "Specification",
             "pages": [
-              "protocol/artifacts",
-              "protocol/llmo-json",
-              "protocol/validation",
-              "protocol/versioning"
+              {
+                "page": "Protocol Artifacts",
+                "path": "protocol/artifacts",
+                "icon": "cubes"
+              },
+              {
+                "page": "llmo.json",
+                "path": "protocol/llmo-json",
+                "icon": "file-code"
+              },
+              {
+                "page": "Validation",
+                "path": "protocol/validation",
+                "icon": "circle-check"
+              },
+              {
+                "page": "Versioning",
+                "path": "protocol/versioning",
+                "icon": "code-branch"
+              }
             ]
           }
         ]
       },
       {
         "tab": "Operations",
+        "icon": "gears",
         "groups": [
           {
-            "group": "Operations",
+            "group": "Doctrine",
             "pages": [
-              "operations/humans-and-harness",
-              "operations/governance",
-              "operations/security",
-              "operations/evaluation-harness"
+              {
+                "page": "Humans + Harness",
+                "path": "operations/humans-and-harness",
+                "icon": "users-gear"
+              }
+            ]
+          },
+          {
+            "group": "Governance & Security",
+            "pages": [
+              {
+                "page": "Governance",
+                "path": "operations/governance",
+                "icon": "landmark"
+              },
+              {
+                "page": "Security",
+                "path": "operations/security",
+                "icon": "lock"
+              }
+            ]
+          },
+          {
+            "group": "Evaluation",
+            "pages": [
+              {
+                "page": "Evaluation Harness",
+                "path": "operations/evaluation-harness",
+                "icon": "flask-vial"
+              }
             ]
           }
         ]
       },
       {
         "tab": "Reference",
+        "icon": "bookmark",
         "groups": [
           {
             "group": "Reference",
             "pages": [
-              "reference/glossary",
-              "reference/schema",
-              "reference/changelog",
-              "about"
+              {
+                "page": "Glossary",
+                "path": "reference/glossary",
+                "icon": "spell-check"
+              },
+              {
+                "page": "Schema",
+                "path": "reference/schema",
+                "icon": "database"
+              },
+              {
+                "page": "Changelog",
+                "path": "reference/changelog",
+                "icon": "clock-rotate-left"
+              }
+            ]
+          },
+          {
+            "group": "About",
+            "pages": [
+              {
+                "page": "About the Author",
+                "path": "about",
+                "icon": "user"
+              }
             ]
           }
         ]
