@@ -1,42 +1,38 @@
 ---
 title: "Humans + Harness"
 icon: "users-gear"
-description: "The operating doctrine for safe, scalable machine-enabled execution. Models reason. Humans judge. The harness governs."
+description: "Operating doctrine for machine-enabled execution. Specifies the roles of humans, models, and the deterministic harness."
 ---
 
 # Humans + Harness
 
-Humans + Harness is the operating doctrine for safe, scalable machine-enabled execution.
+Humans + Harness is the operating doctrine for production-grade machine-enabled execution.
 
 <CardGroup cols={3}>
   <Card title="Humans" icon="user-check">
-    Judgment, exception handling, review, and constitutional constraint.
+    Judgment, exception handling, review, constitutional constraint.
   </Card>
   <Card title="Harness" icon="server">
-    Deterministic scaffolding, routing, logging, memory, policy enforcement, and observability.
+    Deterministic scaffolding, routing, logging, memory, policy enforcement, observability.
   </Card>
   <Card title="Models" icon="brain">
     Probabilistic reasoning within bounded constraints.
   </Card>
 </CardGroup>
 
-It is a rejection of both extremes: pure human labor without leverage, and pure autonomous AI without control. It is the disciplined middle.
+The doctrine rejects both extremes: unaugmented human labor, and autonomous AI without control.
 
-## Why it matters
+## Rationale
 
-LLMs are fluent but unstable. They produce confident output regardless of whether the underlying reasoning is sound. They hallucinate. They drift. They compress ambiguity into false precision.
+LLMs are fluent but unstable. They produce confident output regardless of underlying reasoning quality. They hallucinate, drift, and compress ambiguity into false precision.
 
-Humans are accurate in certain contexts but expensive, inconsistent, and slow. They have domain expertise but cannot scale. They have judgment but fatigue.
+Humans are accurate in specific contexts but expensive, inconsistent, and slow. They possess domain expertise but cannot scale.
 
-Neither alone is sufficient for production-grade work in high-stakes environments.
+Neither is sufficient alone for high-stakes production work. The harness is the structural element that converts ad hoc human-AI interaction into a governed operating model.
 
-The harness is what turns this from chaos into a system. Without the harness, humans plus AI is improvisation. With the harness, humans plus AI becomes an operating model.
-
-## What the harness does
+## Harness specification
 
 The harness is the deterministic layer around stochastic models.
-
-It handles:
 
 | Function | Description |
 |---|---|
@@ -45,51 +41,39 @@ It handles:
 | **Retries** | Re-executing failed steps with logged state |
 | **Confidence handling** | Escalating when model confidence falls below threshold |
 | **Evaluation** | Checking outputs against ground truth or acceptance criteria |
-| **Policy checks** | Enforcing domain-specific rules before output is accepted |
+| **Policy checks** | Enforcing domain-specific rules before output acceptance |
 | **Memory calls** | Retrieving relevant context from structured stores |
 | **Audit logs** | Recording every decision, input, output, and state transition |
 | **Provenance capture** | Tracking the source chain for every claim used in reasoning |
 | **State transitions** | Managing workflow progression through defined stages |
-| **Escalation to humans** | Routing edge cases, ambiguity, and high-risk decisions to reviewers |
-| **Refusal pathways** | Declining to produce output when truth is insufficient |
+| **Escalation** | Routing edge cases and high-risk decisions to human reviewers |
+| **Refusal pathways** | Declining output when available truth is insufficient |
 | **Replayability** | Re-executing workflows from logged state for audit or debugging |
 
-The harness is the difference between chatting with a model and running a production system.
+## Human role specification
 
-## What the humans do
+Humans operate at the constitutional and judgment layer:
 
-Humans sit at the constitutional and judgment layer.
-
-They:
-
-- Validate edge cases that fall outside model training distribution
-- Resolve ambiguity that models would otherwise compress into false precision
+- Validate edge cases outside model training distribution
+- Resolve ambiguity that models would compress into false precision
 - Approve sensitive actions with real-world consequences
-- Catch epistemic drift before it compounds
+- Detect and correct epistemic drift
 - Maintain policy quality and update constraints
-- Label data for evaluation and improvement
-- Supervise retries that failed initial checks
-- Make one-way-door decisions that cannot be reversed
-- Act as accountable operators in high-risk domains
+- Label data for evaluation
+- Supervise failed retries
+- Make irreversible decisions
+- Serve as accountable operators in high-risk domains
 
-Human work becomes more selective, higher leverage, and more legible. The harness does not replace human judgment. It concentrates it where it matters most.
+The harness does not replace human judgment. It concentrates judgment where it produces the most value.
 
-## Why this belongs in LLMO
+## Relationship to LLMO
 
-LLMO is not only about being visible to models. It is about building a world in which machine-mediated decisions can be trusted.
+Optimization ensures accurate external representation. Operations ensures internal truth is machine-usable. Humans + Harness ensures the execution layer is controlled, auditable, and accountable.
 
-The Optimization layer ensures that entities are represented accurately. The Operations layer ensures that internal truth is machine-usable. But neither matters if the execution layer is uncontrolled, unauditable, or unaccountable.
-
-Humans + Harness is the operating doctrine that makes LLMO's promise real. It is how verified decisions get produced at scale without surrendering control to machine fluency.
+Without this doctrine, LLMO's optimization and operations layers lack an execution mechanism.
 
 ## The refusal principle
 
-A good machine system should sometimes refuse, escalate, or defer rather than generate polished wrongness.
+A well-designed system must sometimes refuse, escalate, or defer rather than produce confident but incorrect output.
 
-A refusal state is not a failure. It is a legitimate system output. It means the harness determined that available truth was insufficient to produce a verified decision within the required error bound and risk tier.
-
-<Tip>
-A refusal state is not a failure. It means the system correctly identified that available truth was insufficient to produce a verified decision.
-</Tip>
-
-This is deeply aligned with the LLMO worldview: truth integrity matters more than output volume.
+A refusal state is a legitimate system output. It indicates that the harness determined available truth was insufficient to produce a verified decision within the required error bound and risk tier. Truth integrity takes precedence over output volume.

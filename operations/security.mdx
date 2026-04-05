@@ -1,12 +1,12 @@
 ---
 title: "Security"
 icon: "lock"
-description: "Truth integrity, provenance protection, tamper resistance, and threat models for LLMO systems."
+description: "Threat model, provenance protection, tamper resistance, and integrity requirements for LLMO systems."
 ---
 
 # Security
 
-LLMO is about truth integrity. Security is the discipline of protecting that integrity against adversarial, accidental, and entropic degradation.
+This section specifies the threat model and security requirements for LLMO systems. Security protects truth integrity against adversarial, accidental, and entropic degradation.
 
 ## Threat model
 
@@ -14,11 +14,7 @@ LLMO systems face threats at every layer of the ontology:
 
 ### Source poisoning
 
-<Warning>
-Source poisoning is the highest-impact threat in LLMO systems. A single compromised authoritative source can propagate false claims across every model that retrieves from it.
-</Warning>
-
-Bad actors inject false or misleading claims into sources that models retrieve. This includes:
+A single compromised authoritative source can propagate false claims across every model that retrieves from it. Attack vectors include:
 
 - Creating fake review profiles
 - Publishing false business information on directories
@@ -51,11 +47,7 @@ Systems can be made overconfident through curated inputs that exploit calibratio
 
 ### Audit tampering
 
-<Warning>
-If the audit layer is compromised, the system cannot verify its own history. Every other protection becomes unenforceable.
-</Warning>
-
-If the logging and audit layer is compromised, the system loses its ability to verify its own history. This includes:
+If the audit layer is compromised, the system loses the ability to verify its own history. All other protections become unenforceable. Attack vectors include:
 
 - Modification of audit logs after the fact
 - Deletion of provenance records

@@ -1,12 +1,12 @@
 ---
 title: "Governance"
 icon: "landmark"
-description: "Trust boundaries, policy constraints, audit requirements, and constitutional design for AI-mediated systems."
+description: "Trust boundaries, policy constraints, audit requirements, approval classes, and constitutional design for LLMO systems."
 ---
 
 # Governance
 
-LLMO governance defines the constraints within which machine-mediated work operates. It is not compliance theater. It is the structural boundary between useful automation and uncontrolled output.
+This section specifies the governance framework for LLMO systems: the constraints within which machine-mediated work operates.
 
 ## Trust boundaries
 
@@ -73,11 +73,9 @@ Escalation occurs when:
 
 ## Red-team principles
 
-<Warning>
-A system that has not been adversarially tested should not be trusted for high-risk decisions.
-</Warning>
+LLMO systems must be adversarially tested. A system that has not been red-teamed should not be deployed for high-risk decisions.
 
-LLMO systems should be adversarially tested for:
+Required test vectors:
 
 - Source poisoning: can a bad actor inject false claims into the source graph?
 - Prompt injection: can retrieval-augmented generation be manipulated?

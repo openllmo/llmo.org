@@ -1,96 +1,67 @@
 ---
-title: "The Trust Layer"
+title: "Trust Layer"
 icon: "shield-halved"
-description: "LLMO as trust infrastructure for machine-mediated environments. Provenance, verification, freshness, and signed truth."
+description: "LLMO as trust infrastructure. Provenance, verification, freshness, signed truth, and perception observability."
 ---
 
-# The Trust Layer
+# Trust Layer
 
-LLMO begins as optimization. It evolves into a trust layer.
+LLMO extends from optimization into trust infrastructure. This section specifies the trust primitives and their requirements.
 
-## Why visibility is not enough
+## The insufficiency of visibility
 
-The internet suffers from:
-
-- SEO spam and content farming
-- Fake reviews and salted directories
-- Inconsistent or contradictory business information across platforms
-- Unverifiable claims at scale
-- Liar's dividend dynamics where bad actors benefit from ambient noise
-- Model hallucination built on unreliable source material
-- Probabilistic compression that blends good and bad sources
+The current information environment is degraded by content farming, fake reviews, salted directories, inconsistent entity information, unverifiable claims, model hallucination from unreliable sources, and probabilistic compression that blends high and low quality material.
 
 <Warning>
-A model that surfaces your entity but associates it with stale, conflicting, or fabricated claims is worse than a model that does not mention you at all.
+A model that surfaces an entity but associates it with stale, conflicting, or fabricated claims produces worse outcomes than omission.
 </Warning>
 
-The system must also answer:
+Visibility is necessary but insufficient. The system must also determine: what is true, who asserted it, when it was true, what superseded it, whether it can be verified, and whether a machine can trust it enough to act.
 
-- What is true?
-- Who said it?
-- When was it true?
-- What superseded it?
-- Can it be verified?
-- Can it be signed?
-- Can it be replayed?
-- Can a machine trust it enough to act?
+## Trust primitives
 
-## From optimization to trust
-
-Optimization governs whether models see you. Trust governs whether models should believe what they see.
-
-The architecture keeps returning to a consistent set of primitives:
+Optimization governs whether models surface an entity. Trust governs whether models should believe what they surface.
 
 | Primitive | Function |
 |---|---|
 | **Provenance** | Traces the chain from source to claim to representation |
 | **Signed truth** | Binds a claim to an accountable origin with cryptographic or attestation backing |
 | **Verification** | Confirms a claim against authoritative sources |
-| **Freshness** | Determines whether a claim is still within its validity window |
+| **Freshness** | Determines whether a claim is within its validity window |
 | **Supersession** | Tracks which claims have been replaced by newer authoritative statements |
-| **Audit** | Provides a replayable record of how a claim was produced, verified, and used |
+| **Audit** | Provides a replayable record of claim production, verification, and use |
 | **Replay** | Re-executes decision pathways to confirm or debug prior outputs |
 
-These are not optional extensions. They are the structural requirements for any system where machines act on information at scale.
+These are structural requirements, not optional extensions.
 
-## Machine trust as an economic requirement
+## Economic basis
 
-When models make or inform decisions, the cost of bad information compounds. A stale claim about a company's compliance status, surfaced confidently by a model, can trigger regulatory exposure. A hallucinated product capability, cited in a procurement workflow, can break a contract.
+When models inform or execute decisions, the cost of bad information compounds. Stale compliance claims can trigger regulatory exposure. Hallucinated capabilities cited in procurement can break contracts.
 
-Trust infrastructure is not a philosophical preference. It is an economic requirement for environments where machine outputs have downstream consequences.
+Trust infrastructure is an economic requirement for environments where machine outputs have downstream consequences.
 
-## LLMO as perception observability
+## Perception observability
 
-One component of the trust layer is the ability to observe and measure machine perception over time.
-
-This means the system can show:
+The trust layer includes the ability to observe and measure machine perception over time:
 
 - How an entity appears across models
-- Where it is cited
-- Where it is omitted
-- Where it is distorted
+- Where it is cited, omitted, or distorted
 - Which claims are unstable
-- What changed month to month
+- How representation changes over time
 - Where the source graph weakened or strengthened
 - What interventions improved representation
 
-This creates a diff engine for semantic reputation and truth integrity. It converts invisible machine perception into something measurable, auditable, and correctable.
+This constitutes a diff engine for semantic reputation and truth integrity.
 
 ## The trust artifact
 
-Ordinary content is too weak a substrate for machine trust. A better object is a structured, machine-readable, verifiable artifact that expresses:
+Content is an insufficient substrate for machine trust. The protocol requires a structured, machine-readable, verifiable artifact that expresses:
 
-- Who an entity is
-- What is true about it
-- When that was last verified
-- Which claims are canonical
-- Which claims were superseded
-- What sources support them
-- What confidence or verification level applies
-- How machines should interpret them
+- Entity identity
+- Canonical claims and their truth status
+- Verification timestamps and freshness windows
+- Supersession chains
+- Supporting sources and their trust tiers
+- Applicable confidence or verification levels
 
-This is the truth pack. Its reference implementation is `llmo.json`. It is the point where LLMO stops being rhetoric and becomes protocol.
-
-<Info>
-See [llmo.json](/protocol/llmo-json) for the full schema, field reference, and a working example truth pack.
-</Info>
+This artifact is the **truth pack**. Its reference implementation is [`llmo.json`](/protocol/llmo-json).

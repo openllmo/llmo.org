@@ -1,79 +1,74 @@
 ---
-title: "Why LLMO?"
+title: "Motivation"
+sidebarTitle: "Motivation"
 icon: "lightbulb"
-description: "Why machine-legible truth is the next battleground for organizations operating in AI-mediated environments."
+description: "The structural shift from human-browsable content to machine-interpretable truth, and why existing optimization disciplines are insufficient."
 ---
 
-# Why LLMO?
+# Motivation
 
-## The shift
+## The structural shift
 
-Search engines indexed pages. Users clicked links. Companies optimized for traffic.
+Search engines indexed pages. Users clicked links. Organizations optimized for traffic. That model assumed a human in the loop at every decision point.
 
-That model assumed a human in the loop at every step: reading results, visiting sites, making decisions based on what they found.
+Large language models operate differently. They interpret, compress, synthesize, and act on source material. They consume claims, weight sources, and produce outputs. Increasingly, they inform or execute decisions without a human visiting the original source.
 
-Large language models do not work that way. They interpret, compress, synthesize, and act. They do not click links. They do not browse. They consume sources, weight claims, and produce answers. Increasingly, they make decisions or inform decisions without a human ever visiting the original source.
+This changes the optimization surface from pages to claims, from traffic to representation fidelity, and from ranking to machine-legible truth.
 
-This changes the optimization surface entirely.
+## Requirements for AI-mediated environments
 
-## What companies now need
-
-Companies operating in AI-mediated environments need to optimize for:
-
-| Capability | Description |
+| Requirement | Definition |
 |---|---|
-| **Machine discoverability** | Can models find your information? |
-| **Machine legibility** | Can models parse and structure your claims? |
-| **Machine preference** | Do models favor your information over competitors? |
-| **Factual integrity** | Are your claims consistent, current, and verifiable? |
-| **Operational consistency** | Does your internal truth match your external surface? |
-| **Model memory coherence** | Do models remember you correctly across sessions? |
-| **Trustworthiness under retrieval** | Can models verify your claims against authoritative sources? |
-| **Actionability** | Can models act on your information inside workflows? |
+| **Machine discoverability** | Models can locate and retrieve the entity's information |
+| **Machine legibility** | Models can parse and structure the entity's claims |
+| **Machine preference** | Models favor the entity's information over competing sources |
+| **Factual integrity** | Claims are consistent, current, and verifiable |
+| **Operational consistency** | Internal truth matches the external representation surface |
+| **Model memory coherence** | Models retain accurate representations across sessions |
+| **Trustworthiness under retrieval** | Claims can be verified against authoritative sources |
+| **Actionability** | Models can act on the information inside workflows |
 
-## Why existing approaches fall short
+## Insufficiency of existing approaches
 
 **SEO** optimizes for search engine crawlers. It does not address how models synthesize, weight, or represent entities across generation tasks.
 
-**Content marketing** produces volume. Models do not reward volume. They reward clarity, structure, consistency, and verifiability.
+**Content marketing** optimizes for volume. Models do not reward volume. They reward clarity, structure, consistency, and verifiability.
 
-**Brand monitoring** tracks mentions. It does not track how models internally represent your entity, which claims they associate with you, or whether those claims are current.
+**Brand monitoring** tracks mentions. It does not track how models internally represent an entity, which claims they associate with it, or whether those claims are current.
 
-**Prompt engineering** optimizes individual queries. It does not address the upstream problem: the quality, structure, and trustworthiness of the source material models draw from.
+**Prompt engineering** optimizes individual queries. It does not address the upstream problem: the quality, structure, and trustworthiness of source material.
 
 ---
 
-## Why rigor matters here
-
-Marketing often accepts approximation. LLMO cannot.
+## The rigor constraint
 
 <Warning>
-Machine systems magnify inconsistency. A stale claim about compliance status, surfaced confidently by a model, can trigger regulatory exposure. A hallucinated product capability, cited in a procurement workflow, can break a contract.
+Machine systems magnify inconsistency. A stale compliance claim surfaced by a model can trigger regulatory exposure. A hallucinated capability cited in a procurement workflow can break a contract.
 </Warning>
 
-Machine systems compress conflicting evidence. They reward structured clarity. They surface stale or incorrect facts at scale. They may act downstream on bad summaries.
+Machine systems compress conflicting evidence, reward structured clarity, surface stale or incorrect facts at scale, and may act downstream on bad summaries.
 
-LLMO requires tighter fact discipline, clearer semantic structures, authoritative source alignment, conflict reduction, content hygiene, retrieval-aware publishing, documentation quality, and system-level validation.
+LLMO therefore requires tighter fact discipline, clearer semantic structures, authoritative source alignment, conflict reduction, retrieval-aware publishing, and system-level validation.
 
-This is why LLMO belongs as much to product, security, operations, and governance as it does to marketing.
+LLMO belongs as much to product, security, operations, and governance as it does to marketing.
 
 ---
 
 ## The trust problem
 
 <Note>
-This is where LLMO stops being a marketing discipline and becomes infrastructure.
+At this boundary, LLMO ceases to be a marketing discipline and becomes infrastructure.
 </Note>
 
-The internet increasingly suffers from:
+The current information environment suffers from:
 
-- SEO spam and content farming
+- Content farming and SEO spam
 - Fake reviews and salted directories
-- Inconsistent or contradictory business information
+- Inconsistent or contradictory entity information
 - Unverifiable claims at scale
-- Model hallucination built on bad source material
-- Probabilistic compression of unreliable sources
+- Model hallucination built on unreliable source material
+- Probabilistic compression of low-quality sources
 
-In that environment, visibility alone is not enough. The system must also answer: What is true? Who said it? When was it true? What superseded it? Can it be verified? Can a machine trust it enough to act?
+In this environment, visibility is necessary but insufficient. The system must also answer: What is true? Who asserted it? When was it true? What superseded it? Can it be verified? Can a machine trust it enough to act?
 
-That is where LLMO evolves from optimization into a **trust layer**.
+This is the boundary where LLMO extends from optimization into a trust layer.
