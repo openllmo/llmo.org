@@ -14,6 +14,10 @@ LLMO systems face threats at every layer of the ontology:
 
 ### Source poisoning
 
+<Warning>
+Source poisoning is the highest-impact threat in LLMO systems. A single compromised authoritative source can propagate false claims across every model that retrieves from it.
+</Warning>
+
 Bad actors inject false or misleading claims into sources that models retrieve. This includes:
 
 - Creating fake review profiles
@@ -46,6 +50,10 @@ Systems can be made overconfident through curated inputs that exploit calibratio
 - Manufacturing consensus across synthetic sources
 
 ### Audit tampering
+
+<Warning>
+If the audit layer is compromised, the system cannot verify its own history. Every other protection becomes unenforceable.
+</Warning>
 
 If the logging and audit layer is compromised, the system loses its ability to verify its own history. This includes:
 

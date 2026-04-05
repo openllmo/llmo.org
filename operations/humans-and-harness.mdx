@@ -8,11 +8,17 @@ description: "The operating doctrine for safe, scalable machine-enabled executio
 
 Humans + Harness is the operating doctrine for safe, scalable machine-enabled execution.
 
-It means that high-value work in probabilistic systems should not be delegated to models alone. It should be governed by a structured system in which:
-
-- **Humans** provide judgment, exception handling, review, and constitutional constraint
-- **The harness** provides deterministic scaffolding, routing, logging, memory, policy enforcement, retry logic, and observability
-- **Models** perform the probabilistic reasoning within those bounds
+<CardGroup cols={3}>
+  <Card title="Humans" icon="user-check">
+    Judgment, exception handling, review, and constitutional constraint.
+  </Card>
+  <Card title="Harness" icon="server">
+    Deterministic scaffolding, routing, logging, memory, policy enforcement, and observability.
+  </Card>
+  <Card title="Models" icon="brain">
+    Probabilistic reasoning within bounded constraints.
+  </Card>
+</CardGroup>
 
 It is a rejection of both extremes: pure human labor without leverage, and pure autonomous AI without control. It is the disciplined middle.
 
@@ -81,5 +87,9 @@ Humans + Harness is the operating doctrine that makes LLMO's promise real. It is
 A good machine system should sometimes refuse, escalate, or defer rather than generate polished wrongness.
 
 A refusal state is not a failure. It is a legitimate system output. It means the harness determined that available truth was insufficient to produce a verified decision within the required error bound and risk tier.
+
+<Tip>
+A refusal state is not a failure. It means the system correctly identified that available truth was insufficient to produce a verified decision.
+</Tip>
 
 This is deeply aligned with the LLMO worldview: truth integrity matters more than output volume.

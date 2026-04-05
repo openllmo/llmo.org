@@ -20,7 +20,9 @@ The internet suffers from:
 - Model hallucination built on unreliable source material
 - Probabilistic compression that blends good and bad sources
 
-In this environment, being visible to models is necessary but insufficient. A model that surfaces your entity but associates it with stale, conflicting, or fabricated claims is worse than a model that does not mention you at all.
+<Warning>
+A model that surfaces your entity but associates it with stale, conflicting, or fabricated claims is worse than a model that does not mention you at all.
+</Warning>
 
 The system must also answer:
 
@@ -88,3 +90,7 @@ Ordinary content is too weak a substrate for machine trust. A better object is a
 - How machines should interpret them
 
 This is the truth pack. Its reference implementation is `llmo.json`. It is the point where LLMO stops being rhetoric and becomes protocol.
+
+<Info>
+See [llmo.json](/protocol/llmo-json) for the full schema, field reference, and a working example truth pack.
+</Info>

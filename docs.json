@@ -3,14 +3,33 @@
   "theme": "mint",
   "name": "LLMO",
   "colors": {
-    "primary": "#0D1117",
-    "light": "#E6EDF3",
-    "dark": "#0D1117"
+    "primary": "#2563EB",
+    "light": "#3B82F6",
+    "dark": "#1D4ED8",
+    "background": {
+      "dark": "#0D1117"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "GitHub",
+      "url": "https://github.com/openllmo"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "llmo.json Schema",
+    "url": "/reference/schema"
+  },
+  "metadata": {
+    "og:site_name": "LLMO Protocol",
+    "og:description": "The open protocol for machine-legible truth.",
+    "twitter:site": "@thegigachav"
   },
   "navigation": {
     "tabs": [
       {
         "tab": "Start Here",
+        "icon": "rocket",
         "groups": [
           {
             "group": "Overview",
@@ -24,12 +43,18 @@
       },
       {
         "tab": "Framework",
+        "icon": "cubes",
         "groups": [
           {
-            "group": "Core Architecture",
+            "group": "Architecture",
             "pages": [
               "framework/the-three-os",
-              "framework/ontology",
+              "framework/ontology"
+            ]
+          },
+          {
+            "group": "Foundations",
+            "pages": [
               "framework/canonical-definitions",
               "framework/trust-layer"
             ]
@@ -38,12 +63,18 @@
       },
       {
         "tab": "Protocol",
+        "icon": "file-shield",
         "groups": [
           {
-            "group": "Specification",
+            "group": "Artifacts",
             "pages": [
               "protocol/artifacts",
-              "protocol/llmo-json",
+              "protocol/llmo-json"
+            ]
+          },
+          {
+            "group": "Integrity",
+            "pages": [
               "protocol/validation",
               "protocol/versioning"
             ]
@@ -52,16 +83,12 @@
       },
       {
         "tab": "Operations",
+        "icon": "gears",
         "groups": [
           {
-            "group": "Doctrine",
+            "group": "Doctrine & Governance",
             "pages": [
-              "operations/humans-and-harness"
-            ]
-          },
-          {
-            "group": "Governance & Security",
-            "pages": [
+              "operations/humans-and-harness",
               "operations/governance",
               "operations/security"
             ]
@@ -76,6 +103,7 @@
       },
       {
         "tab": "Reference",
+        "icon": "book-bookmark",
         "groups": [
           {
             "group": "Reference",

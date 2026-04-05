@@ -6,9 +6,11 @@ description: "The reference implementation of the LLMO truth pack. A machine-rea
 
 # llmo.json
 
-`llmo.json` is the reference implementation of the LLMO truth pack. It is a machine-readable, schematizable, validatable artifact that an entity publishes to declare its canonical claims.
+<Info>
+`llmo.json` lives at your domain root, like `robots.txt` or `sitemap.xml`. It declares what a machine should believe about your entity.
+</Info>
 
-It lives at `yourdomain.com/llmo.json`, analogous to `robots.txt` or `sitemap.xml`. It is not content. It is protocol.
+`llmo.json` is the reference implementation of the LLMO truth pack. It is a machine-readable, schematizable, validatable artifact that an entity publishes to declare its canonical claims. It is not content. It is protocol.
 
 ## Purpose
 
@@ -112,8 +114,7 @@ It provides:
 
 ## Field reference
 
-### Entity object
-
+<Accordion title="Entity object">
 | Field | Type | Required | Description |
 |---|---|---|---|
 | `id` | string | yes | Stable unique identifier, typically the domain |
@@ -122,9 +123,9 @@ It provides:
 | `aliases` | array | no | Known alternative names |
 | `description` | string | yes | One-line factual description |
 | `last_verified` | ISO 8601 | yes | When the entity record was last confirmed |
+</Accordion>
 
-### Claim object
-
+<Accordion title="Claim object">
 | Field | Type | Required | Description |
 |---|---|---|---|
 | `id` | string | yes | Unique claim identifier |
@@ -136,9 +137,9 @@ It provides:
 | `last_verified` | ISO 8601 | yes | When this claim was last confirmed |
 | `verification_level` | enum | yes | self_attested, third_party_verified, cryptographically_signed |
 | `supersedes` | string | no | ID of the claim this one replaces |
+</Accordion>
 
-### Source object
-
+<Accordion title="Source object">
 | Field | Type | Required | Description |
 |---|---|---|---|
 | `id` | string | yes | Unique source identifier |
@@ -146,15 +147,16 @@ It provides:
 | `trust_tier` | enum | yes | authoritative, reliable, informational, unverified |
 | `type` | enum | yes | first_party, third_party, regulatory, community |
 | `last_accessed` | ISO 8601 | yes | When the source was last retrieved |
+</Accordion>
 
-### Supersession log entry
-
+<Accordion title="Supersession log entry">
 | Field | Type | Required | Description |
 |---|---|---|---|
 | `old_claim` | string | yes | ID of the superseded claim |
 | `new_claim` | string | yes | ID of the superseding claim |
 | `reason` | string | yes | Why the claim was replaced |
 | `timestamp` | ISO 8601 | yes | When supersession occurred |
+</Accordion>
 
 ## Publishing
 
