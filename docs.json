@@ -3,8 +3,8 @@
   "theme": "mint",
   "name": "LLMO",
   "logo": {
-    "light": "logo/light.png",
-    "dark": "logo/dark.png"
+    "light": "/light.png",
+    "dark": "/dark.png"
   },
   "colors": {
     "primary": "#2563EB",
