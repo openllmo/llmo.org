@@ -1,50 +1,23 @@
 ---
-title: "About"
-icon: "user"
-description: "Who built this and why."
+title: About LLMO
+sidebarTitle: About LLMO
+description: What LLMO is, why it exists, and who maintains it.
 ---
 
-# About the Author
+# About LLMO
 
-```
-======================================================
-  LLMO v0.1.0
-  Written by Nicholas Chavez (@thegigachav)
-  Released: April 2026
-  License: Open protocol. Use it. Build on it.
-======================================================
+## What LLMO is
 
-  If you are reading this, you are early.
+LLMO is an open specification for `llmo.json`, a signed, machine-readable file that organizations publish at a well-known location on their primary domain. The file carries the organization's own assertions about itself — which URLs are canonical, who speaks for the organization, which products are current, which claims it disavows, which prior statements are superseded. It is designed to be consumed directly by large language models, retrieval systems, and autonomous agents, and to be verifiable without recourse to any central authority.
 
-  LLMO was not built by a company. It was built by
-  one person with two models, a terminal, and a
-  conviction that the way machines understand the
-  world should not be left to accident.
+## Why it exists
 
-  Nicholas studied economics at Harvard and
-  cybersecurity at Brown. The first taught him how
-  systems price truth. The second taught him how
-  systems lose it.
+Organizations have no sovereign channel to the machines that increasingly mediate their public reputation. When a language model answers a question about an organization, the answer is synthesized from text the organization did not write, filtered through systems it does not control. The organization's ability to correct, supersede, or repudiate any part of that synthesis is effectively zero. Existing standards cover adjacent problems — schema.org for page markup, C2PA for media provenance, MCP and agent.json for agent capabilities, `security.txt` for disclosure contacts — but none gives an organization a single verifiable place to state the small set of operational facts about itself that machines most need to know.
 
-  LLMO sits at the intersection.
+LLMO fills that narrow gap. It is a protocol for machine-facing identity, not a replacement for any existing web standard. It is declarative, not descriptive: an organization uses `llmo.json` to assert which URLs are authoritative, not to catalog every page; to disavow false attributions, not to list every association. The file is small, scoped, and signable. Its value comes from doing one narrow job well and composing cleanly with the standards already in place.
 
-  This is a protocol specification for how entities,
-  claims, and operational truth should be structured
-  for machine reasoning systems. It was written
-  because nobody else had written it yet, and the
-  window to define it correctly is closing.
+## Who maintains it
 
-  If you find errors, say so. If you want to
-  contribute, reach out. If you build something
-  on top of this, that is the point.
+LLMO is currently maintained by Nic Chavez as editor. llmo.org hosts the specification and related registry content. The site is governance infrastructure, not a service: there is no hosted publishing, no verification endpoint, no account. Organizations adopting LLMO read the specification, author their own `llmo.json` documents, host them on their own domains, and manage their own keys. The protocol works without any participation from llmo.org.
 
-  — NC
-
-  Contact:
-    X ........... @thegigachav
-    Web ......... llmo.org
-
-  Thanks for reading the docs.
-  Most people don't.
-======================================================
-```
+The specification is expected to transition to neutral governance as adoption matures. Until then, Nic Chavez serves as spec editor and maintains the registry. See [Governance](/about/governance) for current status.

@@ -1,0 +1,415 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://llmo.org/spec/v0.1/schema.json",
+  "title": "LLMO Document v0.1",
+  "description": "Schema for llmo.json documents conforming to LLMO Specification v0.1.",
+  "type": "object",
+  "required": [
+    "llmo_version",
+    "entity",
+    "claims",
+    "valid_from",
+    "valid_until",
+    "document_id"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "llmo_version": {
+      "type": "string",
+      "description": "Spec version this document conforms to.",
+      "const": "0.1"
+    },
+    "document_id": {
+      "type": "string",
+      "description": "Stable opaque identifier for this document, unique within the entity.",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9._:-]+$"
+    },
+    "valid_from": {
+      "type": "string",
+      "format": "date-time",
+      "description": "RFC 3339 timestamp. The document is authoritative from this moment."
+    },
+    "valid_until": {
+      "type": "string",
+      "format": "date-time",
+      "description": "RFC 3339 timestamp. The document is stale after this moment. Must be at most 365 days after valid_from."
+    },
+    "supersedes": {
+      "type": "array",
+      "description": "Document IDs of prior llmo.json documents on the same domain that this document supersedes.",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[A-Za-z0-9._:-]+$"
+      },
+      "uniqueItems": true
+    },
+    "entity": {
+      "$ref": "#/$defs/entity"
+    },
+    "claims": {
+      "type": "array",
+      "description": "Ordered array of claim objects. May be empty but must be present.",
+      "items": {
+        "$ref": "#/$defs/claim"
+      }
+    },
+    "signature": {
+      "$ref": "#/$defs/signature"
+    }
+  },
+  "$defs": {
+    "entity": {
+      "type": "object",
+      "required": ["name", "primary_domain"],
+      "additionalProperties": true,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Human-readable entity name.",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "primary_domain": {
+          "type": "string",
+          "description": "The registrable domain at which this llmo.json is authoritative.",
+          "pattern": "^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,}$"
+        },
+        "aliases": {
+          "type": "array",
+          "description": "Other domains owned by the entity.",
+          "items": {
+            "type": "string",
+            "pattern": "^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,}$"
+          },
+          "uniqueItems": true
+        },
+        "legal_identifiers": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "jurisdiction": {
+              "type": "string",
+              "description": "ISO 3166 country or subdivision code."
+            },
+            "registration_number": {
+              "type": "string"
+            }
+          }
+        },
+        "external_ids": {
+          "type": "object",
+          "description": "Pointers into external identity systems. Keys are system names; values are identifiers.",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "properties": {
+            "wikidata": {
+              "type": "string",
+              "pattern": "^Q[0-9]+$"
+            },
+            "duns": {
+              "type": "string",
+              "pattern": "^[0-9]{9}$"
+            },
+            "lei": {
+              "type": "string",
+              "pattern": "^[A-Z0-9]{20}$"
+            },
+            "did": {
+              "type": "string",
+              "pattern": "^did:[a-z0-9]+:.+$"
+            }
+          }
+        }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "required": ["type", "statement"],
+      "additionalProperties": true,
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Core claim type (no dots) or namespaced extension type (contains dots).",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*$"
+        },
+        "statement": {
+          "type": "object",
+          "description": "Type-specific payload."
+        },
+        "asserted_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "confidence": {
+          "type": "string",
+          "enum": ["authoritative", "advisory", "provisional"],
+          "default": "authoritative"
+        },
+        "claim_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9._:-]+$"
+        },
+        "signature": {
+          "$ref": "#/$defs/signature"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "type": { "const": "canonical_urls" } }
+          },
+          "then": {
+            "properties": {
+              "statement": { "$ref": "#/$defs/statement_canonical_urls" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "official_channels" } }
+          },
+          "then": {
+            "properties": {
+              "statement": { "$ref": "#/$defs/statement_official_channels" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "product_facts" } }
+          },
+          "then": {
+            "properties": {
+              "statement": { "$ref": "#/$defs/statement_product_facts" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "personnel" } }
+          },
+          "then": {
+            "properties": {
+              "statement": { "$ref": "#/$defs/statement_personnel" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "disavowal" } }
+          },
+          "then": {
+            "properties": {
+              "statement": { "$ref": "#/$defs/statement_disavowal" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "supersedes" } }
+          },
+          "then": {
+            "properties": {
+              "statement": { "$ref": "#/$defs/statement_supersedes" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "pointer" } }
+          },
+          "then": {
+            "properties": {
+              "statement": { "$ref": "#/$defs/statement_pointer" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "identity" } }
+          },
+          "then": {
+            "properties": {
+              "statement": { "$ref": "#/$defs/statement_identity" }
+            }
+          }
+        }
+      ]
+    },
+    "statement_identity": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "founded": {
+          "type": "string",
+          "description": "RFC 3339 date, year, or year-month."
+        },
+        "headquarters": { "type": "string" },
+        "description": { "type": "string", "maxLength": 2048 }
+      }
+    },
+    "statement_canonical_urls": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "format": "uri" },
+      "properties": {
+        "homepage": { "type": "string", "format": "uri" },
+        "docs": { "type": "string", "format": "uri" },
+        "api": { "type": "string", "format": "uri" },
+        "status": { "type": "string", "format": "uri" },
+        "support": { "type": "string", "format": "uri" },
+        "pricing": { "type": "string", "format": "uri" },
+        "security": { "type": "string", "format": "uri" },
+        "agent_manifest": { "type": "string", "format": "uri" },
+        "mcp_manifest": { "type": "string", "format": "uri" }
+      }
+    },
+    "statement_official_channels": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "email_domains": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,}$"
+          },
+          "uniqueItems": true
+        },
+        "social": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "community": {
+          "type": "object",
+          "additionalProperties": { "type": "string", "format": "uri" }
+        }
+      }
+    },
+    "statement_product_facts": {
+      "type": "object",
+      "required": ["products"],
+      "properties": {
+        "products": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "additionalProperties": true,
+            "properties": {
+              "name": { "type": "string" },
+              "url": { "type": "string", "format": "uri" },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "generally_available",
+                  "beta",
+                  "alpha",
+                  "preview",
+                  "deprecated",
+                  "end_of_life"
+                ]
+              },
+              "current_version": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "statement_personnel": {
+      "type": "object",
+      "required": ["spokespeople"],
+      "properties": {
+        "spokespeople": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["role", "name"],
+            "additionalProperties": true,
+            "properties": {
+              "role": { "type": "string" },
+              "name": { "type": "string" },
+              "verification": { "type": "string", "format": "uri" }
+            }
+          }
+        }
+      }
+    },
+    "statement_disavowal": {
+      "type": "object",
+      "required": ["disavowed"],
+      "properties": {
+        "disavowed": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["what", "detail"],
+            "additionalProperties": true,
+            "properties": {
+              "what": { "type": "string" },
+              "detail": { "type": "string", "maxLength": 2048 },
+              "url": { "type": "string", "format": "uri" }
+            }
+          }
+        }
+      }
+    },
+    "statement_supersedes": {
+      "type": "object",
+      "required": ["superseded"],
+      "properties": {
+        "superseded": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["what", "reason"],
+            "additionalProperties": true,
+            "properties": {
+              "what": { "type": "string" },
+              "url": { "type": "string", "format": "uri" },
+              "reason": { "type": "string", "maxLength": 2048 }
+            }
+          }
+        }
+      }
+    },
+    "statement_pointer": {
+      "type": "object",
+      "required": ["scope", "url"],
+      "additionalProperties": true,
+      "properties": {
+        "scope": { "type": "string" },
+        "standard": { "type": "string" },
+        "url": { "type": "string", "format": "uri" }
+      }
+    },
+    "signature": {
+      "type": "object",
+      "description": "JWS signature over the enclosing object (document or claim) with its own signature field removed, canonicalized per RFC 8785 (JCS).",
+      "required": ["protected", "signature"],
+      "additionalProperties": false,
+      "properties": {
+        "protected": {
+          "type": "string",
+          "description": "Base64url-encoded JWS protected header. MUST include alg (ES256, ES384, or EdDSA) and kid.",
+          "pattern": "^[A-Za-z0-9_-]+$"
+        },
+        "signature": {
+          "type": "string",
+          "description": "Base64url-encoded signature bytes.",
+          "pattern": "^[A-Za-z0-9_-]+$"
+        }
+      }
+    }
+  }
+}
