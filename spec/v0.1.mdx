@@ -73,7 +73,7 @@ https://{domain}/.well-known/llmo.json
 
 The `.well-known` prefix follows [RFC 8615](https://www.rfc-editor.org/rfc/rfc8615). A conforming organization MUST serve the file at this path on its primary domain.
 
-**[DECISION]** Organizations MAY additionally serve the file at `https://{domain}/llmo.json` as a convenience, but consumers MUST check `.well-known` first and MUST prefer it when both exist. Rejected alternative: allowing arbitrary locations declared via `<link rel="llmo">` tags. This was rejected because it re-introduces the discovery ambiguity that the well-known convention exists to eliminate, and because LLMO files need to be reachable without HTML parsing.
+Organizations MAY additionally serve the file at `https://{domain}/llmo.json` as a convenience, but consumers MUST check `.well-known` first and MUST prefer it when both exist. Rejected alternative: allowing arbitrary locations declared via `<link rel="llmo">` tags. This was rejected because it re-introduces the discovery ambiguity that the well-known convention exists to eliminate, and because LLMO files need to be reachable without HTML parsing.
 
 ### 2.2 Content type
 
@@ -151,7 +151,7 @@ The `entity` object identifies who is publishing the file.
 - `legal_identifiers` (optional): structured legal identity. Fields are jurisdiction-dependent.
 - `external_ids` (optional): pointers into external identity systems. Wikidata is particularly useful as a cross-reference point for LLMs.
 
-**[DECISION]** v0.1 does not mandate any single external identifier scheme. Rejected alternative: requiring a Wikidata QID or a DID. Requiring Wikidata would disadvantage new or private organizations; requiring DIDs would impose unfamiliar infrastructure. `external_ids` stays optional and open.
+v0.1 does not mandate any single external identifier scheme. Rejected alternative: requiring a Wikidata QID or a DID. Requiring Wikidata would disadvantage new or private organizations; requiring DIDs would impose unfamiliar infrastructure. `external_ids` stays optional and open.
 
 ### 3.3 Freshness and supersession
 
@@ -396,7 +396,7 @@ https://{domain}/.well-known/llmo-keys.json
 
 The JWKS follows [RFC 7517](https://www.rfc-editor.org/rfc/rfc7517). Keys MUST declare `use: "sig"`, an `alg` of `ES256`, `ES384`, or `EdDSA`, and a stable `kid`.
 
-**[DECISION]** RSA is not in the v0.1 supported algorithm set. Rejected alternative: supporting RS256 for compatibility with legacy JWT infrastructure. Rejected because `llmo.json` is a greenfield artifact; there is no legacy to preserve, and RSA key sizes would inflate signature payloads unnecessarily.
+RSA is not in the v0.1 supported algorithm set. Rejected alternative: supporting RS256 for compatibility with legacy JWT infrastructure. Rejected because `llmo.json` is a greenfield artifact; there is no legacy to preserve, and RSA key sizes would inflate signature payloads unnecessarily.
 
 Keys SHOULD rotate at least annually. Retired keys SHOULD remain in the JWKS for 90 days after rotation, marked with an `exp` claim on the key, to allow verification of recently-cached documents.
 
@@ -531,7 +531,7 @@ The two standards compose cleanly: C2PA handles asset-level provenance; LLMO han
 
 Model Context Protocol and `agent.json` describe what an agent can *do* — capabilities, endpoints, invocation schemas. LLMO describes what is *true* about the organization behind an agent. An LLMO document can declare (via `canonical_urls.agent_manifest` or `canonical_urls.mcp_manifest`) which agent/MCP manifests are authoritative; the manifests themselves remain out of scope.
 
-**[DECISION]** v0.1 deliberately does not specify agent capabilities inside `llmo.json`. This was evaluated and rejected in favor of pointer-only integration. Re-specifying capabilities would duplicate MCP badly; specifying them well would make LLMO a capability spec. The pointer model lets LLMO remain a declarative truth pack while composing with whichever agent spec wins.
+v0.1 deliberately does not specify agent capabilities inside `llmo.json`. This was evaluated and rejected in favor of pointer-only integration. Re-specifying capabilities would duplicate MCP badly; specifying them well would make LLMO a capability spec. The pointer model lets LLMO remain a declarative truth pack while composing with whichever agent spec wins.
 
 ### 6.4 security.txt (RFC 9116)
 
@@ -736,4 +736,4 @@ A formal JSON Schema for `llmo.json` v0.1 is published at [`https://llmo.org/spe
 
 ---
 
-*This specification is maintained at https://llmo.org/spec. Comments, issues, and proposed changes: https://github.com/llmo-spec/spec (forthcoming).*
+*This specification is maintained at https://llmo.org/spec. Comments, issues, and proposed changes: https://github.com/openllmo/llmo.org.*
