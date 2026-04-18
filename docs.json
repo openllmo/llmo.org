@@ -3,130 +3,56 @@
   "theme": "mint",
   "name": "LLMO",
   "logo": {
-    "light": "/light.png",
-    "dark": "/dark.png"
+    "light": "/logo/light.png",
+    "dark": "/logo/dark.png"
   },
   "colors": {
-    "primary": "#2563EB",
-    "light": "#3B82F6",
-    "dark": "#1D4ED8"
+    "primary": "#000000",
+    "light": "#FFFFFF",
+    "dark": "#000000"
   },
   "topbarLinks": [
     {
       "name": "GitHub",
-      "url": "https://github.com/openllmo"
+      "url": "https://github.com/openllmo/llmo.org"
     }
   ],
-  "topbarCtaButton": {
-    "name": "llmo.json Schema",
-    "url": "/reference/schema"
-  },
-  "metadata": {
-    "og:site_name": "LLMO Protocol",
-    "og:description": "The open protocol for machine-legible truth.",
-    "twitter:site": "@thegigachav"
-  },
   "navigation": {
-    "tabs": [
+    "groups": [
       {
-        "tab": "Start Here",
-        "icon": "rocket",
-        "groups": [
-          {
-            "group": "Overview",
-            "pages": [
-              "introduction",
-              "why-llmo",
-              "llmo-vs-seo-aeo-geo"
-            ]
-          }
+        "group": "Spec",
+        "pages": [
+          "spec",
+          "spec/v0.1",
+          "spec/v0.1/schema",
+          "spec/changelog"
         ]
       },
       {
-        "tab": "Framework",
-        "icon": "cubes",
-        "groups": [
-          {
-            "group": "Architecture",
-            "pages": [
-              "framework/the-three-os",
-              "framework/ontology"
-            ]
-          },
-          {
-            "group": "Foundations",
-            "pages": [
-              "framework/canonical-definitions",
-              "framework/trust-layer"
-            ]
-          }
+        "group": "Claim Types",
+        "pages": [
+          "claims",
+          "claims/core",
+          "claims/extensions"
         ]
       },
       {
-        "tab": "Protocol",
-        "icon": "file-shield",
-        "groups": [
-          {
-            "group": "Artifacts",
-            "pages": [
-              "protocol/artifacts",
-              "protocol/llmo-json"
-            ]
-          },
-          {
-            "group": "Integrity",
-            "pages": [
-              "protocol/validation",
-              "protocol/versioning"
-            ]
-          }
+        "group": "Validator",
+        "pages": [
+          "validate"
         ]
       },
       {
-        "tab": "Operations",
-        "icon": "gears",
-        "groups": [
-          {
-            "group": "Doctrine & Governance",
-            "pages": [
-              "operations/humans-and-harness",
-              "operations/governance",
-              "operations/security"
-            ]
-          },
-          {
-            "group": "Evaluation",
-            "pages": [
-              "operations/evaluation-harness"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Reference",
-        "icon": "book-bookmark",
-        "groups": [
-          {
-            "group": "Reference",
-            "pages": [
-              "reference/glossary",
-              "reference/schema",
-              "reference/changelog"
-            ]
-          },
-          {
-            "group": "About",
-            "pages": [
-              "about"
-            ]
-          }
+        "group": "About",
+        "pages": [
+          "about",
+          "about/governance",
+          "about/contact"
         ]
       }
     ]
   },
   "footerSocials": {
-    "website": "https://llmo.org",
-    "github": "https://github.com/openllmo",
-    "x": "https://x.com/thegigachav"
+    "github": "https://github.com/openllmo/llmo.org"
   }
 }
