@@ -54,12 +54,5 @@
   },
   "footerSocials": {
     "github": "https://github.com/openllmo/llmo.org"
-  },
-  "redirects": [
-    {
-      "source": "/spec/v0.1/schema.json",
-      "destination": "/schemas/llmo-v0.1.json",
-      "permanent": false
-    }
-  ]
+  }
 }
