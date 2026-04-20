@@ -46,9 +46,11 @@ The corresponding private key was generated ephemerally during test vector produ
 
 The keys in this JWKS are test-only. They MUST NOT be used in production.
 
-### `signed-strict-canonical.txt`
+### `signed-strict-canonical.json`
 
 The exact UTF-8 bytes of the JCS-canonicalized payload that was signed. This file has no trailing newline. Implementers use it to validate their JCS implementation independent of their JWS implementation.
+
+Note: the file is served with a `.json` extension because Mintlify's default static-asset handler serves `.json` but not `.txt`. The content is a valid canonical JSON object by construction (that is what JCS produces), so the `.json` extension is accurate. Implementers compare the file byte-for-byte; the extension does not change the comparison.
 
 ## Verifying the signed vector
 
@@ -65,7 +67,7 @@ A conforming implementation MUST verify the signature successfully at step 5.
 1. Read `signed-strict.json`.
 2. Remove the `signature` field.
 3. Canonicalize the remainder using the implementation under test.
-4. Compare the output byte-for-byte against `signed-strict-canonical.txt`.
+4. Compare the output byte-for-byte against `signed-strict-canonical.json`.
 
 The two must be identical. If they differ, the implementation is not RFC 8785 conformant.
 
