@@ -1,0 +1,41 @@
+name: Spec bug
+description: Report a bug, ambiguity, or error in the LLMO specification.
+title: "[spec-bug] "
+labels: ["spec-bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template to report bugs in the specification text, the JSON Schema, or the worked examples. For proposed changes (not bug reports), use the proposal templates instead.
+  - type: input
+    id: section
+    attributes:
+      label: Specification section
+      description: The section reference (e.g., §4.2, Appendix A).
+      placeholder: "§4.2"
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: What the specification currently says
+      description: Quote or paraphrase the current text.
+    validations:
+      required: true
+  - type: textarea
+    id: issue
+    attributes:
+      label: The problem
+      description: What is ambiguous, incorrect, or inconsistent?
+    validations:
+      required: true
+  - type: textarea
+    id: proposed
+    attributes:
+      label: Proposed fix (optional)
+      description: If you have a concrete suggestion for the revised text, include it here.
+  - type: textarea
+    id: impact
+    attributes:
+      label: Implementation impact (optional)
+      description: If this bug affects implementations, describe the resulting ambiguity or incompatibility.
