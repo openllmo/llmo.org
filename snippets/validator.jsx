@@ -645,7 +645,7 @@ function statusColor(status) {
   return "#374151";
 }
 
-function ChecksList({ checks }) {
+const ChecksList = ({ checks }) => {
   if (!checks || checks.length === 0) {
     return <p style={{ color: "#6b7280", fontStyle: "italic" }}>Not evaluated (prior tier did not pass).</p>;
   }
@@ -661,9 +661,9 @@ function ChecksList({ checks }) {
       ))}
     </ul>
   );
-}
+};
 
-export function Validator() {
+export const Validator = () => {
   const [initState, setInitState] = useState({ status: "loading", error: null });
   const [ajv, setAjv] = useState(null);
   const [validateFn, setValidateFn] = useState(null);
@@ -1134,7 +1134,7 @@ export function Validator() {
       ) : null}
     </div>
   );
-}
+};
 
 function baseResultShell(source, mode) {
   return {
