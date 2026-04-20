@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: General discussion
+    url: https://github.com/openllmo/llmo.org/issues
+    about: For open-ended discussion without a specific bug or proposal, open an issue with the "discussion" label.
+  - name: Security reports
+    url: https://github.com/openllmo/llmo.org/blob/main/SECURITY.md
+    about: Security concerns should be reported privately. See SECURITY.md (added in a future PR) for the process.

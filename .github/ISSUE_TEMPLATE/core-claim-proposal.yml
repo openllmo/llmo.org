@@ -1,0 +1,59 @@
+name: Core claim type proposal
+description: Propose a new core claim type for inclusion in the specification.
+title: "[spec-proposal] "
+labels: ["spec-proposal"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Core claim types are part of the specification and MUST be understood by every conforming consumer. The bar for acceptance is high. Proposals are reviewed by the editor and discussed publicly for at least 14 days before any acceptance decision. Read CONTRIBUTING.md before submitting.
+  - type: input
+    id: type-name
+    attributes:
+      label: Proposed type name
+      description: No namespace (core types have no dots).
+      placeholder: "e.g., regulatory_status"
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What question does a consumer answer with this claim that cannot be answered with existing core types?
+    validations:
+      required: true
+  - type: textarea
+    id: schema
+    attributes:
+      label: JSON Schema fragment
+      description: The schema for the `statement` payload. Use a fenced code block with `json`.
+    validations:
+      required: true
+  - type: textarea
+    id: examples
+    attributes:
+      label: Worked examples
+      description: At least two examples of valid claim objects from distinct hypothetical organizations.
+    validations:
+      required: true
+  - type: textarea
+    id: consumer-behavior
+    attributes:
+      label: Expected consumer behavior
+      description: What does a verifier do with this claim?
+    validations:
+      required: true
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Compatibility analysis
+      description: Does adding this claim affect any existing v0.1 document, and if so, how?
+    validations:
+      required: true
+  - type: textarea
+    id: implementers
+    attributes:
+      label: Implementer interest
+      description: Which organizations have expressed interest in implementing this? Minimum of one.
+    validations:
+      required: true
