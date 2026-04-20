@@ -47,7 +47,8 @@
         "pages": [
           "about",
           "about/governance",
-          "about/contact"
+          "about/contact",
+          "about/license"
         ]
       }
     ]
