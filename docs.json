@@ -25,6 +25,7 @@
           "spec",
           "spec/v0.1",
           "spec/v0.1/schema",
+          "spec/v0.1/test-vectors",
           "spec/changelog"
         ]
       },

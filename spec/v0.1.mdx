@@ -724,9 +724,17 @@ A plausible input to any such reputation layer is **immutable publication histor
 
 ---
 
-## Appendix A: JSON Schema
+## Appendix A: Conformance Artifacts
+
+### A.1 JSON Schema
 
 A formal JSON Schema for `llmo.json` v0.1 is published at [`https://llmo.org/spec/v0.1/schema.json`](/spec/v0.1/schema.json). The reference validator uses this schema as its structural check.
+
+### A.2 Test Vectors
+
+A set of reference test vectors for v0.1 is published at [`/spec/v0.1/test-vectors`](/spec/v0.1/test-vectors). The vectors exercise the §4 trust model and the §5 conformance tiers: a minimally conforming unsigned document, a standard-conforming unsigned document, and a strictly conforming document with a valid ES256 JWS signature over a JCS-canonicalized payload (RFC 7515, RFC 7518, RFC 7638, RFC 8785). The JWKS containing the public key that verifies the strict vector, and the canonical bytes that were signed, are published alongside. The canonical-bytes file lets implementers validate their JCS implementation independently of their JWS implementation.
+
+The vectors are static fixtures with a fixed validity window. After their `valid_until` date, conforming validators are expected to flag them as expired; that behavior is itself a conformance check.
 
 ## Appendix B: Changelog
 
