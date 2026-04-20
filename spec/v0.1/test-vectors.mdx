@@ -21,10 +21,10 @@ Test vector documents use `document_id` values of the form `test-vector-v0.1-<ti
 
 ## Validity window
 
-Test vectors use a fixed 360-day validity window:
+Test vectors use a fixed 180-day validity window, matching the Standard-tier cap in §5.2 exactly:
 
 - `valid_from`: `2026-04-20T00:00:00Z`
-- `valid_until`: `2027-04-15T00:00:00Z`
+- `valid_until`: `2026-10-17T00:00:00Z`
 
 <Info>
 Test vectors are static fixtures. After `valid_until`, a conforming validator SHOULD flag these documents as expired. This is expected behavior and a useful conformance check: a validator that does not flag an expired document is incorrect.

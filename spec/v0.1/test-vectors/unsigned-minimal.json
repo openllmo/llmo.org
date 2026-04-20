@@ -2,7 +2,7 @@
   "llmo_version": "0.1",
   "document_id": "test-vector-v0.1-minimal-001",
   "valid_from": "2026-04-20T00:00:00Z",
-  "valid_until": "2027-04-15T00:00:00Z",
+  "valid_until": "2026-10-17T00:00:00Z",
   "entity": {
     "name": "JungleCat, Inc.",
     "primary_domain": "junglecat.example.com"
