@@ -1,0 +1,182 @@
+---
+lip: 1
+title: LIP Purpose and Guidelines
+sidebarTitle: LIP-1
+description: Describes the LIP process, format, lifecycle, and editor role.
+author: Nic Chavez <spec@llmo.org>
+discussions-to: https://github.com/openllmo/llmo.org/discussions
+status: Active
+type: Process
+created: 2026-04-21
+license: CC-BY-4.0
+transitions:
+  - date: 2026-04-21
+    from: null
+    to: Draft
+    ref: "Initial draft, this PR"
+---
+
+## 1. What is a LIP
+
+A LIP (LLMO Improvement Proposal) is a design document proposing a change or addition to the LLMO specification, its extension claim registry, or its governance. Each LIP is a self-contained document submitted through the process described in this document, assigned a permanent number, and recorded in the LIP registry.
+
+The LIP process is modeled on Bitcoin's BIP process, specifically BIP-1 (Amir Taaki, 2011), BIP-2 (Luke Dashjr, 2016), and BIP-3 (the current active process document). The BIP process was itself modeled on Python's PEP process, which originated with PEP-1 (Barry Warsaw and colleagues).
+
+LIPs provide a transparent, numbered, auditable record of proposals. Every LIP has a named author, a declared status, a declared type, and a permanent place in the registry. The registry is append-only: accepted, rejected, withdrawn, and superseded LIPs all remain in the registry with their original authors and status attached.
+
+## 2. LIP types
+
+LIPs have one of three types, declared in the `type` field of the frontmatter:
+
+- **Standards Track**: proposes a new extension claim type or a modification to an existing claim type. Authors must demonstrate control of a DNS namespace at submission (see Section 4). The terminal accepted state for a Standards Track LIP is Final.
+- **Process**: proposes changes to the LIP process, to the editor role, or to related governance. Process LIPs are authored by the editor, or by community members whose proposals the editor agrees to author or co-author. Process LIPs follow the 14-day substantive-change governance process defined on the [governance page](/about/governance). The terminal accepted state for a Process LIP is Active.
+- **Informational**: provides guidance or information to implementers and does not propose normative changes. The terminal accepted state for an Informational LIP is Final.
+
+Numbering is unified across all three types. A LIP number does not carry a type prefix. The type is recorded in the frontmatter and in the registry index, not in the identifier.
+
+## 3. LIP lifecycle
+
+A LIP moves through a sequence of statuses. Eight statuses are defined:
+
+- **Draft**: the LIP is under discussion and has not yet been accepted. A LIP in Draft may be revised freely by its author.
+- **Proposed**: the LIP's specification is complete, and the LIP is awaiting evidence of adoption.
+- **Active**: the LIP has been accepted and is in effect. Active is a terminal status for Process LIPs.
+- **Final**: the LIP has been accepted and is in use. Final is a terminal status for Standards Track and Informational LIPs.
+- **Superseded**: the LIP has been replaced by a later LIP. The replacing LIP explicitly references the superseded LIP in its frontmatter.
+- **Withdrawn**: the author has pulled the LIP before acceptance.
+- **Rejected**: the editor or the community has rejected the LIP.
+- **Obsolete**: the LIP was Final, and is no longer relevant. This status is rare and is reserved for cases in which a Final LIP is retired without being directly superseded.
+
+Transitions are generally one-way. A LIP in Draft may be further revised within Draft as many times as the author chooses before moving to Proposed. Supersession requires a new LIP that explicitly references the superseded LIP.
+
+Every LIP must include a `transitions` array in its frontmatter. Each entry records a single status change with four fields: `date` (ISO 8601), `from` (previous status, or `null` for the initial entry), `to` (new status), and `ref` (a short reference to the pull request, discussion, or evidence that justified the transition). The transitions log is append-only and provides an auditable lifecycle history for each LIP.
+
+## 4. Submission process for Standards Track LIPs
+
+Standards Track LIPs propose extensions to the claim registry. The submission process has eight steps:
+
+1. **Open a GitHub Discussion** in [openllmo/llmo.org](https://github.com/openllmo/llmo.org/discussions) describing the proposed extension claim type, its namespace, its purpose, and its intended use. The discussion is the public record of deliberation.
+2. **Observe a minimum 7-day public discussion period.** At least one non-author public response is required in the Discussion thread before the author may proceed to Step 3 (requesting a LIP number and nonce). The 7-day minimum and the non-author response are separate requirements; both must be satisfied. This gate exists before nonce issuance, not merely before pull request submission, so that the anti-flood filter applies at the earliest point in the pipeline.
+3. **Request a LIP number and nonce.** After the Step 2 gate is satisfied (7 days elapsed and at least one non-author public response recorded), request a LIP number and nonce from the editor by commenting on the discussion or emailing [spec@llmo.org](mailto:spec@llmo.org). The editor verifies that the Step 2 conditions have been met before issuing a nonce. The editor issues a unique nonce bound to a reserved LIP number. The nonce expires 30 days after issuance.
+4. **Publish a DNS TXT record** at `_llmo-lip.<namespace-domain>` with a value of the form `llmo-lip=<lip-number> nonce=<nonce>`. Example: `_llmo-lip.acme-corp.com IN TXT "llmo-lip=42 nonce=a1b2c3d4e5f6g7h8"`. This record demonstrates control of the domain corresponding to the proposed namespace.
+5. **Open a pull request** adding the LIP document at `/spec/lips/lip-NNNN.mdx`, where `NNNN` is the reserved number zero-padded to four digits. The PR description must reference the discussion thread and the DNS TXT record location so the editor can verify.
+6. **Editor verification.** The editor verifies the DNS TXT record, checks format compliance of the LIP document, and merges the PR with the LIP in Draft status. At merge time, the reserved number becomes committed.
+7. **Revision within Draft.** The LIP remains in Draft during continued discussion and revision. The author moves the LIP to Proposed when the specification is complete.
+8. **Transition to Final.** A Proposed LIP moves to Final when an adoption signal is observed. Adoption signals include independent implementation, real-world emission of the claim type in published `llmo.json` files, or comparable evidence of use. The editor records the transition in the LIP's `transitions` log.
+
+## 5. Submission process for Process and Informational LIPs
+
+Process and Informational LIPs do not propose extensions to the registry, and therefore are not subject to the DNS TXT proof-of-control requirement. They are authored by the editor, or by community members whose proposals the editor agrees to author or co-author.
+
+Process LIPs propose changes to the LIP process, the editor role, or related governance, and therefore follow the 14-day substantive-change governance process defined on the [governance page](/about/governance). Community discussion during the 14-day window is mandatory, and the editor documents the discussion period in the LIP's `transitions` log.
+
+Informational LIPs provide advisory guidance and do not propose normative changes. The editor may merge an Informational LIP without the 14-day window, following the editorial revision policy defined on the governance page.
+
+## 6. Editor role
+
+The editor (or editors, as the role scales) is a librarian, not a judge.
+
+Editor responsibilities:
+
+- Assign LIP numbers and issue nonces on request.
+- Verify DNS TXT records submitted with Standards Track LIPs.
+- Check format compliance of submitted LIP documents.
+- Merge format-compliant submissions that have completed the required discussion period.
+- Update LIP statuses in response to observed signals (adoption, supersession, withdrawal).
+- Maintain the registry index at `/spec/lips/index.json` and `/spec/lips/index.mdx`.
+
+The editor does not judge the technical merit of proposed extensions. Merit is decided by adoption: an extension that is implemented and emitted in published documents is meritorious; an extension that is not adopted remains in Proposed status indefinitely.
+
+The editor may close a submission without assigning a number on any of the following grounds:
+
+- Format non-compliance (missing required frontmatter fields, missing required sections, non-conforming filename, etc.).
+- Duplication of an existing LIP's proposal.
+- Apparent machine-generated flood submissions at volume.
+- Submissions that skip the required GitHub Discussion or the required 7-day discussion period.
+- Submissions lacking a valid DNS TXT record proof.
+- Submissions proposing a namespace that does not align with the proof-of-control domain (see Section 8).
+
+Editor discretion on the above grounds is explicit and does not require an appeal mechanism. A good-faith disagreement with an editor's closure decision may be raised in a new GitHub Discussion thread, and the editor will respond in that thread. The editor's subsequent decision on the reopened matter is final for the purposes of that submission under the LIP process. A separate submission raising the same or similar proposal at a later date is not barred by the earlier decision and is evaluated on its own merits.
+
+The editor role may scale to multiple people as submission volume warrants. Additional editors are added through a Process LIP that follows the 14-day governance process.
+
+## 7. Anti-flood provisions
+
+The LIP process operates in a submission environment in which format-compliant content can be generated at near-zero marginal cost. Earlier proposal processes, including BIP and PEP, were designed before this threat was credible. The LIP process incorporates four anti-flood provisions:
+
+- **DNS TXT proof-of-control at submission.** Submitters must demonstrate control of a domain to submit a Standards Track LIP. Domain registration carries a real-world monetary cost and requires a persistent identity at the registrar, which together raise the floor on flood economics.
+- **One open Draft per domain.** A domain may have at most one LIP in Draft status at any time. A second Draft from the same domain is not accepted until the first transitions to Proposed, Rejected, or Withdrawn, or has remained unchanged in Draft for 90 days. This provision prevents a single controlled domain from being used to submit a large number of draft proposals in parallel.
+- **Mandatory 7-day public Discussion with non-author response.** No Standards Track LIP proceeds to nonce issuance (and therefore to number reservation) without at least one non-author public response in the associated Discussion thread and a minimum of seven days elapsed since the Discussion was opened. This provision requires at least one human to engage with the proposal before it enters the submission pipeline, and places the gate at the earliest point (nonce issuance) rather than at pull request submission.
+- **Editor discretion for apparent machine-generated submissions at volume.** The registry is a human governance artifact. Submissions that appear to be machine-generated at scale, without human deliberation, are grounds for closure at editor discretion (see Section 6).
+
+These provisions are expected to evolve. Process LIPs are the mechanism for revising them.
+
+## 8. Namespace rules for Standards Track LIPs
+
+The namespace declared in a Standards Track LIP must align with the domain used for the DNS TXT proof-of-control record. Alignment rules:
+
+- If the proof-of-control domain is `acme-corp.com`, permitted namespaces include `acme-corp`, any subdomain label of `acme-corp.com`, and names clearly derived from the domain (for example, `acme`, `acmecorp`).
+- Non-domain-shaped namespaces (short identifiers that do not claim a real domain) are permitted, but require explicit editor approval before proceeding past Step 2 of the submission process. A submitter proposing a non-domain-shaped namespace must indicate this intent in the GitHub Discussion opened at Step 1 and must receive explicit editor approval, recorded in the Discussion thread, before requesting a nonce at Step 3. In lieu of the DNS TXT record at Step 4, the editor and submitter will agree on an alternative proof-of-identity mechanism appropriate to the namespace being proposed, and the agreement will be recorded in the Discussion thread. The 7-day discussion period and non-author response requirement apply unchanged. These submissions are expected to be rare.
+- Exact alignment in edge cases is at editor discretion.
+
+Once a namespace is registered in the LIP registry, it is permanent. Namespaces are not transferred. If a domain lapses or changes hands, the original LIP remains in the registry with its original author and its original namespace. A new controller of a domain who wishes to register a claim type must propose a new LIP with a new namespace.
+
+## 9. LIP numbering
+
+LIP numbers are assigned by the editor. Authors do not self-assign numbers.
+
+Numbering is unified across Standards Track, Process, and Informational LIPs. Type is declared in the frontmatter and in the registry index; type is not part of the identifier.
+
+Numbers are reserved at the point of nonce issuance (for Standards Track LIPs) or at the point of draft commit preparation (for Process and Informational LIPs). Numbers are committed when the corresponding pull request is merged with the LIP in Draft status.
+
+A reserved number that never reaches merge (because the author abandons the submission, or the nonce expires without a PR being opened) is released 30 days after nonce expiration, and may be reused for a later submission.
+
+Committed numbers are permanent. A LIP in Withdrawn, Rejected, or Superseded status retains its number, its author, and its registry entry indefinitely.
+
+LIP filenames are zero-padded to four digits for correct lexicographic sort order: `lip-0001.mdx`, `lip-0042.mdx`, `lip-1000.mdx`. The zero-padding accommodates registry growth without future renames.
+
+## 10. Relationship to the governance page
+
+The [governance page](/about/governance) describes the overall decision process for the LLMO specification. LIP-1 describes the specific mechanism by which extension claim types, process changes, and informational guidance are proposed, discussed, and recorded.
+
+The 14-day substantive-change window from the governance page applies to Process LIPs and to any normative changes proposed through Standards Track LIPs that affect core claim semantics. Editorial revisions to LIPs (typo corrections, clarifications, format corrections) may be merged by the editor without the 14-day window, following the editorial revision policy on the governance page.
+
+Where a conflict is discovered between the governance page and this document, the governance page takes precedence for overall specification governance, and LIP-1 takes precedence for the LIP process itself. Conflicts discovered in practice are resolved by a Process LIP that amends the affected text.
+
+## 11. Prior art and acknowledgments
+
+This process is modeled on the Bitcoin Improvement Proposal (BIP) process. Specific prior documents:
+
+- BIP-1, *BIP Purpose and Guidelines*, Amir Taaki, 2011.
+- BIP-2, *BIP process, revised*, Luke Dashjr, 2016.
+- BIP-3, *BIP process, revised (current)*, the current active BIP process document.
+
+The BIP process was itself modeled on Python's PEP process, originating with PEP-1 (Barry Warsaw and colleagues).
+
+Adaptations for LLMO include:
+
+- DNS TXT proof-of-control at submission, as an anti-abuse measure reflecting the threat model of a post-LLM submission environment.
+- Mandatory pre-submission GitHub Discussion with a 7-day window and a non-author response requirement.
+- Explicit editor discretion for machine-generated flood submissions.
+- One-open-Draft-per-domain rate limiting.
+- Unified numbering across Standards Track, Process, and Informational LIPs (following BIP-2's unified-numbering design).
+
+Future revisions to the LIP process itself are made through Process LIPs that supersede LIP-1.
+
+## 12. Glossary
+
+- **Editor**: the person or persons responsible for assigning numbers, verifying submissions, checking format compliance, and maintaining the registry.
+- **Namespace**: the short identifier prefixing an extension claim type, for example `acme-corp` in `acme-corp.compliance_note`.
+- **Standards Track**: the LIP type proposing a new extension claim type, or a modification to an existing claim type.
+- **Process**: the LIP type proposing changes to the LIP process or to related governance.
+- **Informational**: the LIP type providing guidance or information without proposing normative changes.
+- **Draft**: status indicating a LIP is under discussion.
+- **Proposed**: status indicating a LIP's specification is complete and awaiting adoption.
+- **Active**: terminal status for accepted Process LIPs.
+- **Final**: terminal status for accepted Standards Track and Informational LIPs.
+- **Superseded**: status indicating a LIP has been replaced by a later LIP.
+- **Withdrawn**: status indicating an author pulled a LIP before acceptance.
+- **Rejected**: status indicating editor or community rejection.
+- **Obsolete**: status indicating a Final LIP is no longer relevant.
+- **Nonce**: a unique token issued by the editor, bound to a reserved LIP number, published by the submitter in a DNS TXT record as proof of domain control.
+- **Transitions log**: the append-only `transitions` array in a LIP's frontmatter, recording every status change with date, from, to, and ref fields.
