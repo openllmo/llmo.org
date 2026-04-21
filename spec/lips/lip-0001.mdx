@@ -53,7 +53,7 @@ A LIP moves through a sequence of statuses. Eight statuses are defined:
 
 Transitions are generally one-way. A LIP in Draft may be further revised within Draft as many times as the author chooses before moving to Proposed. Supersession requires a new LIP that explicitly references the superseded LIP.
 
-Every LIP must include a `transitions` array in its frontmatter. Each entry records a single status change with four fields: `date` (ISO 8601), `from` (previous status, or `null` for the initial entry), `to` (new status), and `ref` (a short reference to the pull request, discussion, or evidence that justified the transition). The transitions log is append-only and provides an auditable lifecycle history for each LIP.
+Every LIP must include a `transitions` array in its frontmatter. Each entry records a single status change with four fields: `date` (ISO 8601), `from` (previous status, or `null` for the initial entry), `to` (new status), and `ref` (a short reference to the pull request, discussion, or evidence that justified the transition). The transitions log is append-only and provides an auditable lifecycle history for each LIP. The `status` field in the frontmatter must agree with the `to` field of the last entry in the transitions array. This internal consistency is enforced by the registry validator.
 
 ## 4. Submission process for Standards Track LIPs
 
