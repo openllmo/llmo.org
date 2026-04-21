@@ -1,0 +1,32 @@
+name: Validate LIP Registry
+
+on:
+  pull_request:
+    paths:
+      - 'spec/lips/**'
+      - 'scripts/validate-lip-registry.sh'
+      - '.github/workflows/validate-lip-registry.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ensure jq is installed
+        run: |
+          if ! command -v jq > /dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y jq
+          fi
+          jq --version
+
+      - name: Validate LIP registry
+        run: bash scripts/validate-lip-registry.sh
