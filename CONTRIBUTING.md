@@ -34,7 +34,7 @@ Open a PR against `main`. Reviewers expect:
 - No em dashes. Use commas, parentheses, or colons.
 - Conventional commit messages: `docs: ...`, `feat: ...`, `fix: ...`, `chore: ...`.
 - DCO sign-off on every commit (see below).
-- The Mintlify build passes. Run `mintlify dev` locally and confirm pages render before pushing.
+- The Mintlify build passes. Run `mint validate` and `mint broken-links` locally before pushing. Use `mint dev` to preview pages in the browser.
 
 One logical change per PR. Multiple commits per PR are fine if they represent distinct logical units.
 
