@@ -3,36 +3,29 @@ title: Validator
 description: Reference validator for llmo.json documents.
 ---
 
-import { Validator } from "/snippets/validator.jsx"
+The reference validator for `llmo.json` documents is hosted at **[validate.llmo.org](https://validate.llmo.org)**.
 
-This page is the reference validator promised by specification [§5.4](/spec/v0.1#5-4-validator-behavior). It checks a `llmo.json` document against the published [JSON Schema](/spec/v0.1/schema) and reports which conformance tier the document achieves (Minimal, Standard, Strict) per [§5.1](/spec/v0.1#5-conformance-levels) through [§5.3](/spec/v0.1#5-3-strict-conformance).
+It runs entirely in your browser. Nothing is uploaded.
 
-The validator runs entirely in the browser. Nothing is uploaded to llmo.org.
+## Why it lives at a separate subdomain
 
-## How to use it
+The validator is hosted on Cloudflare Pages, separately from the specification site on Mintlify, so that tooling can evolve independently of the spec. The URL is stable and will continue to serve future versions of the validator as the specification evolves.
 
-**Paste mode (primary).** Paste the contents of your `llmo.json` into the textarea and click Validate. This is the reliable path; every check except URL-serving and JWKS-reachability is evaluated from the pasted document.
+Source code, deployment details, and infrastructure documentation are available at:
 
-**URL mode (secondary).** Enter a domain; the validator attempts `fetch('https://<domain>/.well-known/llmo.json')` from your browser. If the target domain does not permit cross-origin requests from llmo.org (most do not), the fetch fails with a CORS error and you should fall back to paste mode. Domains that explicitly set `Access-Control-Allow-Origin: *` on `.well-known/llmo.json` will work.
+- [openllmo/llmo-validator](https://github.com/openllmo/llmo-validator) (source)
+- [infrastructure/VALIDATOR.md](https://github.com/openllmo/llmo.org/blob/main/infrastructure/VALIDATOR.md) (operational documentation)
 
-If you enter a hostname without a scheme (for example, `example.com`), the validator prompts to confirm `https://example.com` before fetching. HTTPS is required per §2.3; `http://` URLs are rejected.
+## What the validator does
 
-## The validator
+- Parses a pasted `llmo.json` document, or fetches one from a user-provided domain's `/.well-known/llmo.json`
+- Validates against the [published JSON Schema](/spec/v0.1/schema)
+- Reports which conformance tier (Minimal, Standard, Strict) the document achieves per §5.1, §5.2, §5.3
+- Displays per-rule results with spec section citations
+- Provides a self-test against the [strict test vector](/spec/v0.1/test-vectors)
 
-<Validator />
+## What the validator does not do
 
-## Try it: the strict conformance test vector
+- Cryptographic signature verification. The validator reports whether a signature field is structurally present and well-formed, but does not verify the signature against a public key. Implementers verify signatures using the procedure in §4 and the test vectors at [/spec/v0.1/test-vectors](/spec/v0.1/test-vectors).
 
-Click **Load strict test vector** above to populate the textarea with the strict test vector from [`/spec/v0.1/test-vectors/signed-strict.json`](/spec/v0.1/test-vectors/signed-strict.json), then click Validate. This self-tests the validator against a document whose structure and signature are externally verified. The expected result is the amber "Strict (partial, paste mode)" badge: every document-internal Strict-tier check (X1 signature shape, X4 canonical_urls domain ownership) passes, and the two URL-mode-only checks (X2 JWKS retrievability, X3 Cache-Control on the JWKS) are skipped because paste mode cannot fetch the JWKS. If this produces any lower tier after a future validator change, the validator has regressed.
-
-## Current limitations and future work
-
-1. **Signature verification is not performed by this tool in v0.1** due to cross-origin constraints on fetching external JWKS from client JavaScript. Implementers verify signatures using the procedure in [§4](/spec/v0.1#4-trust-model) and the JWS signing-input reference at [`/spec/v0.1/test-vectors/signed-strict-payload.json`](/spec/v0.1/test-vectors/signed-strict-payload.json).
-2. **URL-mode validation depends on the target domain permitting cross-origin requests.** Most domains do not. Paste mode is the reliable path.
-3. **A server-side validator built as a self-hostable service** (for example, on Cloudflare workerd or an equivalent open runtime) is a reasonable future project. It would unblock signature verification, remove the CORS dependency, and allow headers like `Cache-Control` on the JWKS response to be observed directly. Out of scope for this version.
-
-## Related
-
-- [Specification v0.1](/spec/v0.1)
-- [JSON Schema](/spec/v0.1/schema) (raw at [`/spec/v0.1/schema.json`](/spec/v0.1/schema.json))
-- [Test vectors](/spec/v0.1/test-vectors), used for the self-test above
+See the [validator itself](https://validate.llmo.org) for usage instructions, self-test, and current limitations.
