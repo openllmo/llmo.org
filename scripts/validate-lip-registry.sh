@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 # Validates the integrity of the LLMO Improvement Proposal (LIP) registry.
-# Checks five invariants across spec/lips/index.json and spec/lips/lip-NNNN.mdx:
+# Checks six invariants across spec/lips/index.json and spec/lips/lip-NNNN.mdx:
 # (1) 'generated' matches latest commit to spec/lips/; (2) every LIP file has
 # a registry entry; (3) every registry entry points at an existing file;
 # (4) LIP numbers are unique and entries are sorted ascending by number;
-# (5) frontmatter agrees with the registry on six fields.
+# (5) frontmatter agrees with the registry on six fields;
+# (6) the frontmatter 'status' field agrees with the 'to' field of the last
+#     entry in the transitions array.
 # Usage: bash scripts/validate-lip-registry.sh   (run from repo root)
 # Exit codes: 0 = all invariants satisfied; 1 = one or more violations reported.
 
@@ -182,6 +184,50 @@ while IFS=$'\t' read -r lip_num idx_title idx_author idx_status idx_type idx_cre
   [[ "$fm_type"        == "$idx_type"       ]] || fm_report "$rel_path" "$lip_num" "type"    "$fm_type"        "$idx_type"
   [[ "$fm_created"     == "$idx_created"    ]] || fm_report "$rel_path" "$lip_num" "created" "$fm_created"     "$idx_created"
 done < <(jq -r '.lips[] | [.lip, .title, .author, .status, .type, .created, .path] | @tsv' "$INDEX")
+
+# -------- Invariant 6: status agrees with last transition --------
+extract_last_transition_to() {
+  local file="$1"
+  awk '
+    /^---$/ { count++; if (count == 2) exit; next }
+    count == 1 {
+      if ($0 ~ /^transitions:[[:space:]]*$/) { in_t = 1; next }
+      if (in_t && $0 ~ /^[^[:space:]#]/) { in_t = 0 }
+      if (in_t && $0 ~ /^[[:space:]]+to:[[:space:]]*/) {
+        sub(/^[[:space:]]+to:[[:space:]]*/, "")
+        sub(/[[:space:]]+$/, "")
+        sub(/^"/, ""); sub(/"$/, "")
+        last_to = $0
+      }
+    }
+    END { if (last_to != "") print last_to }
+  ' "$file"
+}
+
+while IFS=$'\t' read -r lip_num path; do
+  rel_path="${path#/}"
+  [[ -f "$rel_path" ]] || continue
+  has_two_fm_delims "$rel_path" || continue  # Invariant 5 already reported.
+
+  fm_status=$(extract_fm_field "$rel_path" "status")
+  last_to=$(extract_last_transition_to "$rel_path")
+
+  if [[ -z "$last_to" ]]; then
+    report "ERROR: Cannot parse LIP frontmatter.
+  File: $rel_path
+  Problem: transitions array is missing, empty, or malformed (no 'to:' field found in any list entry).
+  Fix: ensure the frontmatter contains a 'transitions:' array with at least one entry that includes a 'to:' field."
+    continue
+  fi
+
+  if [[ -n "$fm_status" ]] && [[ "$fm_status" != "$last_to" ]]; then
+    report "ERROR: LIP status contradicts transition log.
+  LIP-$lip_num ($rel_path)
+  Status field:               $fm_status
+  Last transition 'to' field: $last_to
+  Fix: either update the status field to match the last transition, or append a new transition entry that ends at the declared status."
+  fi
+done < <(jq -r '.lips[] | [.lip, .path] | @tsv' "$INDEX")
 
 # -------- Summary --------
 if (( ERRORS > 0 )); then
