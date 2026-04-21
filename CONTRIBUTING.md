@@ -17,26 +17,9 @@ Include:
 - What you believe it should say, and why.
 - If the bug affects implementations, an example of the resulting ambiguity or incompatibility.
 
-## Proposing a new core claim type
+## Proposing a LIP
 
-Open a [GitHub Issue](https://github.com/openllmo/llmo.org/issues/new/choose) and select the **Core claim type proposal** template. Apply the `spec-proposal` label.
-
-Core claim types are part of the specification itself and MUST be understood by any conforming consumer. Proposals are reviewed by the editor and discussed publicly for at least 14 days before any acceptance decision. Implementer feedback is solicited before acceptance. Proposals that do not attract implementer interest during the public period are deferred or closed.
-
-Include:
-
-- Proposed type name (no namespace for core types).
-- Problem statement: what question does a consumer answer with this claim that cannot be answered with existing core types?
-- JSON Schema fragment for the `statement` payload.
-- At least two worked examples of valid claim objects from distinct hypothetical organizations.
-- Expected consumer behavior: what does a verifier do with this claim?
-- Compatibility analysis: does adding this claim affect any existing v0.1 document, and if so, how?
-
-## Proposing an extension claim type
-
-Open a [GitHub Issue](https://github.com/openllmo/llmo.org/issues/new/choose) and select the **Extension claim type registration** template. Apply the `extension-proposal` label.
-
-Extension claim types use dot-separated namespaces and MAY be ignored by consumers that do not recognize them. The submission format and registry are documented at [llmo.org/claims/extensions](https://llmo.org/claims/extensions). Follow that page for the specific fields required; this document describes only the workflow.
+New claim types (core or extension), changes to the LIP process, and informational guidance are proposed through the LIP (LLMO Improvement Proposal) process, which defines three types: Standards Track (claim type changes), Process (changes to the LIP process or governance), and Informational. The authoritative process document is [LIP-1](https://llmo.org/spec/lips/lip-0001); read it before submitting. For extension claim type proposals, the submission flow is: open a GitHub Discussion, observe a minimum 7-day discussion period with at least one non-author public response, request a LIP number and nonce from the editor, publish a DNS TXT record at `_llmo-lip.<namespace-domain>` as proof of control, then open a pull request adding the LIP document at `/spec/lips/lip-NNNN.mdx`. Core claim type proposals are handled through editor-mediated review using the 14-day substantive-change governance window described on the [governance page](https://llmo.org/about/governance), until a forthcoming Process LIP formalizes the core-proposal submission mechanics. Open the "Core claim type proposal" issue to start the conversation.
 
 ## Submitting a pull request
 
@@ -51,7 +34,7 @@ Open a PR against `main`. Reviewers expect:
 - No em dashes. Use commas, parentheses, or colons.
 - Conventional commit messages: `docs: ...`, `feat: ...`, `fix: ...`, `chore: ...`.
 - DCO sign-off on every commit (see below).
-- The Mintlify build passes. Run `mintlify dev` locally and confirm pages render before pushing.
+- The Mintlify build passes. Run `mint validate` and `mint broken-links` locally before pushing. Use `mint dev` to preview pages in the browser.
 
 One logical change per PR. Multiple commits per PR are fine if they represent distinct logical units.
 

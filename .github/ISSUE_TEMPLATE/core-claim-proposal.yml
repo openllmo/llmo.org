@@ -1,59 +1,45 @@
 name: Core claim type proposal
-description: Propose a new core claim type for inclusion in the specification.
-title: "[spec-proposal] "
-labels: ["spec-proposal"]
+description: Propose a change to the core claim set (editor-mediated review during transitional state).
+title: "[core-proposal] "
+labels: ["core-proposal"]
 body:
   - type: markdown
     attributes:
       value: |
-        Core claim types are part of the specification and MUST be understood by every conforming consumer. The bar for acceptance is high. Proposals are reviewed by the editor and discussed publicly for at least 14 days before any acceptance decision. Read CONTRIBUTING.md before submitting.
+        **Open this issue to propose a change to the LLMO specification's core claim set** (a new core claim type, a modification to an existing core claim type, or removal of an existing core claim type).
+
+        Formal submission mechanics for proposals are defined in LIP-1 for extension claim type proposals. A forthcoming Process LIP will formalize submission mechanics for core claim type proposals.
+
+        Until that Process LIP is accepted, core claim type proposals proceed through editor-mediated review using the 14-day substantive-change governance window defined on the governance page. Open this issue to start the conversation; the editor will guide the proposal through the review window and (if accepted) into a pull request.
+
+        - LIP-1 (proposal process): <https://llmo.org/spec/lips/lip-0001>
+        - Governance page (decision process and substantive-change window): <https://llmo.org/about/governance>
   - type: input
-    id: type-name
+    id: section
     attributes:
-      label: Proposed type name
-      description: No namespace (core types have no dots).
-      placeholder: "e.g., regulatory_status"
+      label: Specification section affected
+      description: The section reference (for example, §3.2, Appendix A). If the proposal adds a new claim type, reference the section where it would be inserted.
+      placeholder: "§3.2"
     validations:
       required: true
   - type: textarea
-    id: problem
+    id: proposal
     attributes:
-      label: Problem statement
-      description: What question does a consumer answer with this claim that cannot be answered with existing core types?
+      label: Proposed change
+      description: Describe the change. For a new core claim type, include the claim type name, its purpose, its fields and their types, and validation rules. For a modification, state the current behavior and the proposed behavior.
     validations:
       required: true
   - type: textarea
-    id: schema
+    id: rationale
     attributes:
-      label: JSON Schema fragment
-      description: The schema for the `statement` payload. Use a fenced code block with `json`.
+      label: Rationale
+      description: Why is this change needed? What problem does it solve? What use cases does it enable?
     validations:
       required: true
   - type: textarea
-    id: examples
+    id: compat
     attributes:
-      label: Worked examples
-      description: At least two examples of valid claim objects from distinct hypothetical organizations.
-    validations:
-      required: true
-  - type: textarea
-    id: consumer-behavior
-    attributes:
-      label: Expected consumer behavior
-      description: What does a verifier do with this claim?
-    validations:
-      required: true
-  - type: textarea
-    id: compatibility
-    attributes:
-      label: Compatibility analysis
-      description: Does adding this claim affect any existing v0.1 document, and if so, how?
-    validations:
-      required: true
-  - type: textarea
-    id: implementers
-    attributes:
-      label: Implementer interest
-      description: Which organizations have expressed interest in implementing this? Minimum of one.
+      label: Backwards-compatibility implications
+      description: How does this change affect existing implementations, existing published `llmo.json` documents, and the existing test vectors? State "None" if the change is strictly additive and has no compatibility implications.
     validations:
       required: true

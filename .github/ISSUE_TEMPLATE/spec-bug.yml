@@ -1,17 +1,28 @@
 name: Spec bug
-description: Report a bug, ambiguity, or error in the LLMO specification.
+description: Report errata or editorial bugs in existing normative text.
 title: "[spec-bug] "
 labels: ["spec-bug"]
 body:
   - type: markdown
     attributes:
       value: |
-        Use this template to report bugs in the specification text, the JSON Schema, or the worked examples. For proposed changes (not bug reports), use the proposal templates instead.
+        **This template is for errata and editorial bugs in existing normative text, not for proposals.**
+
+        Use this template to report:
+
+        - Typos, grammar errors, or wording fixes in the specification text.
+        - Broken internal links between sections or to anchors.
+        - Ambiguous normative language in existing text (for example, unclear use of MUST, SHOULD, or MAY).
+        - Inconsistencies between sections, between prose and the JSON Schema, or between prose and the test vectors.
+        - JSON Schema errors in `spec/v0.1/schema.json`.
+        - Test vector errors in `spec/v0.1/test-vectors/`.
+
+        **If you are proposing a new claim type (core or extension), a change to the LIP process, or any addition to the specification, this is not the right template.** See LIP-1 at <https://llmo.org/spec/lips/lip-0001> for the proposal process.
   - type: input
     id: section
     attributes:
       label: Specification section
-      description: The section reference (e.g., §4.2, Appendix A).
+      description: The section reference (for example, §4.2, Appendix A, `schema.json` line N).
       placeholder: "§4.2"
     validations:
       required: true
@@ -19,7 +30,7 @@ body:
     id: current
     attributes:
       label: What the specification currently says
-      description: Quote or paraphrase the current text.
+      description: Quote or paraphrase the current text, schema fragment, or test vector field.
     validations:
       required: true
   - type: textarea
@@ -33,7 +44,7 @@ body:
     id: proposed
     attributes:
       label: Proposed fix (optional)
-      description: If you have a concrete suggestion for the revised text, include it here.
+      description: If you have a concrete suggestion for the revised text, schema fragment, or vector value, include it here.
   - type: textarea
     id: impact
     attributes:
