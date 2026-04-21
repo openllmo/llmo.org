@@ -32,7 +32,7 @@ LIPs provide a transparent, numbered, auditable record of proposals. Every LIP h
 
 LIPs have one of three types, declared in the `type` field of the frontmatter:
 
-- **Standards Track**: proposes a new extension claim type or a modification to an existing claim type. Authors must demonstrate control of a DNS namespace at submission (see Section 4). The terminal accepted state for a Standards Track LIP is Final.
+- **Standards Track**: proposes a new claim type or a modification to an existing claim type, where claim types include both core claim types defined in the LLMO specification and extension claim types proposed by publishers. Authors of extension claim type proposals must demonstrate control of a DNS namespace at submission (see Section 4). Core claim type proposals follow the 14-day substantive-change governance process described on the [governance page](/about/governance); the submission mechanics for core claim type proposals will be defined in a forthcoming Process LIP. The terminal accepted state for a Standards Track LIP is Final.
 - **Process**: proposes changes to the LIP process, to the editor role, or to related governance. Process LIPs are authored by the editor, or by community members whose proposals the editor agrees to author or co-author. Process LIPs follow the 14-day substantive-change governance process defined on the [governance page](/about/governance). The terminal accepted state for a Process LIP is Active.
 - **Informational**: provides guidance or information to implementers and does not propose normative changes. The terminal accepted state for an Informational LIP is Final.
 
@@ -57,7 +57,7 @@ Every LIP must include a `transitions` array in its frontmatter. Each entry reco
 
 ## 4. Submission process for Standards Track LIPs
 
-Standards Track LIPs propose extensions to the claim registry. The submission process has eight steps:
+Standards Track LIPs propose changes to the claim registry, whether those changes add or modify core claim types or extension claim types. The submission process below applies to extension claim type proposals; submission mechanics for core claim type proposals will be defined in a forthcoming Process LIP. The eight steps follow:
 
 1. **Open a GitHub Discussion** in [openllmo/llmo.org](https://github.com/openllmo/llmo.org/discussions) describing the proposed extension claim type, its namespace, its purpose, and its intended use. The discussion is the public record of deliberation.
 2. **Observe a minimum 7-day public discussion period.** At least one non-author public response is required in the Discussion thread before the author may proceed to Step 3 (requesting a LIP number and nonce). The 7-day minimum and the non-author response are separate requirements; both must be satisfied. This gate exists before nonce issuance, not merely before pull request submission, so that the anti-flood filter applies at the earliest point in the pipeline.
@@ -88,6 +88,7 @@ Editor responsibilities:
 - Merge format-compliant submissions that have completed the required discussion period.
 - Update LIP statuses in response to observed signals (adoption, supersession, withdrawal).
 - Maintain the registry index at `/spec/lips/index.json` and `/spec/lips/index.mdx`.
+- Verify the 14-day governance window has been observed for core claim type proposals before merging the associated pull request.
 
 The editor does not judge the technical merit of proposed extensions. Merit is decided by adoption: an extension that is implemented and emitted in published documents is meritorious; an extension that is not adopted remains in Proposed status indefinitely.
 
@@ -171,7 +172,7 @@ Future revisions to the LIP process itself are made through Process LIPs that su
 
 - **Editor**: the person or persons responsible for assigning numbers, verifying submissions, checking format compliance, and maintaining the registry.
 - **Namespace**: the short identifier prefixing an extension claim type, for example `acme-corp` in `acme-corp.compliance_note`.
-- **Standards Track**: the LIP type proposing a new extension claim type, or a modification to an existing claim type.
+- **Standards Track**: the LIP type proposing a new claim type or a modification to an existing claim type, whether core or extension.
 - **Process**: the LIP type proposing changes to the LIP process or to related governance.
 - **Informational**: the LIP type providing guidance or information without proposing normative changes.
 - **Draft**: status indicating a LIP is under discussion.
