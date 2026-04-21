@@ -26,6 +26,13 @@
           "spec/v0.1",
           "spec/v0.1/schema",
           "spec/v0.1/test-vectors",
+          {
+            "group": "Improvement Proposals",
+            "pages": [
+              "spec/lips/index",
+              "spec/lips/lip-0001"
+            ]
+          },
           "spec/changelog"
         ]
       },
