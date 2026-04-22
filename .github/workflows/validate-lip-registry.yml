@@ -2,10 +2,6 @@ name: Validate LIP Registry
 
 on:
   pull_request:
-    paths:
-      - 'spec/lips/**'
-      - 'scripts/validate-lip-registry.sh'
-      - '.github/workflows/validate-lip-registry.yml'
 
 permissions:
   contents: read
