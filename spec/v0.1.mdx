@@ -15,7 +15,7 @@ description: The v0.1 specification for llmo.json.
 
 ### 1.1 What `llmo.json` is
 
-`llmo.json` is the **sovereign channel** an organization publishes to the machines that now mediate its reputation. It is a signed, time-bounded, machine-readable artifact served at a well-known location on the organization's primary domain. It carries the organization's own assertions about itself — identity, canonical surfaces, disavowals, supersessions — in a form that large language models, retrieval systems, and autonomous agents can consume directly and verify cryptographically.
+`llmo.json` is the **sovereign channel** an organization publishes to the machines that now mediate its reputation. It is a signed, time-bounded, machine-readable artifact served at a well-known location on the organization's primary domain. It carries the organization's own assertions about itself (identity, canonical surfaces, disavowals, supersessions) in a form that large language models, retrieval systems, and autonomous agents can consume directly and verify cryptographically.
 
 This is a protocol for **machine-facing identity**. It governs the small, high-consequence surface where an organization speaks to automated systems in the first person: *these URLs are us, this person speaks for us, this attribution is false, this prior statement is superseded.* Declarative, not descriptive. Operational, not cataloging. Signable, not merely structured.
 
@@ -37,7 +37,7 @@ Specifically, `llmo.json` does not:
 
 Organizations have no sovereign channel to the machines that now mediate their reputation.
 
-When a large language model answers a question about an organization — what it does, what it charges, who speaks for it, what it has said and unsaid — the answer is synthesized from text the organization did not write, about the organization, filtered through ranking and retrieval systems the organization does not control. The organization's ability to correct, supersede, or repudiate any piece of that synthesis is effectively zero. There is no primary source the model knows to consult and trust above its aggregated priors.
+When a large language model answers a question about an organization (what it does, what it charges, who speaks for it, what it has said and unsaid), the answer is synthesized from text the organization did not write, about the organization, filtered through ranking and retrieval systems the organization does not control. The organization's ability to correct, supersede, or repudiate any piece of that synthesis is effectively zero. There is no primary source the model knows to consult and trust above its aggregated priors.
 
 Existing standards address adjacent problems and leave this one untouched:
 
@@ -49,7 +49,7 @@ Existing standards address adjacent problems and leave this one untouched:
 
 None of these give an organization a single verifiable place to say: *these are the URLs that are us. This is the price. This person does not speak for us. The press release from March is superseded by the one from April. The domain that looks like us is not us.*
 
-That is the gap `llmo.json` fills — and the reason it matters more each quarter. The machines consuming the organization's reputation are no longer an auxiliary audience. For many organizations, they are already the primary one.
+That is the gap `llmo.json` fills, and the reason it matters more each quarter. The machines consuming the organization's reputation are no longer an auxiliary audience. For many organizations, they are already the primary one.
 
 ### 1.4 Non-goals for v0.1
 
@@ -238,7 +238,7 @@ The single most important claim type. Asserts which URLs are authoritative for w
 }
 ```
 
-All keys are optional; orgs declare only the URLs they operate. Consumers MUST treat URLs declared here as preferred over URLs discovered elsewhere. Note that LLMO vouches for the pointer, not the content of the referenced artifact — if `agent_manifest` points at an agent.json, LLMO asserts "this is our agent.json," not "this agent.json is itself well-formed or safe."
+All keys are optional; orgs declare only the URLs they operate. Consumers MUST treat URLs declared here as preferred over URLs discovered elsewhere. Note that LLMO vouches for the pointer, not the content of the referenced artifact: if `agent_manifest` points at an agent.json, LLMO asserts "this is our agent.json," not "this agent.json is itself well-formed or safe."
 
 #### `official_channels`
 
@@ -414,7 +414,7 @@ Both document-level and claim-level signatures use **JWS with JCS (JSON Canonica
 
 Rationale for JCS at both granularities, rather than detached JWS over raw bytes:
 
-- Publishers generate these files from templates, CI pipelines, WordPress plugins, and future tooling that none of us control. Any of these may re-serialize the JSON between signing and serving — reordering keys, normalizing whitespace, re-encoding Unicode. Detached JWS over raw bytes breaks under any such transformation. JCS survives it.
+- Publishers generate these files from templates, CI pipelines, WordPress plugins, and future tooling that none of us control. Any of these may re-serialize the JSON between signing and serving: reordering keys, normalizing whitespace, re-encoding Unicode. Detached JWS over raw bytes breaks under any such transformation. JCS survives it.
 - CDNs, hosting providers, and edge runtimes routinely touch response bodies. JCS tolerates this; raw-byte signing does not.
 - Using the same canonicalization at both granularities means verifiers implement one code path. Implementation complexity and bug surface drop meaningfully.
 - JCS has well-specified libraries in every major language and has been deployed at scale in adjacent standards.
@@ -427,7 +427,7 @@ The cost is modest: JCS adds a canonicalization pass before sign and verify. For
 
 JCS protects against accidental transformation. Intentional transformation after signing is prohibited and will produce undetectable signature breakage. Publishers MUST:
 
-- Sign the file as the final step before deployment. Not before minification, not before templating expansion — last.
+- Sign the file as the final step before deployment. Not before minification. Not before templating expansion. Last.
 - Serve the signed file byte-stable. No server-side reformatting, no minifier-in-the-CDN, no "helpful" prettifying by a reverse proxy.
 - Treat the signed file as an opaque blob for caching and transport purposes. Gzip and Brotli transport compression are fine (they are reversed before parsing); content-level transformation is not.
 
@@ -451,7 +451,7 @@ When a consumer fetches a `llmo.json`, it SHOULD:
 **Invalid signatures.** An invalid signature is more suspicious than a missing one. Consumers SHOULD:
 - Log the failure.
 - Downgrade the affected scope (document or individual claim) to Layer 1 trust.
-- NOT treat the entire document as poisoned — a broken signature on one claim does not invalidate other claims.
+- NOT treat the entire document as poisoned: a broken signature on one claim does not invalidate other claims.
 
 **Key not found in JWKS.** Treated as invalid signature.
 
@@ -527,7 +527,7 @@ The two standards compose cleanly: C2PA handles asset-level provenance; LLMO han
 
 ### 6.3 MCP and agent.json
 
-Model Context Protocol and `agent.json` describe what an agent can *do* — capabilities, endpoints, invocation schemas. LLMO describes what is *true* about the organization behind an agent. An LLMO document can declare (via `canonical_urls.agent_manifest` or `canonical_urls.mcp_manifest`) which agent/MCP manifests are authoritative; the manifests themselves remain out of scope.
+Model Context Protocol and `agent.json` describe what an agent can *do*: capabilities, endpoints, invocation schemas. LLMO describes what is *true* about the organization behind an agent. An LLMO document can declare (via `canonical_urls.agent_manifest` or `canonical_urls.mcp_manifest`) which agent/MCP manifests are authoritative; the manifests themselves remain out of scope.
 
 v0.1 deliberately does not specify agent capabilities inside `llmo.json`. This was evaluated and rejected in favor of pointer-only integration. Re-specifying capabilities would duplicate MCP badly; specifying them well would make LLMO a capability spec. The pointer model lets LLMO remain a declarative truth pack while composing with whichever agent spec wins.
 
@@ -541,7 +541,7 @@ Orthogonal. Sitemaps describe URL inventory for crawlers; robots.txt describes c
 
 ### 6.6 DID and Verifiable Credentials
 
-DIDs and VCs are a general-purpose decentralized identity and credential framework. LLMO could, in principle, be rebuilt on top of DIDs; v0.1 declines to require them for the same reason it declines to require Wikidata QIDs — imposing unfamiliar identity infrastructure would collapse adoption. The `external_ids` field leaves the door open for organizations that choose to publish a DID.
+DIDs and VCs are a general-purpose decentralized identity and credential framework. LLMO could, in principle, be rebuilt on top of DIDs; v0.1 declines to require them for the same reason it declines to require Wikidata QIDs: imposing unfamiliar identity infrastructure would collapse adoption. The `external_ids` field leaves the door open for organizations that choose to publish a DID.
 
 ### 6.7 `.well-known/` conventions (RFC 8615)
 
@@ -684,43 +684,45 @@ Serval, Inc. is a hypothetical enterprise observability company. It publishes th
 **Annotations on this example:**
 
 - The document supersedes a prior Q1 document by `document_id`, ensuring consumers with cached older versions know to discard them.
-- `canonical_urls` includes `agent_manifest` — LLMO points at agent.json without describing its contents.
+- `canonical_urls` includes `agent_manifest`: LLMO points at agent.json without describing its contents.
 - `product_facts` carries `confidence: advisory` because product versions change faster than the document's 90-day window.
 - `disavowal` names both a category (no mobile app) and a specific domain (serval-crypto.com), giving LLMs two kinds of negative assertion to reason with.
-- `supersedes` references a specific URL, not just an internal document ID — this is the "wider web" supersession case.
+- `supersedes` references a specific URL, not just an internal document ID: this is the "wider web" supersession case.
 - The document-level signature covers all fields except `signature` itself. A consumer verifies by fetching `https://serval.com/.well-known/llmo-keys.json`, locating the key with `kid: "serval-2026-01"`, and verifying over the JCS-canonicalized payload.
 
 ---
 
-## 8. Open Questions for v0.2
+## 8. Open Questions for Future Versions
 
 The following are known gaps or deferred decisions. v0.1 ships without resolving them.
 
-**8.1 Revocation beyond supersession.** Document supersession and signature key rotation cover the common case. They do not cover "we need every cached copy of document X to be treated as revoked *immediately*, even if consumers haven't refetched." A v0.2 revocation registry — potentially a signed, append-only list at `/.well-known/llmo-revocations.json` — is under consideration.
+**8.1 Revocation beyond supersession.** Document supersession and signature key rotation cover the common case. They do not cover "we need every cached copy of document X to be treated as revoked *immediately*, even if consumers haven't refetched." A future version of LLMO may define a revocation registry, potentially a signed, append-only list at `/.well-known/llmo-revocations.json`.
 
-**8.2 Delegation.** How does a parent organization assert authority over a subsidiary's `llmo.json`, and vice versa? v0.1 treats each domain as independent. A `delegates_to` / `delegated_from` claim pair is the likely v0.2 answer, but the trust implications (can a compromised parent forge a child?) need careful design.
+**8.2 Delegation.** How does a parent organization assert authority over a subsidiary's `llmo.json`, and vice versa? v0.1 treats each domain as independent. A `delegates_to` / `delegated_from` claim pair is the likely answer in a future version of LLMO, but the trust implications (can a compromised parent forge a child?) need careful design.
 
 **8.3 Cross-domain aliases.** v0.1 requires each alias domain to serve its own file. Whether a single canonical document should be able to speak for multiple domains without per-domain publication is unresolved. The trust argument for per-domain is strong; the operational argument against it is also strong.
 
-**8.4 Claim-level supersession inside a live document.** Currently, supersession operates at the document level (new document supersedes old) and at the "wider web" level (a claim supersedes external content). A third mode — within a single live document, a newer claim supersedes an older one of the same type — is not yet specified. It may not be needed; republication is cheap.
+**8.4 Claim-level supersession inside a live document.** Currently, supersession operates at the document level (new document supersedes old) and at the "wider web" level (a claim supersedes external content). A third mode, within a single live document where a newer claim supersedes an older one of the same type, is not yet specified. It may not be needed; republication is cheap.
 
 **8.5 Registry governance for extension claims.** The `llmo.org/claims/` registry needs an explicit governance model: who can register, what review is required, what it means for a claim type to be "promoted" to core. v0.1 leaves this to an informal editorial process.
 
-**8.6 Non-domain entities.** Individuals, DAOs, and other entities without a primary domain are out of scope for v0.1. A v0.2 binding for DID-rooted publication is plausible.
+**8.6 Non-domain entities.** Individuals, DAOs, and other entities without a primary domain are out of scope for v0.1. A future version of LLMO may include a binding for DID-rooted publication.
 
-**8.7 Interaction with retrieval-augmented generation at scale.** How LLM providers *actually* consume LLMO claims at ingestion or retrieval time is outside the spec's control. v0.2 may include non-normative guidance for implementers on both sides — publishers and consumers — based on early adoption data.
+**8.7 Interaction with retrieval-augmented generation at scale.** How LLM providers *actually* consume LLMO claims at ingestion or retrieval time is outside the spec's control. A future version of LLMO may include non-normative guidance for implementers on both sides, publishers and consumers, based on early adoption data.
 
-**8.8 Internationalization.** All claim statements in v0.1 are free-form strings. A v0.2 binding for localized claim text (`"detail": {"en": "...", "ja": "..."}`) is likely.
+**8.8 Internationalization.** All claim statements in v0.1 are free-form strings. A future version of LLMO will likely include a binding for localized claim text (`"detail": {"en": "...", "ja": "..."}`).
 
 **8.9 Relationship to compliance frameworks.** Whether LLMO claims can or should be referenced in privacy policies, terms of service, or regulated disclosures is a legal question v0.1 explicitly does not answer. Organizations should consult counsel before treating LLMO claims as legally operative.
 
-**8.10 Publisher reputation layer.** LLMO as specified gives publishers a signed channel to assert claims, but says nothing about whether a given publisher *deserves* to be believed. A bad actor can register a plausible-looking domain, publish a strictly-conforming `llmo.json`, sign it correctly, and use the authority of the file to launder false claims — false disavowals of legitimate parties, false supersessions of accurate reporting, canonical URLs pointing at phishing. Layer 2 cryptographic trust verifies *who* asserted *what* and *when*; it does not verify that the asserter should be trusted.
+**8.10 Publisher reputation layer.** LLMO as specified gives publishers a signed channel to assert claims, but says nothing about whether a given publisher *deserves* to be believed. A bad actor can register a plausible-looking domain, publish a strictly-conforming `llmo.json`, sign it correctly, and use the authority of the file to launder false claims: false disavowals of legitimate parties, false supersessions of accurate reporting, canonical URLs pointing at phishing. Layer 2 cryptographic trust verifies *who* asserted *what* and *when*; it does not verify that the asserter should be trusted.
 
-The answer is a consumer-side reputation layer that sits above LLMO — a separate artifact, not a field inside `llmo.json`, that scores publishers on signals LLMO itself cannot carry: domain age, historical consistency of claims, cross-reference against external identity anchors (Wikidata, legal registries, independent identity networks), signature key rotation hygiene, disavowal patterns that correlate with suppression of legitimate criticism. This artifact is necessarily third-party-published — a publisher cannot credibly score itself — and is a plausible role for the LLMO registry or an independent trust network to fill.
+The answer is a consumer-side reputation layer that sits above LLMO, a separate artifact, not a field inside `llmo.json`, that scores publishers on signals LLMO itself cannot carry: domain age, historical consistency of claims, cross-reference against external identity anchors (Wikidata, legal registries, independent identity networks), signature key rotation hygiene, disavowal patterns that correlate with suppression of legitimate criticism. This artifact is necessarily third-party-published (a publisher cannot credibly score itself) and is a plausible role for the LLMO registry or an independent trust network to fill.
 
-The field `confidence` inside a claim is the *publisher's hedge on its own claim*. The reputation layer is *the consumer's score of the publisher*. These are different concerns and belong in different artifacts. v0.1 specifies the first and explicitly defers the second. v0.2 or v0.3 will need to specify the interaction: how consumers combine a claim's stated confidence with the publisher's reputation score to produce a final trust assessment, and how the reputation layer's own trust is anchored without recreating the same adversarial problem one level up.
+The field `confidence` inside a claim is the *publisher's hedge on its own claim*. The reputation layer is *the consumer's score of the publisher*. These are different concerns and belong in different artifacts. v0.1 specifies the first and explicitly defers the second. A future version of LLMO will need to specify the interaction: how consumers combine a claim's stated confidence with the publisher's reputation score to produce a final trust assessment, and how the reputation layer's own trust is anchored without recreating the same adversarial problem one level up.
 
-A plausible input to any such reputation layer is **immutable publication history** — an append-only log of a publisher's `llmo.json` documents over time, hosted by a party other than the publisher. A self-hosting publisher can, in principle, rewrite history by re-signing a backdated prior document and claiming it was always there; a third-party log cannot be rewritten. The diff between successive documents then becomes an auditable trail of what the publisher claimed when. v0.1 does not specify this log; a future version may define an interchange format for importing and exporting such histories between reputation layers.
+A plausible input to any such reputation layer is **immutable publication history**, an append-only log of a publisher's `llmo.json` documents over time, hosted by a party other than the publisher. A self-hosting publisher can, in principle, rewrite history by re-signing a backdated prior document and claiming it was always there; a third-party log cannot be rewritten. The diff between successive documents then becomes an auditable trail of what the publisher claimed when. v0.1 does not specify this log; a future version may define an interchange format for importing and exporting such histories between reputation layers.
+
+**8.11 Post-quantum cryptographic readiness.** Signatures in v0.1 use Ed25519 or comparable pre-quantum algorithms. Sufficiently large quantum computers would break these signatures, undermining the trust model that binds claims to publisher key control. A future version of LLMO will specify a migration path: algorithm identifiers in the schema, hybrid signature support during the transition, and a deprecation window for pre-quantum-only documents.
 
 ---
 
