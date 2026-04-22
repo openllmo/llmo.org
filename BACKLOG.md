@@ -63,6 +63,8 @@ Entries are either short one-liners for lightweight items, or structured subsect
 
   Added 2026-04-21.
 
+- [ ] **Migrate rename automation from GITHUB_TOKEN to dedicated GitHub App** (M). Deferred from Priority 6 Part A (PR to be populated post-merge). The rename automation workflow (`.github/workflows/rename-lip-placeholder.yml`) currently runs under GITHUB_TOKEN with a generic bot author identity. LIP-2 Section 10 specifies a dedicated GitHub App (`llmo-editor-bot`) with signed commits and restricted permissions. Migration steps: register the GitHub App under Diverse.org, configure restricted permissions and webhook scope, generate signing key, store as `LIP_BOT_SIGNING_KEY` secret, update workflow to use the App's installation token. Added 2026-04-21.
+
 ## Process
 
 - [ ] **Cross-repo paired-PR workflow** (M): When `openllmo/llmo.org` modifies the JSON Schema or any test vector, a paired PR must land in `openllmo/llmo-validator` updating the inlined copy. Add this explicitly to `CONTRIBUTING.md` as a checklist item for schema/test-vector PRs. Added 2026-04-20.
