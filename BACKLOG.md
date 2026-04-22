@@ -25,6 +25,8 @@ Entries are either short one-liners for lightweight items, or structured subsect
 
 ## Spec
 
+- [ ] **Verified-transaction review proof mechanism** (investigate). Concept: a cryptographic proof (zero-knowledge or equivalent) that a real transaction occurred between business X and customer Z, which entitles Z to publish a verifiable review of X. Investigation needed to determine whether this is a claim type LIP (publishers attest that review at URL Y is backed by transaction proof), a substantive future-version feature of LLMO, or a separate adjacent protocol that interoperates with LLMO. Context: considered for inclusion as §8.12 in Priority 9 (2026-04-22) and deferred pending clearer framing. Added 2026-04-22.
+
 - [ ] **Authorship provenance for the LLMO specification** (M): Establish durable, independently-verifiable proof that Nic Chavez of Diverse.org authored the LLMO specification, dated to its actual publication. Planned approach: (1) GPG-sign commits on the spec repo with a key published on keybase.io, keys.openpgp.org, and a personal domain; (2) OpenTimestamps-anchor the SHA-256 of the v0.1 spec document to commit the content's existence to the Bitcoin blockchain. Both are standard practice in open-source and cryptographic communities. Added 2026-04-20.
 
 ## Governance
@@ -73,4 +75,4 @@ _Move items here when completed or dropped, with date and resolution note._
 
 ---
 
-*Last updated: 2026-04-20*
+*Last updated: 2026-04-22*
