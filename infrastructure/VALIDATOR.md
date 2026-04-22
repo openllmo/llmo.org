@@ -95,7 +95,7 @@ The validator displays its version in the footer: `Validator <VERSION> (<COMMIT_
 - `COMMIT_SHA`: the git commit SHA of the deployed build, substituted at deploy time.
 - `BUILD_DATE`: constant in `index.html`, updated manually in PRs when a new release is tagged.
 
-Current version: `v0.1.0`.
+Current version: matches specification version. See [versioning policy](/spec/versioning).
 
 Rule-set changes that modify conformance semantics require a corresponding spec revision (in `openllmo/llmo.org`) and must be coordinated across both repos. Bug fixes, UX improvements, and error-message edits do not require spec coordination.
 
