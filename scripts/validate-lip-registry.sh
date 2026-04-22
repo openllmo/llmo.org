@@ -1,16 +1,24 @@
 #!/usr/bin/env bash
 # Validates the integrity of the LLMO Improvement Proposal (LIP) registry.
-# Checks six invariants across spec/lips/index.json and spec/lips/lip-NNNN.mdx:
+# Checks seven invariants across spec/lips/index.json and spec/lips/lip-NNNN.mdx:
 # (1) 'generated' matches latest commit to spec/lips/; (2) every LIP file has
 # a registry entry; (3) every registry entry points at an existing file;
 # (4) LIP numbers are unique and entries are sorted ascending by number;
 # (5) frontmatter agrees with the registry on six fields;
 # (6) the frontmatter 'status' field agrees with the 'to' field of the last
-#     entry in the transitions array.
-# Usage: bash scripts/validate-lip-registry.sh   (run from repo root)
+#     entry in the transitions array;
+# (7) no placeholder files (lip-NEW-*.mdx) exist in main, per LIP-2; enforced
+#     only when --main-branch flag is passed.
+# Usage: bash scripts/validate-lip-registry.sh [--main-branch]   (run from repo root)
 # Exit codes: 0 = all invariants satisfied; 1 = one or more violations reported.
 
 set -euo pipefail
+
+MAIN_BRANCH=0
+if [[ "${1:-}" == "--main-branch" ]]; then
+  MAIN_BRANCH=1
+  shift
+fi
 
 INDEX="spec/lips/index.json"
 ERRORS=0
@@ -46,9 +54,14 @@ elif [[ "$GENERATED" != "$REF_DATE" ]]; then
 fi
 
 # -------- Invariant 2: every LIP file has a registry entry --------
+# Placeholder files (lip-NEW-*.mdx, per LIP-2 Section 2) are skipped here in
+# all modes; Invariant 7 enforces their absence in main-branch mode.
 shopt -s nullglob
-for file in spec/lips/lip-????.mdx; do
+for file in spec/lips/lip-*.mdx; do
   base=$(basename "$file" .mdx)
+  if [[ "$base" == lip-NEW-* ]]; then
+    continue
+  fi
   num_str="${base#lip-}"
   # Reject filenames that do not match the strict four-digit pattern.
   if [[ ! "$num_str" =~ ^[0-9]{4}$ ]]; then
@@ -228,6 +241,20 @@ while IFS=$'\t' read -r lip_num path; do
   Fix: either update the status field to match the last transition, or append a new transition entry that ends at the declared status."
   fi
 done < <(jq -r '.lips[] | [.lip, .path] | @tsv' "$INDEX")
+
+# -------- Invariant 7: no placeholder files in main --------
+# Enforced only when --main-branch flag is passed, per LIP-2 Section 4.
+if (( MAIN_BRANCH )); then
+  shopt -s nullglob
+  for file in spec/lips/lip-NEW-*.mdx; do
+    report "ERROR: Placeholder LIP file found in main.
+  File: $file
+  Fix: placeholder files must be renamed to lip-NNNN.mdx at merge time per LIP-2.
+       If this file exists in main, the rename automation failed or was bypassed.
+       Open a PR that renames the file and adds the corresponding registry entry."
+  done
+  shopt -u nullglob
+fi
 
 # -------- Summary --------
 if (( ERRORS > 0 )); then
