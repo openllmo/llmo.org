@@ -1,0 +1,43 @@
+# Bot identity for rename automation.
+# LIP-2 Section 10 specifies a dedicated GitHub App (llmo-editor-bot) for this workflow.
+# The GitHub App registration is a follow-up operational task. Until registered,
+# this workflow uses the GITHUB_TOKEN with a generic bot author identity.
+# Migration to the dedicated GitHub App is tracked in BACKLOG.md under Governance.
+
+name: Rename LIP Placeholder
+
+on:
+  pull_request:
+    types: [labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  rename:
+    if: github.event.label.name == 'editor-approved'
+    name: rename
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Ensure jq is installed
+        run: |
+          if ! command -v jq > /dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y jq
+          fi
+          jq --version
+
+      - name: Rename placeholder and update registry
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/rename-lip-placeholder.sh
