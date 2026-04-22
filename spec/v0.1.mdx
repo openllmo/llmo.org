@@ -722,6 +722,8 @@ The field `confidence` inside a claim is the *publisher's hedge on its own claim
 
 A plausible input to any such reputation layer is **immutable publication history**, an append-only log of a publisher's `llmo.json` documents over time, hosted by a party other than the publisher. A self-hosting publisher can, in principle, rewrite history by re-signing a backdated prior document and claiming it was always there; a third-party log cannot be rewritten. The diff between successive documents then becomes an auditable trail of what the publisher claimed when. v0.1 does not specify this log; a future version may define an interchange format for importing and exporting such histories between reputation layers.
 
+**8.11 Post-quantum cryptographic readiness.** Signatures in v0.1 use Ed25519 or comparable pre-quantum algorithms. Sufficiently large quantum computers would break these signatures, undermining the trust model that binds claims to publisher key control. A future version of LLMO will specify a migration path: algorithm identifiers in the schema, hybrid signature support during the transition, and a deprecation window for pre-quantum-only documents.
+
 ---
 
 ## Appendix A: Conformance Artifacts
