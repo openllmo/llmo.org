@@ -1,0 +1,285 @@
+---
+lip: 2
+title: Core Claim Type Proposal Submission Mechanics
+sidebarTitle: LIP-2
+description: Formalizes the submission process for core claim type proposals under the LIP framework.
+author: Nic Chavez <spec@llmo.org>
+discussions-to: https://github.com/openllmo/llmo.org/discussions
+status: Draft
+type: Process
+created: 2026-04-21
+license: CC-BY-4.0
+transitions:
+  - date: 2026-04-21
+    from: null
+    to: Draft
+    ref: "Initial draft, PR to be populated post-merge"
+---
+
+## 1. Purpose
+
+LIP-1 defined Standards Track LIPs as covering both core and extension claim types but deferred the submission mechanics for core claim type proposals to a forthcoming Process LIP. This is that LIP.
+
+LIP-2 specifies three mechanisms: a placeholder filename convention for pre-number pull requests, a CI validator amendment that distinguishes pull-request state from main-branch state, and an automation that renames placeholder files to numbered files at merge. Together these allow core claim type proposals to be submitted under the LIP framework without manual rename ceremony by the editor.
+
+LIP-2 amends LIP-1 Sections 4, 6, and 9. Amendments take effect when LIP-2 transitions to Active.
+
+## 2. Placeholder filename convention
+
+Core claim type proposals are filed at `/spec/lips/lip-NEW-<slug>.mdx` during pull request review, where `<slug>` matches the regular expression `[a-z0-9-]{3,40}`. Examples: `lip-NEW-claim-validity-window.mdx`, `lip-NEW-publisher-binding-rotation.mdx`.
+
+The `NEW` prefix is the only permitted placeholder marker. Authors must not self-assign numbers in the filename.
+
+At merge, automation renames the file to `/spec/lips/lip-NNNN.mdx`, where `NNNN` is the LIP number assigned by the editor at Step 3 of the submission process.
+
+The placeholder convention follows the PEP process, which uses descriptive placeholder identifiers during draft and numbered identifiers at acceptance.
+
+## 3. CI workflow amendment
+
+The existing workflow at `.github/workflows/validate-lip-registry.yml` runs the registry validator on pull requests. LIP-2 extends this workflow to run on pushes to main as well, with validation rules that vary by context.
+
+**On `pull_request` events:** placeholder files matching `lip-NEW-*.mdx` are permitted on the PR branch. Invariant 2 (every LIP file has a registry entry) excludes placeholder files from its check. All other invariants (1, 3, 4, 5, 6) apply unchanged.
+
+**On `push` to main (`refs/heads/main`):** Invariant 7 applies. No files matching `lip-NEW-*.mdx` may exist in main. All other invariants apply unchanged.
+
+The single workflow file handles both contexts via `github.event_name` and `github.ref` conditionals. The validator script gains a flag, `--main-branch`, that toggles Invariant 7 enforcement.
+
+## 4. Invariant 7
+
+**Invariant 7: No placeholder files in main.**
+
+For every file matching `spec/lips/lip-NEW-*.mdx` when the validator runs in main-branch mode, fail with a message of this form:
+
+```
+ERROR: Placeholder LIP file found in main.
+  File: spec/lips/lip-NEW-<slug>.mdx
+  Fix: placeholder files must be renamed to lip-NNNN.mdx at merge time per LIP-2.
+       If this file exists in main, the rename automation failed or was bypassed.
+       Open a PR that renames the file and adds the corresponding registry entry.
+```
+
+Invariant 7 is additive to Invariants 1 through 6. It runs only when the validator is invoked with `--main-branch`. On pull request runs, Invariant 7 is skipped.
+
+## 5. Rename automation (behavioral specification)
+
+An automation renames placeholder files to numbered files at merge. The automation is specified below by behavior; specific deployment configuration is in Section 10 (Reference implementation).
+
+**Trigger:** the automation runs when a pull request receives a label named `editor-approved`. No other events trigger the automation.
+
+**Inputs:**
+1. The PR description, which must contain a line of the form `LIP number: NNNN` where `NNNN` is a positive integer.
+2. The PR branch's file tree, which must contain exactly one file matching `spec/lips/lip-NEW-*.mdx`.
+3. The current state of `spec/lips/index.json` on the PR branch.
+
+**Operations, in order:**
+1. Parse the LIP number from the PR description. If the line is missing or malformed, fail (see Error handling).
+2. Verify the number is not already present in `spec/lips/index.json`. If present, fail.
+3. Verify exactly one placeholder file matching `lip-NEW-*.mdx` exists in `spec/lips/`. If zero or more than one, fail.
+4. Rename the placeholder file from `spec/lips/lip-NEW-<slug>.mdx` to `spec/lips/lip-NNNN.mdx` (zero-padded to four digits).
+5. Parse the frontmatter of the renamed file to extract `title`, `author`, `status`, `type`, and `created` fields. Construct a registry entry and append it to `spec/lips/index.json` in numerical order.
+6. Update the `generated` field in `spec/lips/index.json` to the current date.
+7. Commit the rename and registry update with message `chore(spec): rename LIP placeholder to lip-NNNN and add registry entry` and DCO sign-off from the bot identity.
+8. Push to the PR branch.
+
+**Outputs:** the PR branch now contains the numbered LIP file and an updated `index.json`. CI runs automatically on the push and validates the updated state.
+
+**Error handling:** any failure (missing PR line, number already taken, wrong number of placeholder files, push rejected) causes the automation to post a comment on the PR explaining the specific failure and exit without modifying the branch. The editor reads the comment, corrects the underlying issue, and re-applies the `editor-approved` label to re-trigger.
+
+**Idempotency:** if the automation runs twice (label removed and re-applied), the second run detects that the rename has already occurred (no `lip-NEW-*.mdx` files present, numbered file exists, registry entry present) and exits without making changes.
+
+**Audit trail:** every invocation of the automation is logged by the CI system and visible in the PR's workflow run history. Commits by the automation are signed and attributed to the bot identity, distinguishable from human commits in git history.
+
+## 6. Submission process for core claim type proposals
+
+This process applies to core claim type proposals. It parallels the extension proposal process in LIP-1 Section 4 with variations at Steps 3, 4, 5, and 6.
+
+**Step 1: Open a Discussion.** Open a GitHub Discussion in openllmo/llmo.org describing the proposed change: the core claim type being added or modified, the proposed normative content (MUST/SHOULD/MAY clauses), backwards-compatibility implications, and the specification sections affected.
+
+**Step 2: Observe the discussion period.** Minimum 7 days of public discussion with at least one non-author public response, identical to LIP-1 Section 4 Step 2.
+
+**Step 3: Request a LIP number.** After the Step 2 gate is satisfied, request a number from the editor by commenting on the Discussion thread or emailing spec@llmo.org. The editor verifies the Step 2 conditions and assigns a number. No nonce is issued; core claim type proposals have no namespace to verify.
+
+**Step 4: (Skipped for core proposals.)** The DNS TXT proof-of-control step is extension-specific and does not apply.
+
+**Step 5: Open a pull request.** File the LIP document at `/spec/lips/lip-NEW-<slug>.mdx`. The PR description must include the assigned LIP number on a line of the form `LIP number: NNNN`, reference the Discussion thread, and confirm that the 14-day substantive-change governance window (per the governance page) has been observed.
+
+**Step 6: Editor approval and automated rename.** The editor reviews the PR. When review is complete and the governance window has been observed, the editor applies the `editor-approved` label. The rename automation runs (Section 5). The operator reviews the final PR state, which now includes the numbered LIP file and the updated registry entry, and merges via the GitHub user interface.
+
+**Step 7: Draft to Proposed.** The LIP enters Draft on merge. When the specification is complete, the author transitions to Proposed.
+
+**Step 8: Proposed to Final.** Final when an adoption signal is observed (implementation, incorporation into a specification version bump, or comparable evidence).
+
+## 7. Amendments to LIP-1
+
+On transition to Active, LIP-2 amends LIP-1 as follows. Exact find-and-replace text is specified in Appendix A.
+
+**Section 4 (Submission process for Standards Track LIPs):** rewritten to cover both extension and core paths in a unified eight-step list with per-step annotations for path-specific variations. The existing extension content is preserved; core-path annotations are added at Steps 3, 4, 5, and 6.
+
+**Section 6 (Editor role):** one new responsibility is added to the editor bullet list: "Apply the `editor-approved` label to pull requests for core claim type proposals once review is complete, triggering the rename automation described in LIP-2."
+
+**Section 9 (LIP numbering):** a clause is added clarifying that core claim type proposals use a placeholder filename during PR review, with the number assigned at Step 3 and committed to the filename at merge via automation.
+
+## 8. Backwards compatibility
+
+LIP-2 introduces no changes to existing accepted LIPs. LIP-1 remains Active. The amendments in Section 7 apply prospectively. No existing filenames, registry entries, or validator invariants are altered in a way that breaks historical data.
+
+The existing `validate-lip-registry.yml` workflow continues to run on pull requests exactly as before. The amendment adds behavior (Invariant 7 on main-branch runs) without removing or changing existing behavior.
+
+## 9. Prior art
+
+**PEP-1** (Python Enhancement Proposal process) uses placeholder identifiers during draft and numbered identifiers at acceptance. PEPs are filed under placeholder numbers such as `pep-9999` during draft and assigned real numbers by the PEP editor at acceptance.
+
+**BIP-2** uses `?` in the BIP header field before number assignment by the editor. BIP files are renamed from a placeholder form to `bip-NNNN.mediawiki` when the editor assigns a number.
+
+LIP-2 adapts the PEP filename convention (`lip-NEW-<slug>.mdx` instead of a numeric placeholder) and extends it with automated rename at merge, which neither PEP nor BIP has because neither uses a CI-enforced registry integrity validator. The automation exists because the validator exists; the safety-net invariant (Invariant 7) exists because the automation can fail.
+
+The behavioral specification approach (Section 5) follows the IETF RFC tradition of specifying behavior in the document body and referencing reference implementations separately (Section 10). This allows alternative implementations to satisfy the specification on different platforms should LLMO's deployment context change.
+
+## 10. Reference implementation
+
+This section describes LLMO's deployment of the mechanisms specified in Sections 3 through 5. Alternative deployments on other platforms that satisfy the behavioral specification are consistent with LIP-2.
+
+**CI workflow amendment (Section 3):** implemented by modifying `.github/workflows/validate-lip-registry.yml` to add `push` trigger for `refs/heads/main` alongside the existing `pull_request` trigger. Conditional steps use `${{ github.event_name }}` and `${{ github.ref }}` to select the appropriate validator flags.
+
+**Validator script (Section 4, Invariant 7):** implemented by adding a `--main-branch` command-line flag to `scripts/validate-lip-registry.sh`. When set, the script runs an additional check for `lip-NEW-*.mdx` files under `spec/lips/` and fails if any are found. On pull request runs, the flag is not set and Invariant 7 is skipped.
+
+**Rename automation (Section 5):** implemented as a new GitHub Action at `.github/workflows/rename-lip-placeholder.yml`. The workflow triggers on `pull_request` events with `types: [labeled]` and filters on the `editor-approved` label. The workflow runs under a GitHub App installation named `llmo-editor-bot`, scoped to the `openllmo/llmo.org` repository with write access to pull request branches and issues. The app's installation token is used for commits and pushes. Commits are signed using a committer key registered to the GitHub App, visible as "Verified" in git history.
+
+**Bot identity setup:** the GitHub App is registered under the Diverse.org organization account, with restricted permissions (no access to main branch directly, no access to other repositories). The app's webhook is configured to trigger only on the repository's own `pull_request` events. The private key for commit signing is stored as a GitHub Actions secret named `LIP_BOT_SIGNING_KEY`.
+
+LIP-3 (shipping alongside LIP-2 as Informational) codifies LLMO's LIP authoring conventions. LIP-2's verbosity reflects the level of rigor expected of a Process LIP amending core governance. Informational or shorter LIPs may use a lighter register consistent with their scope, per LIP-3 guidance.
+
+If GitHub's platform becomes unavailable or the project migrates to a different forge, the reference implementation must be rebuilt on the new platform to satisfy the behavioral specification in Sections 3, 4, and 5.
+
+## Appendix A: LIP-1 amendment text
+
+The following amendments to LIP-1 take effect when LIP-2 transitions to Active. Find text matches the current state of LIP-1 in main as of LIP-2's initial draft. If LIP-1 is amended by an unrelated editorial revision during LIP-2's 14-day governance window, the find text will be updated to match main at the moment of LIP-2's transition to Active.
+
+### A.0 Amendment to LIP-1 Section 4 opening paragraph
+
+The opening paragraph's middle sentence is dropped because it becomes self-referential when LIP-2 is Active: LIP-2 is the "forthcoming Process LIP" it refers to. The first and third sentences remain accurate for both extension and core paths.
+
+Find:
+
+```
+Standards Track LIPs propose changes to the claim registry, whether those changes add or modify core claim types or extension claim types. The submission process below applies to extension claim type proposals; submission mechanics for core claim type proposals will be defined in a forthcoming Process LIP. The eight steps follow:
+```
+
+Replace with:
+
+```
+Standards Track LIPs propose changes to the claim registry, whether those changes add or modify core claim types or extension claim types. The eight steps follow:
+```
+
+### A.1 Amendments to LIP-1 Section 4
+
+Steps 3, 4, 5, and 6 are amended to add core-path annotations. The extension content at each step is preserved.
+
+**Step 3.** Find:
+
+```
+3. **Request a LIP number and nonce.** After the Step 2 gate is satisfied (7 days elapsed and at least one non-author public response recorded), request a LIP number and nonce from the editor by commenting on the discussion or emailing [spec@llmo.org](mailto:spec@llmo.org). The editor verifies that the Step 2 conditions have been met before issuing a nonce. The editor issues a unique nonce bound to a reserved LIP number. The nonce expires 30 days after issuance.
+```
+
+Replace with:
+
+```
+3. **Request a LIP number.** After the Step 2 gate is satisfied (7 days elapsed and at least one non-author public response recorded), request a LIP number from the editor by commenting on the discussion or emailing [spec@llmo.org](mailto:spec@llmo.org). The editor verifies that the Step 2 conditions have been met before assigning a number. For extension claim type proposals, the editor also issues a unique nonce bound to the reserved LIP number; the nonce expires 30 days after issuance. For core claim type proposals, no nonce is issued.
+```
+
+**Step 4.** Find:
+
+```
+4. **Publish a DNS TXT record** at `_llmo-lip.<namespace-domain>` with a value of the form `llmo-lip=<lip-number> nonce=<nonce>`. Example: `_llmo-lip.acme-corp.com IN TXT "llmo-lip=42 nonce=a1b2c3d4e5f6g7h8"`. This record demonstrates control of the domain corresponding to the proposed namespace.
+```
+
+Replace with:
+
+```
+4. **Publish a DNS TXT record (extension proposals only).** For extension claim type proposals, publish a DNS TXT record at `_llmo-lip.<namespace-domain>` with a value of the form `llmo-lip=<lip-number> nonce=<nonce>`. Example: `_llmo-lip.acme-corp.com IN TXT "llmo-lip=42 nonce=a1b2c3d4e5f6g7h8"`. This record demonstrates control of the domain corresponding to the proposed namespace. Core claim type proposals skip this step; the namespace is the core specification itself, controlled by the editor.
+```
+
+**Step 5.** Find:
+
+```
+5. **Open a pull request** adding the LIP document at `/spec/lips/lip-NNNN.mdx`, where `NNNN` is the reserved number zero-padded to four digits. The PR description must reference the discussion thread and the DNS TXT record location so the editor can verify.
+```
+
+Replace with:
+
+```
+5. **Open a pull request.** For extension claim type proposals, add the LIP document at `/spec/lips/lip-NNNN.mdx`, where `NNNN` is the reserved number zero-padded to four digits; the PR description must reference the discussion thread and the DNS TXT record location so the editor can verify. For core claim type proposals, add the LIP document at `/spec/lips/lip-NEW-<slug>.mdx` (placeholder filename per LIP-2 Section 2); the PR description must include the assigned LIP number on a line of the form `LIP number: NNNN` and reference the discussion thread.
+```
+
+**Step 6.** Find:
+
+```
+6. **Editor verification.** The editor verifies the DNS TXT record, checks format compliance of the LIP document, and merges the PR with the LIP in Draft status. At merge time, the reserved number becomes committed.
+```
+
+Replace with:
+
+```
+6. **Editor verification.** For extension claim type proposals, the editor verifies the DNS TXT record, checks format compliance of the LIP document, and merges the PR with the LIP in Draft status; at merge time, the reserved number becomes committed. For core claim type proposals, the editor checks format compliance and applies the `editor-approved` label, which triggers the rename automation described in LIP-2. The automation renames the placeholder file to `lip-NNNN.mdx` and appends the registry entry; the editor reviews the final PR state and merges.
+```
+
+### A.2 Amendment to LIP-1 Section 6
+
+One new bullet is added at the end of the editor responsibilities list. Existing bullets retain their order.
+
+Find:
+
+```
+- Assign LIP numbers and issue nonces on request.
+- Verify DNS TXT records submitted with Standards Track LIPs.
+- Check format compliance of submitted LIP documents.
+- Merge format-compliant submissions that have completed the required discussion period.
+- Update LIP statuses in response to observed signals (adoption, supersession, withdrawal).
+- Maintain the registry index at `/spec/lips/index.json` and `/spec/lips/index.mdx`.
+- Verify the 14-day governance window has been observed for core claim type proposals before merging the associated pull request.
+```
+
+Replace with:
+
+```
+- Assign LIP numbers and issue nonces on request.
+- Verify DNS TXT records submitted with Standards Track LIPs.
+- Check format compliance of submitted LIP documents.
+- Merge format-compliant submissions that have completed the required discussion period.
+- Update LIP statuses in response to observed signals (adoption, supersession, withdrawal).
+- Maintain the registry index at `/spec/lips/index.json` and `/spec/lips/index.mdx`.
+- Verify the 14-day governance window has been observed for core claim type proposals before merging the associated pull request.
+- Apply the `editor-approved` label to pull requests for core claim type proposals once review is complete, triggering the rename automation described in LIP-2.
+```
+
+### A.3 Amendment to LIP-1 Section 9
+
+The number-reservation paragraph is amended to describe the core-proposal path: placeholder filename during PR review, number committed to the filename at merge via automation.
+
+Find:
+
+```
+Numbers are reserved at the point of nonce issuance (for Standards Track LIPs) or at the point of draft commit preparation (for Process and Informational LIPs). Numbers are committed when the corresponding pull request is merged with the LIP in Draft status.
+```
+
+Replace with:
+
+```
+Numbers are reserved at the point of nonce issuance (for extension claim type proposals), at the point of number assignment by the editor (for core claim type proposals), or at the point of draft commit preparation (for Process and Informational LIPs). For extension, Process, and Informational LIPs, numbers are committed when the corresponding pull request is merged with the LIP in Draft status. For core claim type proposals, the LIP is filed under a placeholder filename (`lip-NEW-<slug>.mdx` per LIP-2 Section 2) during PR review; the number is committed to the filename at merge via the rename automation described in LIP-2.
+```
+
+### A.4 Amendment to LIP-1 Section 9 abandoned-reservation paragraph
+
+The release paragraph currently anchors the release trigger on "nonce expiration," which is extension-specific. It is rewritten to cover both paths with per-path release triggers.
+
+Find:
+
+```
+A reserved number that never reaches merge (because the author abandons the submission, or the nonce expires without a PR being opened) is released 30 days after nonce expiration, and may be reused for a later submission.
+```
+
+Replace with:
+
+```
+A reserved number that never reaches merge is released and may be reused for a later submission. For extension claim type proposals, release occurs 30 days after nonce expiration. For core claim type proposals, release occurs 60 days after the editor's number assignment. In both cases, the trigger for release is the reservation becoming stale without corresponding merge activity.
+```
