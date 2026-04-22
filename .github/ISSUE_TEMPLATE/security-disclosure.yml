@@ -1,0 +1,38 @@
+name: Security disclosure (redirect)
+description: If you've found a security vulnerability in LLMO, please do NOT open a public issue. Use the private disclosure channels described in SECURITY.md.
+title: "[DO NOT FILE: Use private disclosure]"
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # Stop, this is not the right place to report a security vulnerability
+
+        Public GitHub issues are visible to everyone. If you have found a security vulnerability in LLMO, reporting it here would expose it before we have a chance to fix it.
+
+        **Please close this form and use one of the private disclosure channels instead:**
+
+        ## Preferred: GitHub Private Vulnerability Reporting
+
+        - [openllmo/llmo.org](https://github.com/openllmo/llmo.org/security/advisories/new)
+        - [openllmo/llmo-validator](https://github.com/openllmo/llmo-validator/security/advisories/new)
+
+        ## Alternative: Encrypted email
+
+        Email **security@llmo.org** with the PGP key published in [SECURITY.md](https://github.com/openllmo/llmo.org/blob/main/SECURITY.md).
+
+        ## Fallback: Plain email
+
+        Email **security@llmo.org** without PGP. We will respond with a secure channel. Do not include exploitation details in a plain email.
+
+        ## What counts as a security issue?
+
+        See the [scope section of SECURITY.md](https://github.com/openllmo/llmo.org/blob/main/SECURITY.md#scope) for what is and isn't covered by this policy. If your issue is a spec bug or a proposed change, please use one of the other issue templates instead.
+  - type: checkboxes
+    id: understanding
+    attributes:
+      label: Acknowledgment
+      description: Please confirm you understand before submitting.
+      options:
+        - label: I have read the guidance above and I am NOT reporting a security vulnerability through this form.
+          required: true
