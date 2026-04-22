@@ -10,6 +10,15 @@
       "type": "Process",
       "created": "2026-04-21",
       "path": "/spec/lips/lip-0001.mdx"
+    },
+    {
+      "lip": 3,
+      "title": "LIP Authoring Conventions",
+      "author": "Nic Chavez",
+      "status": "Draft",
+      "type": "Informational",
+      "created": "2026-04-21",
+      "path": "/spec/lips/lip-0003.mdx"
     }
   ]
 }
