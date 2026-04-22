@@ -36,7 +36,8 @@
             ]
           },
           "spec/anchoring",
-          "spec/changelog"
+          "spec/changelog",
+          "spec/versioning"
         ]
       },
       {
