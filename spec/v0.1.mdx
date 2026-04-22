@@ -692,13 +692,13 @@ Serval, Inc. is a hypothetical enterprise observability company. It publishes th
 
 ---
 
-## 8. Open Questions for v0.2
+## 8. Open Questions for Future Versions
 
 The following are known gaps or deferred decisions. v0.1 ships without resolving them.
 
-**8.1 Revocation beyond supersession.** Document supersession and signature key rotation cover the common case. They do not cover "we need every cached copy of document X to be treated as revoked *immediately*, even if consumers haven't refetched." A v0.2 revocation registry — potentially a signed, append-only list at `/.well-known/llmo-revocations.json` — is under consideration.
+**8.1 Revocation beyond supersession.** Document supersession and signature key rotation cover the common case. They do not cover "we need every cached copy of document X to be treated as revoked *immediately*, even if consumers haven't refetched." A future version of LLMO may define a revocation registry, potentially a signed, append-only list at `/.well-known/llmo-revocations.json`.
 
-**8.2 Delegation.** How does a parent organization assert authority over a subsidiary's `llmo.json`, and vice versa? v0.1 treats each domain as independent. A `delegates_to` / `delegated_from` claim pair is the likely v0.2 answer, but the trust implications (can a compromised parent forge a child?) need careful design.
+**8.2 Delegation.** How does a parent organization assert authority over a subsidiary's `llmo.json`, and vice versa? v0.1 treats each domain as independent. A `delegates_to` / `delegated_from` claim pair is the likely answer in a future version of LLMO, but the trust implications (can a compromised parent forge a child?) need careful design.
 
 **8.3 Cross-domain aliases.** v0.1 requires each alias domain to serve its own file. Whether a single canonical document should be able to speak for multiple domains without per-domain publication is unresolved. The trust argument for per-domain is strong; the operational argument against it is also strong.
 
@@ -706,11 +706,11 @@ The following are known gaps or deferred decisions. v0.1 ships without resolving
 
 **8.5 Registry governance for extension claims.** The `llmo.org/claims/` registry needs an explicit governance model: who can register, what review is required, what it means for a claim type to be "promoted" to core. v0.1 leaves this to an informal editorial process.
 
-**8.6 Non-domain entities.** Individuals, DAOs, and other entities without a primary domain are out of scope for v0.1. A v0.2 binding for DID-rooted publication is plausible.
+**8.6 Non-domain entities.** Individuals, DAOs, and other entities without a primary domain are out of scope for v0.1. A future version of LLMO may include a binding for DID-rooted publication.
 
-**8.7 Interaction with retrieval-augmented generation at scale.** How LLM providers *actually* consume LLMO claims at ingestion or retrieval time is outside the spec's control. v0.2 may include non-normative guidance for implementers on both sides — publishers and consumers — based on early adoption data.
+**8.7 Interaction with retrieval-augmented generation at scale.** How LLM providers *actually* consume LLMO claims at ingestion or retrieval time is outside the spec's control. A future version of LLMO may include non-normative guidance for implementers on both sides, publishers and consumers, based on early adoption data.
 
-**8.8 Internationalization.** All claim statements in v0.1 are free-form strings. A v0.2 binding for localized claim text (`"detail": {"en": "...", "ja": "..."}`) is likely.
+**8.8 Internationalization.** All claim statements in v0.1 are free-form strings. A future version of LLMO will likely include a binding for localized claim text (`"detail": {"en": "...", "ja": "..."}`).
 
 **8.9 Relationship to compliance frameworks.** Whether LLMO claims can or should be referenced in privacy policies, terms of service, or regulated disclosures is a legal question v0.1 explicitly does not answer. Organizations should consult counsel before treating LLMO claims as legally operative.
 
@@ -718,7 +718,7 @@ The following are known gaps or deferred decisions. v0.1 ships without resolving
 
 The answer is a consumer-side reputation layer that sits above LLMO — a separate artifact, not a field inside `llmo.json`, that scores publishers on signals LLMO itself cannot carry: domain age, historical consistency of claims, cross-reference against external identity anchors (Wikidata, legal registries, independent identity networks), signature key rotation hygiene, disavowal patterns that correlate with suppression of legitimate criticism. This artifact is necessarily third-party-published — a publisher cannot credibly score itself — and is a plausible role for the LLMO registry or an independent trust network to fill.
 
-The field `confidence` inside a claim is the *publisher's hedge on its own claim*. The reputation layer is *the consumer's score of the publisher*. These are different concerns and belong in different artifacts. v0.1 specifies the first and explicitly defers the second. v0.2 or v0.3 will need to specify the interaction: how consumers combine a claim's stated confidence with the publisher's reputation score to produce a final trust assessment, and how the reputation layer's own trust is anchored without recreating the same adversarial problem one level up.
+The field `confidence` inside a claim is the *publisher's hedge on its own claim*. The reputation layer is *the consumer's score of the publisher*. These are different concerns and belong in different artifacts. v0.1 specifies the first and explicitly defers the second. A future version of LLMO will need to specify the interaction: how consumers combine a claim's stated confidence with the publisher's reputation score to produce a final trust assessment, and how the reputation layer's own trust is anchored without recreating the same adversarial problem one level up.
 
 A plausible input to any such reputation layer is **immutable publication history** — an append-only log of a publisher's `llmo.json` documents over time, hosted by a party other than the publisher. A self-hosting publisher can, in principle, rewrite history by re-signing a backdated prior document and claiming it was always there; a third-party log cannot be rewritten. The diff between successive documents then becomes an auditable trail of what the publisher claimed when. v0.1 does not specify this log; a future version may define an interchange format for importing and exporting such histories between reputation layers.
 
