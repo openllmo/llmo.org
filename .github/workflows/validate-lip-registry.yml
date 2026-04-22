@@ -6,6 +6,12 @@ on:
       - 'spec/lips/**'
       - 'scripts/validate-lip-registry.sh'
       - '.github/workflows/validate-lip-registry.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'spec/lips/**'
+      - 'scripts/validate-lip-registry.sh'
+      - '.github/workflows/validate-lip-registry.yml'
 
 permissions:
   contents: read
@@ -29,4 +35,9 @@ jobs:
           jq --version
 
       - name: Validate LIP registry
-        run: bash scripts/validate-lip-registry.sh
+        run: |
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
+            bash scripts/validate-lip-registry.sh --main-branch
+          else
+            bash scripts/validate-lip-registry.sh
+          fi
