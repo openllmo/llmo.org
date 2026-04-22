@@ -34,6 +34,7 @@
               "spec/lips/lip-0003"
             ]
           },
+          "spec/anchoring",
           "spec/changelog"
         ]
       },
