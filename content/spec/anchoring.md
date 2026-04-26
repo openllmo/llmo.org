@@ -2,7 +2,7 @@
 title: Anchoring LIP Documents
 linkTitle: Anchoring
 description: "How LLMO anchors LIP documents to Bitcoin via OpenTimestamps."
-date: 2026-04-17
+date: 2026-04-26
 ---
 
 ## Purpose
@@ -35,10 +35,10 @@ Both states are meaningful proofs; confirmed is stronger. Running the verificati
 To anchor a LIP file:
 
 ```
-bash scripts/anchor-lip.sh spec/lips/lip-NNNN.mdx
+bash scripts/anchor-lip.sh content/spec/lips/lip-NNNN.md
 ```
 
-The script validates that the path points to a non-placeholder LIP (four-digit numbered filename) and submits the file hash to the default OpenTimestamps calendars. It produces a `.ots` file adjacent to the LIP (for example, `spec/lips/lip-0001.mdx.ots`).
+The script validates that the path points to a non-placeholder LIP (four-digit numbered filename) and submits the file hash to the default OpenTimestamps calendars. It produces a `.ots` file adjacent to the LIP (for example, `content/spec/lips/lip-0001.md.ots`).
 
 Commit both the LIP and its `.ots` file together. The proof attests to the exact bytes of the LIP at stamp time; any subsequent edit to the LIP invalidates the proof.
 
@@ -51,7 +51,7 @@ An anchor timestamp reflects when the stamp was created, not when the LIP was or
 To verify a LIP's anchor:
 
 ```
-bash scripts/verify-lip-anchor.sh spec/lips/lip-NNNN.mdx
+bash scripts/verify-lip-anchor.sh content/spec/lips/lip-NNNN.md
 ```
 
 The script first runs `ots upgrade` on the `.ots` file, which pulls any newly available Bitcoin attestations from the calendar servers. This operation is idempotent and best-effort; if the calendars are unreachable or the proof has no new attestations to pull, upgrade returns silently and verification proceeds.
@@ -78,4 +78,12 @@ RFC 3161 specifies the Time-Stamp Protocol used by traditional timestamping auth
 
 Anchoring is currently **optional** for LIPs. The LLMO editor anchors accepted LIPs as part of the merge workflow, but the registry validator does not require the presence of a `.ots` file. A future Process LIP may introduce a mandatory anchoring requirement; until then, the presence or absence of an anchor is an editorial decision recorded in the LIP's commit history.
 
-At the time of this writing, LIP-1 and LIP-3 carry initial anchor proofs in their pending state. LIP-2 will be anchored when its PR merges.
+At the time of this writing, LIP-1 and LIP-3 carry anchor proofs in their pending state, re-anchored on 2026-04-26 against the post-migration `.md` byte content. LIP-2 will be anchored when its PR merges.
+
+## Migration history
+
+On 2026-04-26 the LLMO project migrated its publishing platform from Mintlify (`.mdx`) to Hugo (`.md`). LIP source files moved from `spec/lips/lip-NNNN.mdx` to `content/spec/lips/lip-NNNN.md`, and Mintlify-specific frontmatter (`sidebarTitle:`) was renamed to Hugo's equivalent (`linkTitle:`). Both changes invalidated the original anchor proofs, which had been stamped on 2026-04-22 against the pre-migration byte content.
+
+The original `.mdx.ots` proofs are preserved at [`/spec/lips/legacy/`](/spec/lips/legacy/) as historical record. Verifying them requires reconstructing the original `.mdx` bytes from git history; the directory's `README.md` documents the procedure.
+
+LIP-1 and LIP-3 were re-anchored on 2026-04-26 against the new `.md` byte content. The re-anchored proofs reset the canonical anchor timestamp; the original drafting and acceptance dates remain in each LIP's `transitions` log, which is part of the anchored content.
