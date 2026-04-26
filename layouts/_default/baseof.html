@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="{{ .Site.Language.Lang }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ block "title" . }}{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} | {{ .Site.Title }}{{ end }}{{ end }}</title>
+{{ with .Description }}<meta name="description" content="{{ . }}">{{ end }}
+<style>
+  :root { --fg: #111; --bg: #fff; --muted: #555; --link: #0645ad; --code-bg: #f4f4f4; --rule: #ddd; }
+  html { background: var(--bg); color: var(--fg); }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; line-height: 1.55; max-width: 48rem; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+  header { margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--rule); display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  header a.brand { font-weight: 600; text-decoration: none; color: var(--fg); }
+  nav a { margin-left: 1rem; color: var(--link); }
+  h1, h2, h3, h4 { line-height: 1.25; }
+  h1 { font-size: 1.75rem; margin: 0 0 1rem; }
+  h2 { font-size: 1.35rem; margin-top: 2rem; }
+  h3 { font-size: 1.1rem; margin-top: 1.5rem; }
+  a { color: var(--link); }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: var(--code-bg); padding: 0.1em 0.3em; border-radius: 3px; font-size: 0.95em; }
+  pre { background: var(--code-bg); padding: 0.75rem 1rem; border-radius: 4px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  blockquote { border-left: 3px solid var(--rule); margin: 1rem 0; padding: 0.25rem 1rem; color: var(--muted); }
+  table { border-collapse: collapse; margin: 1rem 0; }
+  th, td { border: 1px solid var(--rule); padding: 0.4rem 0.7rem; text-align: left; vertical-align: top; }
+  th { background: var(--code-bg); }
+  hr { border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }
+  footer { margin-top: 4rem; padding-top: 1rem; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.9em; }
+  .meta { color: var(--muted); font-size: 0.9em; margin-bottom: 1rem; }
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="/">LLMO</a>
+  <nav>
+    <a href="/spec">Spec</a>
+    <a href="/claims">Claims</a>
+    <a href="/validate">Validator</a>
+    <a href="/about">About</a>
+    <a href="https://github.com/openllmo/llmo.org">GitHub</a>
+  </nav>
+</header>
+<main>
+{{ block "main" . }}{{ end }}
+</main>
+<footer>
+LLMO &middot; stewarded by <a href="https://diverse.org">Diverse.org</a> &middot; <a href="/about/license">License</a> &middot; <a href="https://github.com/openllmo/llmo.org">Source</a>
+</footer>
+</body>
+</html>

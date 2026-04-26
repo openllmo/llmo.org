@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Verifies the OpenTimestamps anchor proof for a LIP file.
-# Usage: bash scripts/verify-lip-anchor.sh spec/lips/lip-NNNN.mdx   (run from repo root)
+# Usage: bash scripts/verify-lip-anchor.sh content/spec/lips/lip-NNNN.md   (run from repo root)
 # Reads <file>.ots, runs 'ots upgrade' (best effort; pulls latest Bitcoin
 # attestations from calendar servers), then 'ots verify'. Reports pending
 # or confirmed. If 'ots upgrade' modifies the .ots file, notes it so the
@@ -11,15 +11,31 @@ set -euo pipefail
 
 if [[ $# -ne 1 ]]; then
   echo "ERROR: exactly one argument required (path to LIP file)." >&2
-  echo "Usage: bash scripts/verify-lip-anchor.sh spec/lips/lip-NNNN.mdx" >&2
+  echo "Usage: bash scripts/verify-lip-anchor.sh content/spec/lips/lip-NNNN.md" >&2
   exit 1
 fi
 
 FILE="$1"
+
+if [[ "$FILE" == spec/lips/*.mdx ]]; then
+  echo "ERROR: $FILE uses the pre-migration path and extension." >&2
+  echo "       LIPs were migrated to Hugo on 2026-04-26. The new path is:" >&2
+  echo "         content/spec/lips/$(basename "${FILE%.mdx}").md" >&2
+  echo "       Original .mdx.ots proofs are preserved at static/spec/lips/legacy/;" >&2
+  echo "       verifying those requires the original .mdx bytes from git history" >&2
+  echo "       (e.g. git show <commit>:spec/lips/lip-NNNN.mdx)." >&2
+  exit 1
+fi
+
 PROOF="$FILE.ots"
 
 if [[ ! -f "$FILE" ]]; then
   echo "ERROR: $FILE does not exist or is not a regular file." >&2
+  exit 1
+fi
+
+if [[ "$FILE" != content/spec/lips/* ]]; then
+  echo "ERROR: $FILE is not under content/spec/lips/." >&2
   exit 1
 fi
 
@@ -31,6 +47,7 @@ fi
 if ! command -v ots > /dev/null 2>&1; then
   echo "ERROR: ots is required but not installed." >&2
   echo "Install with: pip3 install opentimestamps-client" >&2
+  echo "Ensure the install location (e.g. ~/Library/Python/3.9/bin) is on PATH." >&2
   exit 1
 fi
 
