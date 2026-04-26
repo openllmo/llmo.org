@@ -7,6 +7,10 @@
 # (5) frontmatter agrees with the registry on six fields;
 # (6) the frontmatter 'status' field agrees with the 'to' field of the last
 #     entry in the transitions array.
+#
+# The 'path' field in index.json is the public URL where each LIP is
+# published (e.g., /spec/lips/lip-0001/), not a filesystem path. This
+# script maps URL to filesystem path internally via url_to_fs_path().
 # Usage: bash scripts/validate-lip-registry.sh   (run from repo root)
 # Exit codes: 0 = all invariants satisfied; 1 = one or more violations reported.
 
@@ -18,6 +22,16 @@ ERRORS=0
 report() {
   printf '%s\n\n' "$1" >&2
   ERRORS=$((ERRORS + 1))
+}
+
+# Map a published URL (as carried in index.json's path field) to the
+# filesystem path of the LIP's source markdown file.
+# Example: /spec/lips/lip-0001/ -> content/spec/lips/lip-0001.md
+url_to_fs_path() {
+  local url="$1"
+  url="${url#/}"
+  url="${url%/}"
+  echo "content/${url}.md"
 }
 
 if [[ ! -f "$INDEX" ]]; then
@@ -65,10 +79,10 @@ shopt -u nullglob
 
 # -------- Invariant 3: every registry entry points at an existing file --------
 while IFS=$'\t' read -r lip_num path; do
-  rel_path="${path#/}"
+  rel_path=$(url_to_fs_path "$path")
   if [[ ! -f "$rel_path" ]]; then
     report "ERROR: Registry entry points at non-existent file.
-  Broken entry: LIP-$lip_num (path: $path)
+  Broken entry: LIP-$lip_num (URL: $path; expected source: $rel_path)
   Fix: create the missing file, or remove the entry from $INDEX."
   fi
 done < <(jq -r '.lips[] | [.lip, .path] | @tsv' "$INDEX")
@@ -140,7 +154,7 @@ fm_report() {
 }
 
 while IFS=$'\t' read -r lip_num idx_title idx_author idx_status idx_type idx_created path; do
-  rel_path="${path#/}"
+  rel_path=$(url_to_fs_path "$path")
   [[ -f "$rel_path" ]] || continue  # Invariant 3 will have reported the missing file.
 
   if ! has_two_fm_delims "$rel_path"; then
@@ -205,7 +219,7 @@ extract_last_transition_to() {
 }
 
 while IFS=$'\t' read -r lip_num path; do
-  rel_path="${path#/}"
+  rel_path=$(url_to_fs_path "$path")
   [[ -f "$rel_path" ]] || continue
   has_two_fm_delims "$rel_path" || continue  # Invariant 5 already reported.
 

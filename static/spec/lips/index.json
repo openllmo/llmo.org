@@ -9,7 +9,7 @@
       "status": "Active",
       "type": "Process",
       "created": "2026-04-21",
-      "path": "/content/spec/lips/lip-0001.md"
+      "path": "/spec/lips/lip-0001/"
     },
     {
       "lip": 3,
@@ -18,7 +18,7 @@
       "status": "Draft",
       "type": "Informational",
       "created": "2026-04-21",
-      "path": "/content/spec/lips/lip-0003.md"
+      "path": "/spec/lips/lip-0003/"
     }
   ]
 }
