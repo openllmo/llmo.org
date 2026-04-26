@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Validates the integrity of the LLMO Improvement Proposal (LIP) registry.
-# Checks six invariants across spec/lips/index.json and spec/lips/lip-NNNN.mdx:
-# (1) 'generated' matches latest commit to spec/lips/; (2) every LIP file has
+# Checks six invariants across static/spec/lips/index.json and content/spec/lips/lip-NNNN.md:
+# (1) 'generated' matches latest commit to LIP files; (2) every LIP file has
 # a registry entry; (3) every registry entry points at an existing file;
 # (4) LIP numbers are unique and entries are sorted ascending by number;
 # (5) frontmatter agrees with the registry on six fields;
@@ -12,7 +12,7 @@
 
 set -euo pipefail
 
-INDEX="spec/lips/index.json"
+INDEX="static/spec/lips/index.json"
 ERRORS=0
 
 report() {
@@ -32,23 +32,23 @@ fi
 
 # -------- Invariant 1: 'generated' freshness --------
 GENERATED=$(jq -r '.generated' "$INDEX")
-REF_DATE=$(git log -1 --format=%cs -- spec/lips/ 2>/dev/null || true)
+REF_DATE=$(git log -1 --format=%cs -- content/spec/lips/ static/spec/lips/ 2>/dev/null || true)
 
 if [[ -z "$REF_DATE" ]]; then
-  echo "NOTE: No commits to spec/lips/ yet. Invariant 1 (generated freshness) skipped." >&2
+  echo "NOTE: No commits to LIP files yet. Invariant 1 (generated freshness) skipped." >&2
   echo "This state should only occur during initial repo setup. If you see this in" >&2
   echo "a non-bootstrap context, something is wrong with the git history." >&2
 elif [[ "$GENERATED" != "$REF_DATE" ]]; then
   report "ERROR: $INDEX 'generated' field is out of date.
   Current value:  $GENERATED
-  Expected value: $REF_DATE  (date of most recent commit to spec/lips/)
+  Expected value: $REF_DATE  (date of most recent commit to LIP files)
   Fix: update the 'generated' field in $INDEX to match the latest commit date."
 fi
 
 # -------- Invariant 2: every LIP file has a registry entry --------
 shopt -s nullglob
-for file in spec/lips/lip-????.mdx; do
-  base=$(basename "$file" .mdx)
+for file in content/spec/lips/lip-????.md; do
+  base=$(basename "$file" .md)
   num_str="${base#lip-}"
   # Reject filenames that do not match the strict four-digit pattern.
   if [[ ! "$num_str" =~ ^[0-9]{4}$ ]]; then
