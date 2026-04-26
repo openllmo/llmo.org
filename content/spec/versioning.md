@@ -1,7 +1,8 @@
 ---
 title: Versioning
-sidebarTitle: Versioning
+linkTitle: Versioning
 description: "How LLMO specification versions are numbered, published, and superseded."
+date: 2026-04-17
 ---
 
 ## Version format

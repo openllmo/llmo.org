@@ -1,7 +1,8 @@
 ---
 title: About LLMO
-sidebarTitle: About LLMO
+linkTitle: About LLMO
 description: "What LLMO is, why it exists, and who maintains it."
+date: 2026-04-17
 ---
 
 ## What LLMO is

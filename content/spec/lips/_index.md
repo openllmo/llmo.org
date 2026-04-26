@@ -1,7 +1,8 @@
 ---
 title: LIP Registry
-sidebarTitle: Registry
+linkTitle: Registry
 description: Index of LLMO Improvement Proposals.
+date: 2026-04-21
 ---
 
 The LIP (LLMO Improvement Proposal) registry is the permanent, numbered record of proposals to change or extend the LLMO specification, its extension claim registry, or its governance. Every LIP has a named author, a declared status, a declared type, and a permanent place in this registry.

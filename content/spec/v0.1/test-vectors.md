@@ -1,7 +1,8 @@
 ---
 title: Test Vectors (v0.1)
-sidebarTitle: Test Vectors
+linkTitle: Test Vectors
 description: Reference test vectors for implementers of the LLMO v0.1 signing and canonicalization requirements.
+date: 2026-04-17
 ---
 
 This page describes the test vectors for implementers of the LLMO specification. Vectors exercise the signing and canonicalization requirements of [§4](/spec/v0.1#4-trust-model) of the spec: JWS with ES256 over a JCS-canonicalized payload ([RFC 7515](https://www.rfc-editor.org/rfc/rfc7515), [RFC 8785](https://www.rfc-editor.org/rfc/rfc8785)).
@@ -26,9 +27,7 @@ Test vectors use a fixed 180-day validity window, matching the Standard-tier cap
 - `valid_from`: `2026-04-20T00:00:00Z`
 - `valid_until`: `2026-10-17T00:00:00Z`
 
-<Info>
-Test vectors are static fixtures. After `valid_until`, a conforming validator SHOULD flag these documents as expired. This is expected behavior and a useful conformance check: a validator that does not flag an expired document is incorrect.
-</Info>
+> **Info:** Test vectors are static fixtures. After `valid_until`, a conforming validator SHOULD flag these documents as expired. This is expected behavior and a useful conformance check: a validator that does not flag an expired document is incorrect.
 
 ## Files
 
@@ -56,9 +55,7 @@ The JWKS containing the public key that verifies `signed-strict.json`. The `kid`
 
 The corresponding private key was generated ephemerally during test vector production and was not retained. The public key here is the only material required to verify the signed vector.
 
-<Warning>
-The keys in this JWKS are test-only. They MUST NOT be used in production.
-</Warning>
+> **Warning:** The keys in this JWKS are test-only. They MUST NOT be used in production.
 
 Raw: [`/spec/v0.1/test-vectors/signed-strict-key.json`](/spec/v0.1/test-vectors/signed-strict-key.json)
 
@@ -68,9 +65,7 @@ The exact UTF-8 bytes of the JCS-canonicalized payload that was signed (that is,
 
 Raw: [`/spec/v0.1/test-vectors/signed-strict-payload.json`](/spec/v0.1/test-vectors/signed-strict-payload.json)
 
-<Note>
-The file is served with a `.json` extension because Mintlify's default static-asset handler serves `.json` but not `.txt`. The content is a valid canonical JSON object by construction (that is what JCS produces), so the `.json` extension is accurate. Implementers compare the file byte-for-byte; the extension does not change the comparison.
-</Note>
+> **Note:** The file is served with a `.json` extension because Mintlify's default static-asset handler serves `.json` but not `.txt`. The content is a valid canonical JSON object by construction (that is what JCS produces), so the `.json` extension is accurate. Implementers compare the file byte-for-byte; the extension does not change the comparison.
 
 ## Verifying the signed vector
 

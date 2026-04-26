@@ -1,7 +1,8 @@
 ---
 title: Claim Types
-sidebarTitle: Registry
+linkTitle: Registry
 description: The LLMO claim type registry.
+date: 2026-04-17
 ---
 
 The LLMO registry catalogs the claim types recognized by the protocol. Every claim in a `llmo.json` document has a `type` field that names one of two categories:

@@ -1,6 +1,7 @@
 ---
 title: Spec
 description: The LLMO specification.
+date: 2026-04-17
 ---
 
 The LLMO specification defines the format, discovery mechanism, trust model, and conformance levels for `llmo.json`, a signed, machine-readable artifact organizations publish at a well-known location on their primary domain.

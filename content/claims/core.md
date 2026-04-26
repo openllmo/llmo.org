@@ -1,7 +1,8 @@
 ---
 title: Core Claim Types
-sidebarTitle: Core Claim Types
+linkTitle: Core Claim Types
 description: The eight core claim types defined in LLMO v0.1.
+date: 2026-04-17
 ---
 
 Specification v0.1 defines eight core claim types. Every conforming consumer MUST understand all eight. Each entry below names the type, its purpose, its statement schema, an example, and common pitfalls.

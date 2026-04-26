@@ -1,7 +1,8 @@
 ---
 title: JSON Schema (v0.1)
-sidebarTitle: JSON Schema
+linkTitle: JSON Schema
 description: Structural schema for llmo.json v0.1 documents.
+date: 2026-04-17
 ---
 
 A formal [JSON Schema](https://json-schema.org/) (draft 2020-12) defines the structural shape of a conforming `llmo.json` document. The raw schema is published at:

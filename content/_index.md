@@ -1,6 +1,7 @@
 ---
 title: LLMO
 description: "An open protocol for publishing machine-readable organizational identity artifacts that LLMs and agents can discover, verify, and act on."
+date: 2026-04-17
 ---
 
 ## The problem

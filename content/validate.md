@@ -1,6 +1,7 @@
 ---
 title: Validator
 description: Reference validator for llmo.json documents.
+date: 2026-04-17
 ---
 
 The reference validator for `llmo.json` documents is hosted at **[validate.llmo.org](https://validate.llmo.org)**.

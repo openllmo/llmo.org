@@ -1,6 +1,7 @@
 ---
 title: Governance
 description: Current governance model and planned transition.
+date: 2026-04-17
 ---
 
 ## Maintaining entity

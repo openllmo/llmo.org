@@ -1,7 +1,8 @@
 ---
 title: Extension Claim Types
-sidebarTitle: Extensions
+linkTitle: Extensions
 description: Publisher-defined extension claim types and how to propose them.
+date: 2026-04-17
 ---
 
 Extension claim types allow publishers to carry information beyond the core claim set defined in the LLMO specification. Extensions use the format `namespace.type` (for example, `acme-corp.compliance_note`), where `namespace` is a short identifier under the publisher's control and `type` is a claim name within that namespace. The specification defines extension claims in [§3.6](/spec/v0.1#3-6-extension-claims).

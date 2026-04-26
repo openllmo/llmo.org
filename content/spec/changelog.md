@@ -1,6 +1,7 @@
 ---
 title: Changelog
 description: Version history for the LLMO specification.
+date: 2026-04-26
 ---
 
 ## About this changelog

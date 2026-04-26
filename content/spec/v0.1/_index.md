@@ -1,7 +1,8 @@
 ---
 title: LLMO Specification v0.1
-sidebarTitle: v0.1 (current)
+linkTitle: "v0.1 (current)"
 description: The v0.1 specification for llmo.json.
+date: 2026-04-17
 ---
 
 **Status:** Draft
