@@ -58,11 +58,27 @@ The script first runs `ots upgrade` on the `.ots` file, which pulls any newly av
 
 If `ots upgrade` modifies the `.ots` file (a pending proof became confirmed, or a confirmed proof gained additional attestations), the script emits a note advising the caller to commit the updated proof. The update reflects a stronger attestation state and is worth preserving.
 
-The script then runs `ots verify` and reports one of three outcomes:
+The script then parses the proof via `ots info` to extract the Bitcoin block height and the merkleroot the proof claims for that block. It compares that claimed merkleroot against the actual merkleroot of the same block, fetched from one of three independent public block explorers in fallback order:
 
-- `Pending: submitted to calendar servers, not yet confirmed in Bitcoin.` Exit 0. The proof is valid as a calendar commitment; Bitcoin confirmation has not yet landed.
-- `Confirmed: anchored in Bitcoin at <timestamp> (block <number>).` Exit 0. The proof is fully anchored. The timestamp and block number are recorded for the editor's reference.
-- `Verification failed:` followed by the underlying `ots verify` output. Exit 1. Either the file content no longer matches the anchored hash, or the proof is structurally invalid.
+1. `blockstream.info` (Blockstream)
+2. `mempool.space` (independent open source)
+3. `blockchain.info` (Blockchain.com)
+
+Verification succeeds if any one explorer reports a matching merkleroot. The script reports one of three outcomes:
+
+- `OK: Bitcoin attestation verified against <explorer> at block <number>.` Exit 0. The proof is fully Bitcoin-anchored and the explorer agrees.
+- `Pending: proof has only calendar attestations, no Bitcoin block yet.` Exit 0. The proof is valid as a calendar commitment; Bitcoin confirmation has not yet landed. Re-run later.
+- `ERROR:` followed by a specific cause (proof corrupt, all three explorers unreachable, or merkleroot mismatch). Exit 1. A merkleroot mismatch is a real anomaly and warrants investigation; an explorer-availability error is environmental.
+
+This design removes the local Bitcoin node requirement that earlier versions had. Verification works in any environment with internet access to at least one of the three explorers.
+
+**Trust trade-off.** This script trusts at least one of three independent explorer operators to report block headers correctly. The three operators run independent codebases on independent infrastructure; a coordinated attack against all three is implausible, but not impossible. For higher-trust verification, run `ots verify` directly against a local Bitcoin node (the gold standard, since the verifier holds the entire chain and validates block hashes from first principles):
+
+```
+ots verify content/spec/lips/lip-NNNN.md.ots
+```
+
+Bitcoin Core or any equivalent must be running with RPC enabled.
 
 ## Security considerations
 
