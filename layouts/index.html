@@ -1,7 +1,47 @@
 {{ define "main" }}
-<article>
-<h1>{{ .Title }}</h1>
-{{ with .Description }}<p class="meta">{{ . }}</p>{{ end }}
-{{ .Content }}
-</article>
+<section class="hero">
+  <div class="container hero-inner">
+    <h1 class="hero-headline">An open protocol for organizational identity in the AI era.</h1>
+    <p class="hero-subhead">Organizations publish signed claims at <code>/.well-known/llmo.json</code>. AI agents and LLMs read them directly.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-primary" href="/spec/v0.1/">Read the spec</a>
+      <a class="btn btn-secondary" href="https://github.com/openllmo/llmo.org">View on GitHub</a>
+    </div>
+  </div>
+</section>
+
+<section class="explainer">
+  <div class="container">
+    <p class="explainer-eyebrow">What</p>
+    <h2>A canonical place for organizational truth.</h2>
+    <p>Organizations have always needed a way to publicly declare what they are, what they offer, who runs them, and how to reach them. LLMO is an open standard for publishing that declaration in a machine-readable, cryptographically signed format at a well-known URL.</p>
+  </div>
+</section>
+
+<section class="explainer">
+  <div class="container">
+    <p class="explainer-eyebrow">How</p>
+    <h2>Sign it once, serve it anywhere.</h2>
+    <p>An <code>llmo.json</code> file is a JWS-signed JSON document. The signing key is rotated through a key registry the spec defines. Verification is a single HTTPS GET plus signature check. No central authority, no per-vendor integration, no proprietary tooling.</p>
+  </div>
+</section>
+
+<section class="explainer">
+  <div class="container">
+    <p class="explainer-eyebrow">Why</p>
+    <h2>Built for AI consumption.</h2>
+    <p>Search engines and AI systems increasingly answer questions on behalf of organizations. They need a verifiable source of truth that organizations themselves control. LLMO is that source. The protocol is open, the validator is free, and any organization can adopt it today.</p>
+  </div>
+</section>
+
+<section class="container">
+  <div class="cta-strip">
+    <h2>Implement LLMO for your organization.</h2>
+    <p>Read the spec, generate your llmo.json, validate it, publish it.</p>
+    <div class="cta-strip-buttons">
+      <a class="btn btn-primary" href="/spec/v0.1/">Read the spec</a>
+      <a class="btn btn-secondary" href="https://validate.llmo.org">Open validator</a>
+    </div>
+  </div>
+</section>
 {{ end }}
