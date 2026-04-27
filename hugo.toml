@@ -2,4 +2,4 @@ baseURL = "https://llmo.org"
 title = "LLMO"
 defaultContentLanguage = "en"
 
-ignoreFiles = ['^README\.md$', '^CONTRIBUTING\.md$', '^SECURITY\.md$', '^BACKLOG\.md$', '^CLAUDE\.md$', '^infrastructure/', '^scripts/', '^design/', '^\.github/', '^\.claude/']
+ignoreFiles = ['^README\.md$', '^CONTRIBUTING\.md$', '^SECURITY\.md$', '^CLAUDE\.md$', '^infrastructure/', '^scripts/', '^design/', '^\.github/', '^\.claude/']
