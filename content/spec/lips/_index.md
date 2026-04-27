@@ -13,15 +13,19 @@ The authoritative process document is [LIP-1](/spec/lips/lip-0001), which define
 
 | Number | Title | Author | Status | Type | Created |
 | --- | --- | --- | --- | --- | --- |
-| [LIP-1](/spec/lips/lip-0001) | LIP Purpose and Guidelines | Nic Chavez | Active | Process | 2026-04-21 |
+| [LIP-1](/spec/lips/lip-0001/) | LIP Purpose and Guidelines | Nic Chavez | Active | Process | 2026-04-21 |
+| LIP-2 | (placeholder withdrawn before merge) | — | Withdrawn | Process | 2026-04-21 |
+| [LIP-3](/spec/lips/lip-0003/) | LIP Authoring Conventions | Nic Chavez | Draft | Informational | 2026-04-21 |
+
+LIP numbers are not necessarily contiguous. LIP-2 was reserved during initial scaffolding for a Process LIP defining core claim type submission mechanics. The placeholder was removed from the repository before being formally numbered, and the number is permanently retained as withdrawn per the registry's append-only rule.
 
 A machine-readable version of this index is served at [/spec/lips/index.json](/spec/lips/index.json) for tooling.
 
 ## How to propose a LIP
 
-LIPs fall into three types: Standards Track (new extension claim types), Process (changes to the LIP process or related governance), and Informational (advisory guidance). Standards Track LIPs require a DNS TXT proof-of-control record at submission, a minimum 7-day public GitHub Discussion period, and at least one non-author public response before a LIP number and nonce are issued. Process and Informational LIPs are authored by the editor, or by community members whose proposals the editor agrees to author or co-author.
+LIPs fall into three types: Standards Track (new extension claim types), Process (changes to the LIP process or related governance), and Informational (advisory guidance). Standards Track LIPs require a DNS TXT proof-of-control record at submission, a minimum 7-day public [GitHub Discussion](https://github.com/openllmo/llmo.org/discussions) period, and at least one non-author public response before a LIP number and nonce are issued. Process and Informational LIPs are authored by the editor, or by community members whose proposals the editor agrees to author or co-author.
 
-The full submission process, including numbering rules, lifecycle states, editor role, anti-flood provisions, and namespace rules, is specified in [LIP-1](/spec/lips/lip-0001). Contributors proposing a LIP should read LIP-1 in full before opening a Discussion.
+The full submission process, including numbering rules, lifecycle states, editor role, anti-flood provisions, and namespace rules, is specified in [LIP-1](/spec/lips/lip-0001/). Contributors proposing a LIP should read LIP-1 in full, then open a [GitHub Discussion](https://github.com/openllmo/llmo.org/discussions) describing the proposal.
 
 ## About this registry
 
