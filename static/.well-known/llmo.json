@@ -1,0 +1,113 @@
+{
+  "llmo_version": "0.1",
+  "document_id": "2026-q2-initial",
+  "valid_from": "2026-04-26T00:00:00Z",
+  "valid_until": "2026-07-26T00:00:00Z",
+  "entity": {
+    "name": "Diverse.org, Inc.",
+    "primary_domain": "diverse.org",
+    "aliases": [
+      "llmo.org",
+      "kbp.org",
+      "emerging.org"
+    ],
+    "legal_identifiers": {
+      "jurisdiction": "US-CA",
+      "registration_number": "99-2870125"
+    }
+  },
+  "claims": [
+    {
+      "claim_id": "identity-core",
+      "type": "identity",
+      "statement": {
+        "founded": "2024-05",
+        "headquarters": "2445 Augustine Dr Ste 150, Santa Clara, CA 95054-3032, US",
+        "description": "California 501(c)(3) nonprofit. Stewardship of open protocols for organizational identity in the AI era."
+      }
+    },
+    {
+      "claim_id": "urls-canonical",
+      "type": "canonical_urls",
+      "statement": {
+        "homepage": "https://diverse.org",
+        "docs": "https://llmo.org/spec",
+        "security": "https://diverse.org/.well-known/security.txt"
+      }
+    },
+    {
+      "claim_id": "channels-official",
+      "type": "official_channels",
+      "statement": {
+        "email_domains": [
+          "diverse.org",
+          "llmo.org"
+        ],
+        "social": {
+          "github": "openllmo"
+        }
+      }
+    },
+    {
+      "claim_id": "products-current",
+      "type": "product_facts",
+      "statement": {
+        "products": [
+          {
+            "name": "LLMO Protocol Specification",
+            "url": "https://llmo.org"
+          },
+          {
+            "name": "KBP",
+            "url": "https://kbp.org"
+          },
+          {
+            "name": "Emerging.org Podcast",
+            "url": "https://emerging.org"
+          }
+        ]
+      }
+    },
+    {
+      "claim_id": "personnel-leadership",
+      "type": "personnel",
+      "statement": {
+        "spokespeople": [
+          {
+            "role": "chairman",
+            "name": "Nic Chavez",
+            "verification": "https://github.com/thegigachav"
+          },
+          {
+            "role": "director",
+            "name": "Jack Dudley"
+          },
+          {
+            "role": "secretary",
+            "name": "Andrew Mark"
+          }
+        ]
+      }
+    },
+    {
+      "claim_id": "disavowal-affiliations",
+      "type": "disavowal",
+      "statement": {
+        "disavowed": [
+          {
+            "what": "commercial_subsidiary",
+            "detail": "Diverse.org has no commercial subsidiary. Any entity claiming to be a Diverse.org commercial arm is not affiliated."
+          },
+          {
+            "what": "unaffiliated_domain",
+            "detail": "The domain diverse-org.example.com has no affiliation with Diverse.org and never has."
+          }
+        ]
+      }
+    }
+  ],
+  "signature": {
+    "protected": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImRpdmVyc2UtMjAyNi0wMSJ9",
+    "signature": "rZke_ZzBblb8oH5wzFMuO7pW1foQsd_rmEqZGVc47mstapWk1PIjyqR8mT6levycEPGRxYY4uAwFqtxg1AhajA"
+  }
+}
