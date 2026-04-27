@@ -87,7 +87,7 @@ Consumers MUST also accept `application/json` as a fallback, since many hosting 
 ### 2.3 HTTP behavior
 
 - The file MUST be reachable via HTTPS. HTTP-only hosting is non-conforming.
-- Redirects are permitted but MUST stay on the same registrable domain. A cross-domain redirect (e.g., from `serval.com/.well-known/llmo.json` to `serval-corp.io/.well-known/llmo.json`) is non-conforming for v0.1. Organizations with split domains should publish at each domain and use the `aliases` field (§3.2) to cross-reference.
+- Redirects are permitted but MUST stay on the same registrable domain. A cross-domain redirect (e.g., from `diverse.org/.well-known/llmo.json` to `kbp.org/.well-known/llmo.json`) is non-conforming for v0.1. Organizations with split domains should publish at each domain and use the `aliases` field (§3.2) to cross-reference.
 - CORS: the file SHOULD be served with `Access-Control-Allow-Origin: *`. Consumers that fetch via browser contexts will expect this.
 - Compression: standard HTTP compression (gzip, br) is permitted and recommended.
 
@@ -129,26 +129,24 @@ The `entity` object identifies who is publishing the file.
 ```json
 {
   "entity": {
-    "name": "Serval, Inc.",
-    "primary_domain": "serval.com",
-    "aliases": ["serval.io", "getserval.com"],
+    "name": "Diverse.org, Inc.",
+    "primary_domain": "diverse.org",
+    "aliases": ["llmo.org", "kbp.org"],
     "legal_identifiers": {
-      "jurisdiction": "US-DE",
-      "registration_number": "7891234"
-    },
-    "external_ids": {
-      "wikidata": "Q123456789",
-      "duns": "123456789"
+      "jurisdiction": "US-CA",
+      "registration_number": "99-2870125"
     }
   }
 }
 ```
 
+Organizations MAY include `external_ids` referencing Wikidata, DUNS, or other identifier registries when those identifiers exist. The field is optional; entities without registry presence simply omit it.
+
 - `name` (required): human-readable entity name.
 - `primary_domain` (required): the registrable domain at which this `llmo.json` is authoritative. MUST match the domain serving the file.
 - `aliases` (optional): other domains owned by the entity. Each alias domain SHOULD serve its own `llmo.json` whose `primary_domain` points back to a single authoritative domain; consumers encountering an alias SHOULD prefer the authoritative document.
 - `legal_identifiers` (optional): structured legal identity. Fields are jurisdiction-dependent.
-- `external_ids` (optional): pointers into external identity systems. Wikidata is particularly useful as a cross-reference point for LLMs.
+- `external_ids` (optional): pointers into external identity systems (Wikidata, DUNS, LEI, DID, etc.).
 
 v0.1 does not mandate any single external identifier scheme. Rejected alternative: requiring a Wikidata QID or a DID. Requiring Wikidata would disadvantage new or private organizations; requiring DIDs would impose unfamiliar infrastructure. `external_ids` stays optional and open.
 
@@ -226,15 +224,10 @@ The single most important claim type. Asserts which URLs are authoritative for w
 {
   "type": "canonical_urls",
   "statement": {
-    "homepage": "https://serval.com",
-    "docs": "https://docs.serval.com",
-    "api": "https://api.serval.com",
-    "status": "https://status.serval.com",
-    "support": "https://serval.com/support",
-    "pricing": "https://serval.com/pricing",
-    "security": "https://serval.com/security",
-    "agent_manifest": "https://serval.com/.well-known/agent.json",
-    "mcp_manifest": "https://serval.com/.well-known/mcp.json"
+    "homepage": "https://diverse.org",
+    "docs": "https://llmo.org/spec",
+    "security": "https://diverse.org/.well-known/security.txt",
+    "agent_manifest": "https://diverse.org/.well-known/agent.json"
   }
 }
 ```
@@ -249,14 +242,9 @@ Asserts which social accounts, email domains, and messaging presences are operat
 {
   "type": "official_channels",
   "statement": {
-    "email_domains": ["serval.com", "serval.io"],
+    "email_domains": ["diverse.org", "llmo.org"],
     "social": {
-      "x": "@serval",
-      "linkedin": "company/serval-inc",
-      "github": "serval"
-    },
-    "community": {
-      "discord": "https://discord.gg/serval-official"
+      "github": "openllmo"
     }
   }
 }
@@ -272,10 +260,16 @@ Asserts currently-true facts about the organization's products. Intentionally na
   "statement": {
     "products": [
       {
-        "name": "Serval Observe",
-        "url": "https://serval.com/observe",
-        "status": "generally_available",
-        "current_version": "4.2"
+        "name": "LLMO Protocol Specification",
+        "url": "https://llmo.org"
+      },
+      {
+        "name": "KBP",
+        "url": "https://kbp.org"
+      },
+      {
+        "name": "Emerging.org Podcast",
+        "url": "https://emerging.org"
       }
     ]
   }
@@ -292,9 +286,9 @@ Asserts which individuals hold public-facing roles and are authorized to speak f
   "statement": {
     "spokespeople": [
       {
-        "role": "ceo",
-        "name": "Dana Okafor",
-        "verification": "https://serval.com/team#dana"
+        "role": "chairman",
+        "name": "Nic Chavez",
+        "verification": "https://github.com/thegigachav"
       }
     ]
   }
@@ -311,12 +305,12 @@ Explicitly repudiates claims, attributions, or associations the organization con
   "statement": {
     "disavowed": [
       {
-        "what": "products_not_offered",
-        "detail": "Serval does not offer a consumer mobile app. Any app branded 'Serval' in consumer app stores is not affiliated."
+        "what": "commercial_subsidiary",
+        "detail": "Diverse.org has no commercial subsidiary. Any entity claiming to be a Diverse.org commercial arm is not affiliated."
       },
       {
-        "what": "former_affiliation",
-        "detail": "The domain serval-crypto.com has no affiliation with Serval, Inc., and never has."
+        "what": "unaffiliated_domain",
+        "detail": "The domain diverse-org.example.com has no affiliation with Diverse.org and never has."
       }
     ]
   }
@@ -333,9 +327,9 @@ Declares that a prior public statement, URL, or document is no longer authoritat
   "statement": {
     "superseded": [
       {
-        "what": "press_release",
-        "url": "https://serval.com/press/2025-11-pricing-update",
-        "reason": "Pricing structure announced in that release was revised on 2026-02-01. See canonical_urls.pricing for current."
+        "what": "draft_announcement",
+        "url": "https://diverse.org/announce/2026-04-protocol-draft",
+        "reason": "Initial protocol announcement was revised when v0.1 was published. See canonical_urls.docs for current."
       }
     ]
   }
@@ -352,7 +346,7 @@ A typed reference to an external artifact the organization endorses as authorita
   "statement": {
     "scope": "media_provenance",
     "standard": "C2PA",
-    "url": "https://serval.com/.well-known/c2pa-manifest.json"
+    "url": "https://diverse.org/.well-known/c2pa-manifest.json"
   }
 }
 ```
@@ -381,7 +375,7 @@ Consumers MAY use confidence to resolve conflicts between LLMO claims and other 
 
 LLMO defines two layers of trust. Every conforming document has the first; higher conformance levels require the second.
 
-**Layer 1: Domain-bound trust.** The file is trusted to the extent that the domain serving it is trusted. HTTPS provides transport integrity; DNS and certificate chains provide the binding. A consumer that has verified the TLS connection to `serval.com` and retrieved `.well-known/llmo.json` from that connection has domain-bound trust in the contents. This layer requires no publisher-side key management.
+**Layer 1: Domain-bound trust.** The file is trusted to the extent that the domain serving it is trusted. HTTPS provides transport integrity; DNS and certificate chains provide the binding. A consumer that has verified the TLS connection to `diverse.org` and retrieved `.well-known/llmo.json` from that connection has domain-bound trust in the contents. This layer requires no publisher-side key management.
 
 **Layer 2: Cryptographic trust.** The document or individual claims carry JWS signatures. Signatures are verifiable against public keys the publisher makes available at a well-known JWKS URI. Signatures survive caching, mirroring, and republication: an LLM that cached a `llmo.json` last month can still verify its signatures today.
 
@@ -516,7 +510,7 @@ LLMO deliberately stays narrow. This section maps the boundaries.
 
 ### 6.1 schema.org / JSON-LD
 
-[Schema.org](https://schema.org/) markup is per-page and descriptive; LLMO is per-entity and operational. Schema.org tells a search engine "this page describes an Organization named Serval, with this address." LLMO tells any machine consumer "these are the URLs we vouch for, this statement we repudiate, this document supersedes the last one."
+[Schema.org](https://schema.org/) markup is per-page and descriptive; LLMO is per-entity and operational. Schema.org tells a search engine "this page describes an Organization named Diverse.org, with this address." LLMO tells any machine consumer "these are the URLs we vouch for, this statement we repudiate, this document supersedes the last one."
 
 Use both. An organization's homepage should carry schema.org markup; the organization should additionally publish `llmo.json`. When claims overlap (name, homepage URL), LLMO is authoritative by virtue of being single-sourced and signable; schema.org is authoritative for page-level facts that LLMO does not carry.
 
@@ -550,28 +544,24 @@ LLMO uses `.well-known/` as intended: a stable, discoverable location for per-or
 
 ---
 
-## 7. Worked Example: Serval, Inc.
+## 7. Worked Example: Diverse.org, Inc. {#7-worked-example-diverse-org-inc}
 
-Serval, Inc. is a hypothetical enterprise observability company. It publishes the following at `https://serval.com/.well-known/llmo.json`. The example meets strict conformance.
+This section walks through a complete `llmo.json` for Diverse.org, Inc., the nonprofit that stewards this protocol. The example is real: the entity exists, the address is correct, the products are real initiatives, and an actual signed `llmo.json` corresponding to this example is published at `https://diverse.org/.well-known/llmo.json`. The example meets strict conformance.
 
 ```json
 {
   "llmo_version": "0.1",
-  "document_id": "2026-04-q2-ops",
-  "valid_from": "2026-04-17T00:00:00Z",
-  "valid_until": "2026-07-17T00:00:00Z",
-  "supersedes": ["2026-01-q1-ops"],
+  "document_id": "2026-q2-initial",
+  "valid_from": "2026-04-26T00:00:00Z",
+  "valid_until": "2026-07-26T00:00:00Z",
 
   "entity": {
-    "name": "Serval, Inc.",
-    "primary_domain": "serval.com",
-    "aliases": ["serval.io", "getserval.com"],
+    "name": "Diverse.org, Inc.",
+    "primary_domain": "diverse.org",
+    "aliases": ["llmo.org", "kbp.org", "emerging.org"],
     "legal_identifiers": {
-      "jurisdiction": "US-DE",
-      "registration_number": "7891234"
-    },
-    "external_ids": {
-      "wikidata": "Q123456789"
+      "jurisdiction": "US-CA",
+      "registration_number": "99-2870125"
     }
   },
 
@@ -580,116 +570,109 @@ Serval, Inc. is a hypothetical enterprise observability company. It publishes th
       "claim_id": "identity-core",
       "type": "identity",
       "statement": {
-        "founded": "2019-06",
-        "headquarters": "San Francisco, CA, US",
-        "description": "Enterprise observability for AI and ML workloads."
+        "founded": "2024-05",
+        "headquarters": "2445 Augustine Dr Ste 150, Santa Clara, CA 95054-3032, US",
+        "description": "California 501(c)(3) nonprofit. Stewardship of open protocols for organizational identity in the AI era."
       }
     },
     {
       "claim_id": "urls-canonical",
       "type": "canonical_urls",
       "statement": {
-        "homepage": "https://serval.com",
-        "docs": "https://docs.serval.com",
-        "api": "https://api.serval.com",
-        "status": "https://status.serval.com",
-        "support": "https://serval.com/support",
-        "pricing": "https://serval.com/pricing",
-        "security": "https://serval.com/.well-known/security.txt",
-        "agent_manifest": "https://serval.com/.well-known/agent.json"
+        "homepage": "https://diverse.org",
+        "docs": "https://llmo.org/spec",
+        "security": "https://diverse.org/.well-known/security.txt"
       }
     },
     {
       "claim_id": "channels-official",
       "type": "official_channels",
       "statement": {
-        "email_domains": ["serval.com", "serval.io"],
+        "email_domains": ["diverse.org", "llmo.org"],
         "social": {
-          "x": "@serval",
-          "linkedin": "company/serval-inc",
-          "github": "serval"
-        },
-        "community": {
-          "discord": "https://discord.gg/serval-official"
+          "github": "openllmo"
         }
       }
     },
     {
       "claim_id": "products-current",
       "type": "product_facts",
-      "confidence": "advisory",
       "statement": {
         "products": [
           {
-            "name": "Serval Observe",
-            "url": "https://serval.com/observe",
-            "status": "generally_available",
-            "current_version": "4.2"
+            "name": "LLMO Protocol Specification",
+            "url": "https://llmo.org"
           },
           {
-            "name": "Serval Trace",
-            "url": "https://serval.com/trace",
-            "status": "beta",
-            "current_version": "0.9"
+            "name": "KBP",
+            "url": "https://kbp.org"
+          },
+          {
+            "name": "Emerging.org Podcast",
+            "url": "https://emerging.org"
           }
         ]
       }
     },
     {
-      "claim_id": "disavowal-imposters",
+      "claim_id": "personnel-leadership",
+      "type": "personnel",
+      "statement": {
+        "spokespeople": [
+          {
+            "role": "chairman",
+            "name": "Nic Chavez",
+            "verification": "https://github.com/thegigachav"
+          },
+          {
+            "role": "director",
+            "name": "Jack Dudley"
+          },
+          {
+            "role": "secretary",
+            "name": "Andrew Mark"
+          }
+        ]
+      }
+    },
+    {
+      "claim_id": "disavowal-affiliations",
       "type": "disavowal",
       "statement": {
         "disavowed": [
           {
-            "what": "products_not_offered",
-            "detail": "Serval does not offer a consumer mobile app. Any app branded 'Serval' in consumer app stores is not affiliated with Serval, Inc."
+            "what": "commercial_subsidiary",
+            "detail": "Diverse.org has no commercial subsidiary. Any entity claiming to be a Diverse.org commercial arm is not affiliated."
           },
           {
             "what": "unaffiliated_domain",
-            "detail": "The domain serval-crypto.com has no affiliation with Serval, Inc. and never has."
+            "detail": "The domain diverse-org.example.com has no affiliation with Diverse.org and never has."
           }
         ]
-      }
-    },
-    {
-      "claim_id": "supersede-pricing-press",
-      "type": "supersedes",
-      "statement": {
-        "superseded": [
-          {
-            "what": "press_release",
-            "url": "https://serval.com/press/2025-11-pricing-update",
-            "reason": "Pricing structure revised 2026-02-01. See canonical_urls.pricing for current."
-          }
-        ]
-      }
-    },
-    {
-      "claim_id": "pointer-c2pa",
-      "type": "pointer",
-      "statement": {
-        "scope": "media_provenance",
-        "standard": "C2PA",
-        "url": "https://serval.com/.well-known/c2pa-manifest.json"
       }
     }
   ],
 
   "signature": {
-    "protected": "eyJhbGciOiJFUzI1NiIsImtpZCI6InNlcnZhbC0yMDI2LTAxIn0",
-    "signature": "MEUCIQDfG...truncated..."
+    "protected": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImRpdmVyc2UtMjAyNi0wMSJ9",
+    "signature": "<placeholder; the published signed document at diverse.org will use a real ES256 signature over the JCS-canonicalized payload>"
   }
 }
 ```
 
 **Annotations on this example:**
 
-- The document supersedes a prior Q1 document by `document_id`, ensuring consumers with cached older versions know to discard them.
-- `canonical_urls` includes `agent_manifest`: LLMO points at agent.json without describing its contents.
-- `product_facts` carries `confidence: advisory` because product versions change faster than the document's 90-day window.
-- `disavowal` names both a category (no mobile app) and a specific domain (serval-crypto.com), giving LLMs two kinds of negative assertion to reason with.
-- `supersedes` references a specific URL, not just an internal document ID: this is the "wider web" supersession case.
-- The document-level signature covers all fields except `signature` itself. A consumer verifies by fetching `https://serval.com/.well-known/llmo-keys.json`, locating the key with `kid: "serval-2026-01"`, and verifying over the JCS-canonicalized payload.
+- The entity declares three aliases (`llmo.org`, `kbp.org`, `emerging.org`) because Diverse.org operates these domains as project surfaces. Each alias domain SHOULD serve its own `llmo.json` whose `primary_domain` points back to `diverse.org`.
+- `legal_identifiers.registration_number` carries the federal IRS EIN (99-2870125). For US 501(c)(3) entities, the EIN is the most useful registration identifier to consumers; the jurisdiction (`US-CA`) records the state of incorporation.
+- `identity.founded` is recorded at year-month granularity (2024-05); the spec also accepts year-only or full RFC 3339 date.
+- `canonical_urls` is intentionally minimal: Diverse.org operates a homepage, points at the LLMO spec as its canonical documentation, and serves a security disclosure document. Future products may add more named URLs (`api`, `status`, etc.) as those surfaces come online.
+- `official_channels` declares the GitHub organization (`openllmo`) and email domains. Spec correspondence at `spec@llmo.org` and security at `security@llmo.org` are reachable through the declared `email_domains`.
+- `product_facts` lists three Diverse.org-stewarded initiatives. The schema permits richer fields per product (`status`, `current_version`); this example carries only `name` and `url` because those are the facts Diverse.org currently asserts. Stewardship status is described in prose at each product's URL.
+- `personnel.spokespeople` enumerates the three officers of Diverse.org. The chairman entry includes a `verification` URL (a public GitHub profile); the others omit `verification`, which a conforming validator will surface as a warning per §5.4. Future revisions of this document will add verification URLs as the leadership team's public surfaces are formalized.
+- `disavowal` pairs a category-level disavowal (`commercial_subsidiary`, asserting Diverse.org has no commercial arm) with a specific disavowal (an unaffiliated domain). Consumers reasoning about Diverse.org get both a class assertion and a concrete instance to match against.
+- The document-level signature covers all fields except `signature` itself. A consumer verifies by fetching `https://diverse.org/.well-known/llmo-keys.json`, locating the key with `kid: "diverse-2026-01"`, and verifying the ES256 signature over the JCS-canonicalized payload.
+
+The signed instance of this `llmo.json` is published at `https://diverse.org/.well-known/llmo.json` and at `https://llmo.org/.well-known/llmo.json`. Both should validate identically against this spec via [validate.llmo.org](https://validate.llmo.org) or any conforming validator.
 
 ---
 

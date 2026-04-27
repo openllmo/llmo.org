@@ -50,12 +50,10 @@ The authoritative definitions live in specification [§3.5](/spec/v0.1#3-5-core-
 {
   "type": "canonical_urls",
   "statement": {
-    "homepage": "https://serval.com",
-    "docs": "https://docs.serval.com",
-    "api": "https://api.serval.com",
-    "pricing": "https://serval.com/pricing",
-    "security": "https://serval.com/.well-known/security.txt",
-    "agent_manifest": "https://serval.com/.well-known/agent.json"
+    "homepage": "https://diverse.org",
+    "docs": "https://llmo.org/spec",
+    "security": "https://diverse.org/.well-known/security.txt",
+    "agent_manifest": "https://diverse.org/.well-known/agent.json"
   }
 }
 ```
@@ -84,14 +82,9 @@ The authoritative definitions live in specification [§3.5](/spec/v0.1#3-5-core-
 {
   "type": "official_channels",
   "statement": {
-    "email_domains": ["serval.com", "serval.io"],
+    "email_domains": ["diverse.org", "llmo.org"],
     "social": {
-      "x": "@serval",
-      "linkedin": "company/serval-inc",
-      "github": "serval"
-    },
-    "community": {
-      "discord": "https://discord.gg/serval-official"
+      "github": "openllmo"
     }
   }
 }
@@ -116,20 +109,19 @@ Each product object may contain `name` (required), `url`, `status` (one of `gene
 ```json
 {
   "type": "product_facts",
-  "confidence": "advisory",
   "statement": {
     "products": [
       {
-        "name": "Serval Observe",
-        "url": "https://serval.com/observe",
-        "status": "generally_available",
-        "current_version": "4.2"
+        "name": "LLMO Protocol Specification",
+        "url": "https://llmo.org"
       },
       {
-        "name": "Serval Trace",
-        "url": "https://serval.com/trace",
-        "status": "beta",
-        "current_version": "0.9"
+        "name": "KBP",
+        "url": "https://kbp.org"
+      },
+      {
+        "name": "Emerging.org Podcast",
+        "url": "https://emerging.org"
       }
     ]
   }
@@ -139,7 +131,7 @@ Each product object may contain `name` (required), `url`, `status` (one of `gene
 **Common pitfalls.**
 
 - **Using `product_facts` as a full product catalog.** The type is intentionally narrow. Publishers tempted to list every SKU, tier, or feature should resist. Full catalogs belong on the product site, not in `llmo.json`.
-- **Declaring product facts as `authoritative` when they change faster than the document's freshness window.** If `current_version` turns over weekly but the document's `valid_until` is 90 days out, the claim will be stale long before the document is. In the worked example in specification [§7](/spec/v0.1#7-worked-example-serval-inc), Serval uses `confidence: advisory` on `product_facts` for exactly this reason.
+- **Declaring product facts as `authoritative` when they change faster than the document's freshness window.** If `current_version` turns over weekly but the document's `valid_until` is 90 days out, the claim will be stale long before the document is. Publishers whose product facts move faster than their document cadence SHOULD use `confidence: advisory` on `product_facts`; consumers weight these claims accordingly per §3.7.
 
 ---
 
@@ -163,9 +155,9 @@ Each spokesperson object may contain `role` (required), `name` (required), and `
   "statement": {
     "spokespeople": [
       {
-        "role": "ceo",
-        "name": "Dana Okafor",
-        "verification": "https://serval.com/team#dana"
+        "role": "chairman",
+        "name": "Nic Chavez",
+        "verification": "https://github.com/thegigachav"
       }
     ]
   }
@@ -198,12 +190,12 @@ Each disavowed object requires `what` (a short category or label) and `detail` (
   "statement": {
     "disavowed": [
       {
-        "what": "products_not_offered",
-        "detail": "Serval does not offer a consumer mobile app. Any app branded 'Serval' in consumer app stores is not affiliated."
+        "what": "commercial_subsidiary",
+        "detail": "Diverse.org has no commercial subsidiary. Any entity claiming to be a Diverse.org commercial arm is not affiliated."
       },
       {
         "what": "unaffiliated_domain",
-        "detail": "The domain serval-crypto.com has no affiliation with Serval, Inc. and never has."
+        "detail": "The domain diverse-org.example.com has no affiliation with Diverse.org and never has."
       }
     ]
   }
@@ -212,7 +204,7 @@ Each disavowed object requires `what` (a short category or label) and `detail` (
 
 **Common pitfalls.**
 
-- **Disavowals too vague for LLMs to act on.** A disavowal of "all misinformation about us" gives consumers nothing concrete to reason with. The worked example in specification [§7](/spec/v0.1#7-worked-example-serval-inc) illustrates the useful pattern: pair a category-level disavowal ("no mobile app") with one or more specific disavowals (the domain `serval-crypto.com`), so consumers have both a class and an instance to match against.
+- **Disavowals too vague for LLMs to act on.** A disavowal of "all misinformation about us" gives consumers nothing concrete to reason with. The useful pattern is to pair a category-level disavowal (e.g., "no commercial subsidiary") with one or more specific disavowals (e.g., the unaffiliated domain `diverse-org.example.com`), so consumers have both a class and an instance to match against. The worked example in specification [§7](/spec/v0.1#7-worked-example-diverse-org-inc) demonstrates this.
 
 ---
 
@@ -236,9 +228,9 @@ Each superseded object requires `what` (a short category or label) and `reason` 
   "statement": {
     "superseded": [
       {
-        "what": "press_release",
-        "url": "https://serval.com/press/2025-11-pricing-update",
-        "reason": "Pricing structure revised 2026-02-01. See canonical_urls.pricing for current."
+        "what": "draft_announcement",
+        "url": "https://diverse.org/announce/2026-04-protocol-draft",
+        "reason": "Initial protocol announcement was revised when v0.1 was published. See canonical_urls.docs for current."
       }
     ]
   }
@@ -271,7 +263,7 @@ Each superseded object requires `what` (a short category or label) and `reason` 
   "statement": {
     "scope": "media_provenance",
     "standard": "C2PA",
-    "url": "https://serval.com/.well-known/c2pa-manifest.json"
+    "url": "https://diverse.org/.well-known/c2pa-manifest.json"
   }
 }
 ```
