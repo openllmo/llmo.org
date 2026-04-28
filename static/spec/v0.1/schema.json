@@ -401,13 +401,15 @@
       "properties": {
         "protected": {
           "type": "string",
-          "description": "Base64url-encoded JWS protected header. MUST include alg (ES256, ES384, or EdDSA) and kid.",
-          "pattern": "^[A-Za-z0-9_-]+$"
+          "description": "Base64url-encoded JWS protected header. MUST include alg (ES256, ES384, or EdDSA) and kid. MUST NOT assert b64:false or include b64 in crit. crit SHOULD be omitted.",
+          "pattern": "^[A-Za-z0-9_-]+$",
+          "minLength": 16
         },
         "signature": {
           "type": "string",
           "description": "Base64url-encoded signature bytes.",
-          "pattern": "^[A-Za-z0-9_-]+$"
+          "pattern": "^[A-Za-z0-9_-]+$",
+          "minLength": 16
         }
       }
     }

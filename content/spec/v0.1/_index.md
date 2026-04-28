@@ -397,13 +397,32 @@ Keys SHOULD rotate at least annually. Retired keys SHOULD remain in the JWKS for
 
 Publishers may sign at two granularities:
 
-**Document-level signing.** A single JWS covers the entire document (excluding the signature field itself). Placed at the top level as `signature`. The signing payload is the document with the `signature` key removed, canonicalized per §4.3.1.
+**Document-level signing.** A single JWS covers the entire document (excluding the signature field itself). Placed at the top level as `signature`. The signing payload is the document with the `signature` key removed, canonicalized per §4.3.2.
 
 **Claim-level signing.** Individual claims carry their own `signature` field covering the claim object (excluding the signature field). Useful when different claims are asserted by different organizational functions (e.g., legal signs `disavowal` claims; ops signs `canonical_urls`).
 
 A document MAY use both. Claim-level signatures are evaluated per-claim; the document signature covers the wrapper.
 
-#### 4.3.1 Canonicalization
+#### 4.3.1 JWS payload encoding
+
+Both document-level and claim-level signatures are **standard (attached) JWS** per [RFC 7515](https://www.rfc-editor.org/rfc/rfc7515), not detached-payload JWS per [RFC 7797](https://www.rfc-editor.org/rfc/rfc7797). The protected header MUST NOT include `b64: false`; the `crit` parameter MUST NOT list `b64`. The `crit` parameter SHOULD be omitted entirely. Verifiers MUST reject any JWS whose `crit` parameter is non-empty for v0.1; future versions may define recognized critical extensions.
+
+The bytes that are signed (the JWS payload, base64url-encoded inside the JWS structure) are the JCS-canonicalized bytes of the target object with its own `signature` field removed, as specified in §4.3.2. The on-disk `signature` field stores only the JWS protected header and the signature itself, in the flattened form:
+
+```json
+"signature": {
+  "protected": "<base64url-encoded protected header>",
+  "signature": "<base64url-encoded signature>"
+}
+```
+
+Verifiers reconstruct the signed bytes by re-canonicalizing the document (or claim) with its `signature` field removed and base64url-encoding the result. Verifiers SHOULD construct a flattened JWS object with `payload` set to the base64url-encoded canonical bytes and the on-disk `protected` and `signature` fields, then pass it to a standard flattened-JWS verification routine. Verifiers MUST NOT accept signatures whose protected header asserts `b64: false`; such documents are non-conforming for v0.1.
+
+Rationale: standard JWS has uniform, well-tested support across every major JOSE library, while detached-payload mode (RFC 7797) is a less-trodden code path whose `crit` handling is a frequent source of interop failure. The on-disk size is identical between the two modes (the JWS payload bytes are not stored in the `signature` field regardless), so the only consequence of this choice is which library entry points implementers call. v0.1 picks the entry point everyone already has tested.
+
+Rejected alternative: detached-payload JWS (RFC 7797, `b64: false`) with the canonical JSON serving as both the document on disk and the JWS payload bytes. Rejected because the on-disk savings are zero (see above), the interop risk is real, and the `crit: ["b64"]` requirement adds a verification edge case that v0.1 verifiers would routinely mishandle.
+
+#### 4.3.2 Canonicalization
 
 Both document-level and claim-level signatures use **JWS with JCS (JSON Canonicalization Scheme, [RFC 8785](https://www.rfc-editor.org/rfc/rfc8785))** over the target object with its own `signature` field removed.
 
@@ -418,7 +437,7 @@ The cost is modest: JCS adds a canonicalization pass before sign and verify. For
 
 **Reversibility.** If future measurement shows JCS overhead is meaningful at aggregate scale, v0.2 can introduce alternate canonicalization modes without breaking v0.1 verifiers. Signatures already carry their `alg` in the JOSE header; a future `cty` or custom header parameter can declare canonicalization variant. v0.1 verifiers will simply treat unknown variants as unverifiable and downgrade trust per §4.5.
 
-#### 4.3.2 Publisher guidance: sign last, serve byte-stable
+#### 4.3.3 Publisher guidance: sign last, serve byte-stable
 
 JCS protects against accidental transformation. Intentional transformation after signing is prohibited and will produce undetectable signature breakage. Publishers MUST:
 
@@ -717,13 +736,14 @@ A formal JSON Schema for `llmo.json` v0.1 is published at [`https://llmo.org/spe
 
 ### A.2 Test Vectors
 
-A set of reference test vectors for v0.1 is published at [`/spec/v0.1/test-vectors`](/spec/v0.1/test-vectors). The vectors exercise the §4 trust model and the §5 conformance tiers: a minimally conforming unsigned document, a standard-conforming unsigned document, and a strictly conforming document with a valid ES256 JWS signature over a JCS-canonicalized payload (RFC 7515, RFC 7518, RFC 7638, RFC 8785). The JWKS containing the public key that verifies the strict vector, and the canonical bytes that were signed, are published alongside. The canonical-bytes file lets implementers validate their JCS implementation independently of their JWS implementation.
+A set of reference test vectors for v0.1 is published at [`/spec/v0.1/test-vectors`](/spec/v0.1/test-vectors). The vectors exercise the §4 trust model and the §5 conformance tiers: a minimally conforming unsigned document, a standard-conforming unsigned document, and a strictly conforming document with a valid ES256 JWS signature over a JCS-canonicalized payload (RFC 7515, RFC 7518, RFC 7638, RFC 8785). The JWKS containing the public key that verifies the strict vector, and the canonical bytes that were signed, are published alongside. The canonical-bytes file lets implementers validate their JCS implementation independently of their JWS implementation. The vectors do not exercise RFC 7797 (detached-payload JWS); §4.3.1 prohibits that mode for v0.1.
 
 The vectors are static fixtures with a fixed validity window. After their `valid_until` date, conforming validators are expected to flag them as expired; that behavior is itself a conformance check.
 
 ## Appendix B: Changelog
 
 - **v0.1 (2026-04-17):** Initial draft.
+- **v0.1.1 (2026-04-27):** §4.3 clarified to specify standard (attached) JWS; detached-payload mode (RFC 7797) explicitly prohibited. No on-disk byte format change for any pre-existing strict-conforming document. Verifier behavior is tightened to reject `b64: false` and non-empty `crit` parameters; this formalizes the only mode any existing implementation supports. Renumbered §4.3.1 → §4.3.2 and §4.3.2 → §4.3.3 to accommodate the new §4.3.1. Patch-level revision under §[Versioning] line 16 (editorial revisions, including clarification of ambiguous normative text); author-decided per the pre-release section.
 
 ---
 
