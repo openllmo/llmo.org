@@ -1,48 +1,67 @@
 ---
 title: LLMO
-description: "An open protocol for publishing machine-readable organizational identity artifacts that LLMs and agents can discover, verify, and act on."
-date: 2026-04-17
+description: "LLMs need to know who you are. LLMO is how you tell them."
+date: 2026-04-29
 ---
 
-## The problem
+Organizations cryptographically sign their identity, claims, and provenance. AI agents and language models verify them. Today's text-predicting LLMs evolve into auditable world models, deployable in regulated industries.
 
-Language models and autonomous agents increasingly make consequential decisions based on claims about organizations. Who operates a domain. When a statement was published. Whether a credential is current. Which entity a communication came from. Today these claims are scattered across websites, press releases, third-party directories, and social platforms. The formats are inconsistent. The sources are not cryptographically signed. The time of assertion is usually unrecoverable.
+## Why this exists
 
-A consumer that needs to verify an organizational claim, whether a reasoning system, a search index, or a human operator, has no canonical place to look and no canonical format to parse. The result is that organizational facts get synthesized from whatever happens to be surfaced at retrieval time, with no authoritative source to anchor them.
+Today's LLMs predict text. Tomorrow's must reason over verifiable data: claims with provenance, identity with signatures, sources with accountability. The infrastructure for that doesn't exist yet.
 
-LLMO addresses this by defining a canonical location, a canonical format, and a verification model.
+AI deployment in regulated industries (finance, healthcare, defense, legal) is blocked on a single missing primitive: a way to know who said what, when, and whether you can trust the channel. Without it, every AI deployment is a compliance review against unverifiable inputs.
 
-## The approach
+LLMO is the protocol layer that fills this gap for organizational identity. Signed claims at a well-known location, verifiable by anyone, no central authority required.
 
-Organizations publish a signed JSON document at `/.well-known/llmo.json` on their primary domain. The document contains claims about the organization: identity, operators, endpoints, publication timestamps, and signatures. The schema is versioned and machine-readable. Signatures bind claims to the publisher's control of the domain.
+> AI in regulated environments must be insurable, auditable, and accountable. LLMO makes the underlying organizational data layer meet that bar.
 
-Consumers fetch the document, validate it against the schema, verify signatures, and use whichever claims they trust for their purpose. LLMO does not impose a trust authority. Each consumer chooses its own trust model.
+## A canonical place for organizational truth
 
-The protocol is vendor-neutral, open, and intended to be widely implemented.
+Every organization publishes a single signed document at `/.well-known/llmo.json` on its primary domain. The document declares who they are, what URLs they consider canonical, what channels are official, what they disavow, and who's authorized to speak for them.
 
-## What exists today
+The signature anchors trust to the domain. The well-known location makes discovery uniform. The schema makes machine reading reliable.
 
-Specification v0.1 is published with a JSON schema, five test vectors, and a reference [validator](/validator/). A governance process is active with three accepted improvement proposals covering the process itself, core-proposal submission mechanics, and authoring conventions. OpenTimestamps anchoring is live for accepted proposals.
+A consuming AI agent fetches one URL, verifies one signature, and gets ground truth from the publisher rather than synthesizing from third-party content of varying reliability.
 
-## Where to go next
+## How it works
 
-**If you're evaluating LLMO as a publisher:** read the [specification](/spec), validate a draft document against the [reference validator](/validator/), and publish at your domain's `/.well-known/llmo.json`.
+A publisher generates a keypair, scaffolds an `llmo.json` declaring their identity and claims, signs it with the private key, and serves it at `/.well-known/llmo.json` over HTTPS. Their public JWKS lives at `/.well-known/llmo-keys.json` on the same domain.
 
-**If you're evaluating LLMO as a consumer:** read the [specification](/spec) to understand the document structure, fetch documents from publishers you care about, and apply whatever trust model fits your use case.
+A consumer fetches the document, verifies the signature against the JWKS, checks the freshness window, and uses the declared claims as authoritative for that organization.
 
-**If you're evaluating LLMO as an implementer of tooling:** the [specification](/spec), [JSON schema](/spec/v0.1/schema), and [test vectors](/spec/v0.1/test-vectors) together define the full interoperability surface. A conformant implementation can be built from these alone.
+```json
+{
+  "llmo_version": "0.1",
+  "entity": {
+    "name": "Example Corp",
+    "primary_domain": "example.com"
+  },
+  "claims": [
+    {
+      "type": "canonical_urls",
+      "statement": {
+        "homepage": "https://example.com",
+        "docs": "https://docs.example.com"
+      }
+    }
+  ],
+  "signature": { "protected": "...", "signature": "..." }
+}
+```
 
-## Governance
+The full schema, signature format, and conformance tiers are specified at [`/spec/v0.1/`](/spec/v0.1/).
 
-LLMO is stewarded by [Diverse.org](https://diverse.org), a California 501(c)(3) nonprofit. The specification is vendor-neutral. Governance details, the editor role, and decision-making processes are documented on the [about page](/about/governance).
+## Who this is for
 
-## Links
+**AI providers** integrating verified organizational identity into retrieval, citation, tool use, and agent reasoning chains.
 
-- [Specification](/spec)
-- [JSON schema](/spec/v0.1/schema)
-- [Test vectors](/spec/v0.1/test-vectors)
-- [Reference validator](/validator/)
-- [Improvement proposals](/spec/lips)
-- [Governance](/about/governance)
-- [GitHub](https://github.com/openllmo/llmo.org)
-- Contact: [spec@llmo.org](mailto:spec@llmo.org)
+**Organizations** publishing canonical claims about themselves: their domains, personnel, partnerships, disavowals, and supersedes.
+
+**Regulated industries** building AI deployments that must be auditable, insurable, and accountable to compliance frameworks.
+
+## Status
+
+The protocol is at version **0.1.1**, published April 2026 and considered draft-stable. The reference CLI ships on npm as [`llmo`](https://www.npmjs.com/package/llmo). The validator runs at [llmo.org/validator/](/validator/). Proposals to extend the spec follow [LIP-1](/spec/lips/lip-0001/), the protocol's improvement process.
+
+LLMO is stewarded by [Diverse.org, Inc.](https://diverse.org/), a 501(c)(3) nonprofit, and developed in the open at [github.com/openllmo](https://github.com/openllmo).
