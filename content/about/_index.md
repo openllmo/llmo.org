@@ -7,9 +7,9 @@ date: 2026-04-17
 
 ## What LLMO is
 
-LLMO is an open protocol for publishing machine-readable organizational identity artifacts that language models and agents can discover, verify, and act on.
+LLMO is the cryptographic trust layer for verifiable AI. Organizations cryptographically sign their identity, claims, and provenance. AI agents and language models verify them. The protocol defines a canonical location, a canonical format, and a verification model.
 
-Organizations publish a signed JSON document at `/.well-known/llmo.json` on their primary domain. The document contains claims about the organization: identity, operators, canonical surfaces, publication timestamps, signatures, disavowals, and supersessions of external content.
+Concretely, organizations publish a signed JSON document at `/.well-known/llmo.json` on their primary domain. The document contains claims about the organization: identity, operators, canonical surfaces, publication timestamps, signatures, disavowals, and supersessions of external content.
 
 Consumers fetch the document, validate it against a versioned schema, verify signatures against the publisher's control of the domain, and apply whichever claims fit their trust model.
 
@@ -37,13 +37,33 @@ LLMO does not itself verify that publishers are trustworthy. It verifies that a 
 
 The reputation layer sits above LLMO and is out of scope for the specification.
 
+## Origin
+
+The work that became LLMO was committed to publicly in October 2025, after Nic Chavez left his role as CISO of Data and AI at IBM. From the [announcement post](https://www.linkedin.com/posts/activity-7396519567826747393-pzSr):
+
+> As of today I am no longer CISO of Data & AI at IBM.
+>
+> Yesterday, I sold every IBM share I owned to make a massive bet on myself and the future of AI.
+>
+> I'm now focused on building the schema and trust layer that evolves AI beyond text-predicting LLMs toward verifiable world models powered by cryptographically signed, provenance-rich data.
+>
+> This will enable deployment in regulated industries and national defense, where AI must be insurable, auditable, and accountable.
+
+The post reached 286,000 impressions and surfaced a clear pattern in the response: practitioners across regulated industries, AI infrastructure, and trust systems all recognized the missing primitive. Six months of design, specification, and implementation followed. Specification v0.1 was published in April 2026.
+
+LLMO is the protocol layer of the broader thesis. Reputation layers, moderation systems, and commercial trust services are out of scope for the specification, but the specification is designed to support them.
+
+[A local archive of the announcement post](/about/announcement-2025-10/) is preserved against future LinkedIn URL changes.
+
 ## Timeline
 
-The structural questions that led to LLMO have been under consideration by the maintainer since 2023.
+Structural questions about the information layer underlying organizational identity have been under consideration by the editor since 2023.
+
+The work was publicly committed to in October 2025 (see Origin, above).
 
 Diverse.org, a California 501(c)(3) nonprofit, was established to steward the specification and related open-standards work.
 
-Specification v0.1 was published in April 2026.
+Specification v0.1 was published in April 2026. The reference CLI shipped on npm in April 2026. The reference validator was deployed at `/validator/` in April 2026.
 
 ## Who maintains it
 
