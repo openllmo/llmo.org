@@ -2,4 +2,9 @@ baseURL = "https://llmo.org"
 title = "LLMO"
 defaultContentLanguage = "en"
 
+# enableGitInfo lets layouts read .GitInfo.AbbreviatedHash for build-time
+# stamping. Used by /validator/ to surface the deployed commit SHA in the
+# tool's footer.
+enableGitInfo = true
+
 ignoreFiles = ['^README\.md$', '^CONTRIBUTING\.md$', '^SECURITY\.md$', '^CLAUDE\.md$', '^infrastructure/', '^scripts/', '^design/', '^\.github/', '^\.claude/']
