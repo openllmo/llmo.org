@@ -321,13 +321,15 @@ small {
   background: var(--code-bg);
 }
 
-.btn-cta {
+/* Specificity bump: .btn.btn-cta (0,0,2,0) vs .btn-primary (0,0,1,0)
+   keeps green CTA winning even if a later rule reorders the cascade. */
+.btn.btn-cta {
   background: #16a34a;
   color: white;
   border-color: #15803d;
 }
 
-.btn-cta:hover {
+.btn.btn-cta:hover {
   background: #15803d;
   transform: translateY(-1px);
 }
