@@ -14,7 +14,7 @@ The authoritative process document is [LIP-1](/spec/lips/lip-0001), which define
 | Number | Title | Author | Status | Type | Created |
 | --- | --- | --- | --- | --- | --- |
 | [LIP-1](/spec/lips/lip-0001/) | LIP Purpose and Guidelines | Nic Chavez | Active | Process | 2026-04-21 |
-| LIP-2 | (placeholder withdrawn before merge) | — | Withdrawn | Process | 2026-04-21 |
+| LIP-2 | (placeholder withdrawn before merge) |  | Withdrawn | Process | 2026-04-21 |
 | [LIP-3](/spec/lips/lip-0003/) | LIP Authoring Conventions | Nic Chavez | Draft | Informational | 2026-04-21 |
 
 LIP numbers are not necessarily contiguous. LIP-2 was reserved during initial scaffolding for a Process LIP defining core claim type submission mechanics. The placeholder was removed from the repository before being formally numbered, and the number is permanently retained as withdrawn per the registry's append-only rule.

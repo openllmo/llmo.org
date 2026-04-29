@@ -6,9 +6,9 @@ This file is committed to a public repository. It documents **identities** (emai
 
 The two entities that own production infrastructure today, plus a third grouping for personal / individual accounts that connect to the projects:
 
-- **Diverse.org** — California 501(c)(3); steward of the LLMO protocol.
-- **Greyfront, Inc.** — Delaware C-corp; future commercial vehicle. No live infrastructure deployed yet; domains reserved.
-- **Personal / individual** — accounts attached to specific humans rather than to either entity.
+- **Diverse.org**: California 501(c)(3); steward of the LLMO protocol.
+- **Greyfront, Inc.**: Delaware C-corp; future commercial vehicle. No live infrastructure deployed yet; domains reserved.
+- **Personal / individual**: accounts attached to specific humans rather than to either entity.
 
 ---
 
@@ -29,9 +29,9 @@ The two entities that own production infrastructure today, plus a third grouping
 
 - **Domain:** `diverse.org`
 - **Aliases configured:**
-  - `spec@llmo.org` — protocol editor and primary public contact
-  - `security@llmo.org` — security disclosure address (see `SECURITY.md`)
-  - `team@diverse.org` — operational / infrastructure address used as the SSO identity for Cloudflare
+  - `spec@llmo.org`: protocol editor and primary public contact
+  - `security@llmo.org`: security disclosure address (see `SECURITY.md`)
+  - `team@diverse.org`: operational / infrastructure address used as the SSO identity for Cloudflare
 - **Notes:** Workspace pays for the email infrastructure that backs all three aliases. Mail flow for `llmo.org` is configured via MX records on the Cloudflare zone (see `infrastructure/DNS.md`).
 
 ### GitHub organization
@@ -40,8 +40,8 @@ The two entities that own production infrastructure today, plus a third grouping
 - **Owner (admin human):** `@thegigachav`
 - **Repos:** `openllmo/llmo.org`, `openllmo/llmo-validator`
 - **Org-level GitHub Apps installed:**
-  - `cloudflare-workers-and-pages` — drives Cloudflare Pages auto-deploy on push to `main` for both Pages projects.
-  - `Mintlify` — **REMOVED 2026-04-26** during the migration. See "Mintlify" below.
+  - `cloudflare-workers-and-pages`: drives Cloudflare Pages auto-deploy on push to `main` for both Pages projects.
+  - `Mintlify`: **REMOVED 2026-04-26** during the migration. See "Mintlify" below.
 - **Notes:** the org is administered by a personal GitHub account (`@thegigachav`) rather than a Diverse.org-owned identity. Migrating ownership to a `team@diverse.org`-tied GitHub identity is a TODO; there is no urgency until staffing changes or for governance reasons.
 
 ### Mintlify (DEFUNCT, retained for historical record)
@@ -67,9 +67,9 @@ The two entities that own production infrastructure today, plus a third grouping
 
 ### Domains reserved (no infrastructure deployed)
 
-- `greyfront.com` — registered, parked.
-- `grayfront.com` — registered, parked.
-- `llmo.com` — registered, parked.
+- `greyfront.com`: registered, parked.
+- `grayfront.com`: registered, parked.
+- `llmo.com`: registered, parked.
 
 No DNS, hosting, email, or other services are configured for these domains yet. They will be commissioned during the `llmo.com` product build.
 
@@ -81,7 +81,7 @@ No DNS, hosting, email, or other services are configured for these domains yet. 
 
 ### GitHub
 
-- **`@thegigachav`** — primary personal GitHub account. Owner of the `openllmo` organization (administers `llmo.org`, `llmo-validator`).
+- **`@thegigachav`**: primary personal GitHub account. Owner of the `openllmo` organization (administers `llmo.org`, `llmo-validator`).
 - **Primary email on file:** rocketmail address (the same address Mintlify still has on file for the orphaned project).
 - **Notes:** this is the human who can administer the `openllmo` org. Org-ownership migration to a Diverse.org-tied identity is the TODO noted under "GitHub organization" above.
 

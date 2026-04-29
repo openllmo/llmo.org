@@ -15,7 +15,7 @@ This policy covers security vulnerabilities in:
 The following are explicitly out of scope for this policy:
 
 - **Abuse of LLMO by third parties.** Reports that a specific organization is publishing false, misleading, or forged `llmo.json` documents are not security vulnerabilities in LLMO; they are abuse of the protocol by that organization. Abuse reports are handled separately and are not covered by the commitments in this document.
-- **Vulnerabilities in dependencies** (Node.js, Cloudflare Pages, Mintlify, GitHub, Google Workspace, and so on) unless the vulnerability is exploitable specifically because of how LLMO integrates with the dependency. General dependency issues should be reported to the dependency's maintainer.
+- **Vulnerabilities in dependencies** (Node.js, Cloudflare Pages, GitHub, Google Workspace, and so on) unless the vulnerability is exploitable specifically because of how LLMO integrates with the dependency. General dependency issues should be reported to the dependency's maintainer.
 - **Social engineering, phishing, or physical attacks** against the project maintainers or contributors.
 
 ## Reporting a vulnerability

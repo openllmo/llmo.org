@@ -8,7 +8,7 @@
   {{ with .Pages }}
   <ul class="page-list">
     {{ range . }}
-    <li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>{{ with .Description }} <span class="page-list-desc">— {{ . }}</span>{{ end }}</li>
+    <li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>{{ with .Description }} <span class="page-list-desc">: {{ . }}</span>{{ end }}</li>
     {{ end }}
   </ul>
   {{ end }}

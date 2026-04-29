@@ -2,7 +2,7 @@
 
 ## When to use this skill
 
-Trigger conditions — invoke this skill when ANY of the following are true in the current task:
+Trigger conditions: invoke this skill when ANY of the following are true in the current task:
 
 - You are about to propose deferring work to "Phase 2," "follow-up commit," "next iteration," "later," or "post-conference"
 - You are about to suggest the operator do "the easier version now and the right version later"
@@ -33,7 +33,7 @@ When triggered, work through these questions in order:
 
 ### 1. Is this hard, or is it just hard right now?
 
-Hard tasks are tasks that are inherently difficult — they require domain expertise you don't have, they depend on something that doesn't exist yet, they need a business decision you can't make.
+Hard tasks are tasks that are inherently difficult: they require domain expertise you don't have, they depend on something that doesn't exist yet, they need a business decision you can't make.
 
 Hard-right-now tasks are tasks that are difficult only because you're tired, the codebase is unfamiliar, or you don't want to debug. These are not real reasons to defer.
 
@@ -69,7 +69,7 @@ Real reasons:
 - The work is well-defined but large enough to warrant a separate deliverable
 
 Bullshit reasons:
-- It's complex (irrelevant — most things worth doing are complex)
+- It's complex (irrelevant; most things worth doing are complex)
 - I don't want to debug this right now (your fatigue is not the project's problem)
 - The easier path is also acceptable (often false; check against the promise)
 - We can polish this later (later usually never comes)
@@ -114,19 +114,19 @@ This skill's job is to catch the *smaller-than-promised* failure mode, not to dr
 
 **Triggered:**
 
-> "We can fix this in a follow-up commit later. Get the proofs committed now, polish the script later." — verify-lip-anchor.sh requiring local Bitcoin node. Apply skill: rewrite with three-explorer fallback now.
+> "We can fix this in a follow-up commit later. Get the proofs committed now, polish the script later." (verify-lip-anchor.sh requiring local Bitcoin node). Apply skill: rewrite with three-explorer fallback now.
 
-> "The signed document fails Standard tier S3 but passes Minimal tier. We can re-sign tomorrow." — first signing of llmo.json. Apply skill: re-sign tonight to pass Strict tier before conference.
+> "The signed document fails Standard tier S3 but passes Minimal tier. We can re-sign tomorrow." (first signing of llmo.json). Apply skill: re-sign tonight to pass Strict tier before conference.
 
-> "Section 7 references Serval. We can update the worked example post-conference." — Serval is also a Greyfront commercial customer. Apply skill: refactor to use Diverse.org as self-referential example now.
+> "Section 7 references Serval. We can update the worked example post-conference." (Serval is also a Greyfront commercial customer). Apply skill: refactor to use Diverse.org as self-referential example now.
 
 **NOT triggered (real deferrals):**
 
-> "We need to migrate from `diverse-org` GitHub identity to a service account, but Diverse.org has no employees yet to use the service account." — Real dependency. Defer to BACKLOG.md with trigger ("when Diverse.org has employees").
+> "We need to migrate from `diverse-org` GitHub identity to a service account, but Diverse.org has no employees yet to use the service account." (real dependency). Defer to BACKLOG.md with trigger ("when Diverse.org has employees").
 
-> "The v0.2 schema additions (mission, address as object, distinct leadership claim type) are nice but require a v0.2 LIP." — Real reason. v0.1 is anchored. Defer to BACKLOG.md.
+> "The v0.2 schema additions (mission, address as object, distinct leadership claim type) are nice but require a v0.2 LIP." (real reason). v0.1 is anchored. Defer to BACKLOG.md.
 
-> "Self-hosting Inter and JetBrains Mono fonts is the right answer but Google Fonts works for now." — Real cost-benefit. Document in BACKLOG.md, do post-conference.
+> "Self-hosting Inter and JetBrains Mono fonts is the right answer but Google Fonts works for now." (real cost-benefit). Document in BACKLOG.md, do post-conference.
 
 The difference: in the first three, the deferral protects Claude (less work). In the last three, the deferral reflects real dependencies or trade-offs.
 

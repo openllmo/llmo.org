@@ -28,7 +28,7 @@ This document tracks deferred work, scheduled commitments, and open decisions fo
 
 This is the deadline for the above. After this date, validators will (correctly) flag the document as expired. A consumer fetching the document on 2026-07-27 sees an expired claim. **Do not let this date arrive without re-signing.**
 
-If the 2026-07-15 re-signing doesn't happen for any reason, this becomes a real production incident. Move the demo down to "we have a spec" without "and we use it ourselves" — the protocol-uses-itself loop breaks if our own document is expired.
+If the 2026-07-15 re-signing doesn't happen for any reason, this becomes a real production incident. Move the demo down to "we have a spec" without "and we use it ourselves"; the protocol-uses-itself loop breaks if our own document is expired.
 
 ---
 
@@ -36,13 +36,13 @@ If the 2026-07-15 re-signing doesn't happen for any reason, this becomes a real 
 
 **Email Mintlify support to delete the orphaned project.**
 
-Context: Mintlify project was created via GitHub App install in early 2026 without a paired user dashboard account. The project still exists on Mintlify's infrastructure even though we've migrated to Hugo and uninstalled the GitHub App. The project orphan is harmless — no traffic flows through it — but it's a loose end. Deleting it tidies up.
+Context: Mintlify project was created via GitHub App install in early 2026 without a paired user dashboard account. The project still exists on Mintlify's infrastructure even though we've migrated to Hugo and uninstalled the GitHub App. The project orphan is harmless (no traffic flows through it), but it's a loose end. Deleting it tidies up.
 
 **How:** Email support@mintlify.com from Nic's rocketmail address (the one originally tied to the GitHub App install). Suggested wording:
 
-> Hi — I'd like to fully delete a Mintlify project that was orphaned during a migration. The project was for github.com/openllmo/llmo.org and was installed via your GitHub App without a paired dashboard account. The GitHub App has been uninstalled. I'd like the project itself fully removed from your infrastructure. Can you confirm deletion?
+> Hi, I'd like to fully delete a Mintlify project that was orphaned during a migration. The project was for github.com/openllmo/llmo.org and was installed via your GitHub App without a paired dashboard account. The GitHub App has been uninstalled. I'd like the project itself fully removed from your infrastructure. Can you confirm deletion?
 
-Async — they'll reply when they reply. Not blocking anything.
+Async; they'll reply when they reply. Not blocking anything.
 
 ---
 
@@ -70,7 +70,7 @@ Async — they'll reply when they reply. Not blocking anything.
    - Same component patterns (header, footer, theme toggle)
    - Same Stripe/Linear/Vercel register
    - Logo: same mark, perhaps different color treatment if needed (red is reserved for llmo.com, black-on-white for both .org sites is fine)
-4. DNS: diverse.org → diverse-org.pages.dev (whatever the Pages subdomain becomes). **Find out current registrar/DNS provider for diverse.org first** — likely needs to be added to ACCOUNTS.md.
+4. DNS: diverse.org → diverse-org.pages.dev (whatever the Pages subdomain becomes). **Find out current registrar/DNS provider for diverse.org first**; likely needs to be added to ACCOUNTS.md.
 5. Custom domain on Cloudflare Pages (diverse.org and www.diverse.org)
 6. Content needed:
 
@@ -81,13 +81,13 @@ Async — they'll reply when they reply. Not blocking anything.
 - Board: Nic Chavez (Chairman), Jack Dudley (Director), Andrew Mark (Secretary)
 - Bylaws (link to PDF if available, or "in development")
 - Fiscal classification: 501(c)(3), Charitable + Educational
-- 990-N filing status (most recent: TBD — Diverse.org is new, may not have filed yet)
+- 990-N filing status (most recent: TBD; Diverse.org is new, may not have filed yet)
 - Annual report (when available)
 
 **Greyfront firewall disclosure:**
 > ## Diverse.org and Greyfront, Inc.
 >
-> LLMO is stewarded by Diverse.org as an open protocol. Commercial offerings on top of LLMO — including the validator-as-a-service product at llmo.com — are built and operated by Greyfront, Inc., a Delaware C-corporation legally separate from Diverse.org.
+> LLMO is stewarded by Diverse.org as an open protocol. Commercial offerings on top of LLMO (including the validator-as-a-service product at llmo.com) are built and operated by Greyfront, Inc., a Delaware C-corporation legally separate from Diverse.org.
 >
 > The two entities are governed independently:
 > - Diverse.org is funded by donations and grants. Its decisions are made by its board.
@@ -114,7 +114,7 @@ Async — they'll reply when they reply. Not blocking anything.
 
 **Diverse.org's own /.well-known/llmo.json (Priority 14d):** see below.
 
-**Estimate:** 4-6 hours of focused work. Real risk: the donations infrastructure could spiral into Stripe setup, charity registration paperwork, etc. Defer that — for v1, even just "donations coming soon" or a simple Stripe link is enough.
+**Estimate:** 4-6 hours of focused work. Real risk: the donations infrastructure could spiral into Stripe setup, charity registration paperwork, etc. Defer that; for v1, even just "donations coming soon" or a simple Stripe link is enough.
 
 ---
 
@@ -132,7 +132,7 @@ Async — they'll reply when they reply. Not blocking anything.
 1. Generate or re-use ES256 keypair. Decision: **same key**. Same legal entity (Diverse.org, Inc.) is signing both documents; using two different keys would imply two different signing authorities. Re-use kid `diverse-2026-01`.
 
 2. Construct payload similar to llmo.org's, but:
-   - `primary_domain`: `"diverse.org"` (matches serving domain — Standard tier S3)
+   - `primary_domain`: `"diverse.org"` (matches serving domain; Standard tier S3)
    - `aliases`: `["llmo.org", "kbp.org", "emerging.org"]` (the others)
    - Same identity claim, leadership claim, disavowal claim
    - `canonical_urls.docs`: `https://llmo.org/spec` (still points at the spec)
@@ -157,7 +157,7 @@ Async — they'll reply when they reply. Not blocking anything.
 
 ---
 
-## DEFERRED — POST-CONFERENCE (April 29+)
+## DEFERRED: POST-CONFERENCE (April 29+)
 
 ### Soft public launch (HN, Twitter, etc.)
 
@@ -177,7 +177,7 @@ Async — they'll reply when they reply. Not blocking anything.
 
 **Status:** Not started. Strategic priority for Greyfront commercial arc.
 
-**Why it matters:** Yoast SEO has demonstrated that the WordPress plugin distribution channel is real (Yoast: $12M ARR at acquisition). LLMO's commercial product can follow the same path — a WordPress plugin that helps publishers configure and validate their llmo.json.
+**Why it matters:** Yoast SEO has demonstrated that the WordPress plugin distribution channel is real (Yoast: $12M ARR at acquisition). LLMO's commercial product can follow the same path: a WordPress plugin that helps publishers configure and validate their llmo.json.
 
 **Pre-conditions before starting:**
 1. Greyfront has actual infrastructure (no DNS/hosting/email yet)
@@ -206,7 +206,7 @@ Async — they'll reply when they reply. Not blocking anything.
 - Registrar/DNS for the three domains (likely the same one used for llmo.org and diverse.org)
 - Email infrastructure (Greyfront Google Workspace or similar)
 - Web infrastructure (Cloudflare Pages probably)
-- Admin identity (who's the admin user — currently nobody)
+- Admin identity (who's the admin user, currently nobody)
 - Add to ACCOUNTS.md once provisioned
 
 **Why deferred:** Greyfront has no products yet. Provisioning infrastructure for an empty company is premature. When the first commercial product is real (likely the WordPress plugin), Greyfront infrastructure gets stood up alongside.
@@ -313,7 +313,7 @@ These items were captured in the original repo-root `BACKLOG.md` on 2026-04-20 a
 
 ## FUTURE SCHEMA EVOLUTION (v0.2+)
 
-These are spec-evolution ideas surfaced during v0.1 work. **Do not modify the v0.1 schema** — it's anchored. These belong in a v0.2 LIP.
+These are spec-evolution ideas surfaced during v0.1 work. **Do not modify the v0.1 schema**: it's anchored. These belong in a v0.2 LIP.
 
 ### Richer `identity` claim type
 

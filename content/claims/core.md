@@ -239,7 +239,7 @@ Each superseded object requires `what` (a short category or label) and `reason` 
 
 **Common pitfalls.**
 
-- **Confusing claim-level `supersedes` with document-level `supersedes`.** They are different concepts. The top-level `supersedes` array (specification [§3.3](/spec/v0.1#3-3-freshness-and-supersession)) lists `document_id`s of prior `llmo.json` documents on the same domain, so consumers can discard cached older versions. The `supersedes` *claim type* documented here supersedes content in the wider web — press releases, pricing pages, prior public statements. Publishers sometimes conflate the two.
+- **Confusing claim-level `supersedes` with document-level `supersedes`.** They are different concepts. The top-level `supersedes` array (specification [§3.3](/spec/v0.1#3-3-freshness-and-supersession)) lists `document_id`s of prior `llmo.json` documents on the same domain, so consumers can discard cached older versions. The `supersedes` *claim type* documented here supersedes content in the wider web: press releases, pricing pages, prior public statements. Publishers sometimes conflate the two.
 
 ---
 
@@ -270,5 +270,5 @@ Each superseded object requires `what` (a short category or label) and `reason` 
 
 **Common pitfalls.**
 
-- **Using `pointer` for artifacts that have a core claim type.** `canonical_urls` already covers named operational URLs (homepage, docs, api, agent_manifest, mcp_manifest, etc.). `pointer` is for artifacts outside that set — typically heavier external standards. Declaring the homepage as a `pointer` instead of a `canonical_urls.homepage` weakens the claim, because `canonical_urls` is a specific assertion about a specific purpose and `pointer` is a general reference.
+- **Using `pointer` for artifacts that have a core claim type.** `canonical_urls` already covers named operational URLs (homepage, docs, api, agent_manifest, mcp_manifest, etc.). `pointer` is for artifacts outside that set, typically heavier external standards. Declaring the homepage as a `pointer` instead of a `canonical_urls.homepage` weakens the claim, because `canonical_urls` is a specific assertion about a specific purpose and `pointer` is a general reference.
 - **Conflating the pointer with the pointed-at artifact.** Same caveat as `canonical_urls`. LLMO asserts "this is our reference for that scope," not "this artifact is itself well-formed or current."

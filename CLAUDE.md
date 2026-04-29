@@ -1,14 +1,14 @@
-# CLAUDE.md — LLMO Project Memory
+# CLAUDE.md: LLMO Project Memory
 
 This file is auto-loaded by Claude Code at the start of every session in this repository. It captures the working principles, conventions, and conventions-not-to-violate that have emerged through this project's development.
 
-If you are a Claude session opening this file, **read it fully before any meaningful work in the repo.** The principles below were earned through specific exchanges — they're not arbitrary preferences.
+If you are a Claude session opening this file, **read it fully before any meaningful work in the repo.** The principles below were earned through specific exchanges; they're not arbitrary preferences.
 
 For deeper context (history, decision rationale, strategic backlog), see:
-- `infrastructure/BACKLOG.md` — deferred work and scheduled commitments
-- `infrastructure/SIGNING-CEREMONY.md` — cryptographic signing procedure
-- `infrastructure/ACCOUNTS.md` — service accounts and entity ownership
-- Local operator handoff documents (not in this repo) — personal/strategic context
+- `infrastructure/BACKLOG.md`: deferred work and scheduled commitments
+- `infrastructure/SIGNING-CEREMONY.md`: cryptographic signing procedure
+- `infrastructure/ACCOUNTS.md`: service accounts and entity ownership
+- Local operator handoff documents (not in this repo): personal/strategic context
 
 ---
 
@@ -18,9 +18,9 @@ For deeper context (history, decision rationale, strategic backlog), see:
 
 **Stewardship:** Diverse.org, Inc. (CA 501(c)(3), EIN 99-2870125)
 
-**Commercial vehicle:** Greyfront, Inc. (DE C-corp) — separate entity, future llmo.com
+**Commercial vehicle:** Greyfront, Inc. (DE C-corp); separate entity, future llmo.com
 
-**Repo:** This is the spec/site repo (openllmo/llmo.org). Validator is at openllmo/llmo-validator. Diverse.org's own site is planned separately (Priority 14c — see BACKLOG.md).
+**Repo:** This is the spec/site repo (openllmo/llmo.org). Validator is at openllmo/llmo-validator. Diverse.org's own site is planned separately (Priority 14c, see BACKLOG.md).
 
 **Current state:** Site live at https://llmo.org, signed `llmo.json` published at `/.well-known/llmo.json` passing Strict tier conformance, LIP-1 and LIP-3 Bitcoin-anchored.
 
@@ -34,7 +34,7 @@ These come from specific failures or earned conventions. Don't re-litigate them.
 
 The repo migrated from Mintlify after permanent dashboard auth lockout. The structural argument: a protocol whose product thesis is "organizations control their own identity" cannot operate on infrastructure where the project owner doesn't have administrative control.
 
-If a future task tempts you toward a proprietary docs platform (Mintlify, GitBook, ReadMe, etc.) or a hosted CMS — **reject it**. Hugo + Cloudflare Pages is the right answer.
+If a future task tempts you toward a proprietary docs platform (Mintlify, GitBook, ReadMe, etc.) or a hosted CMS, **reject it**. Hugo + Cloudflare Pages is the right answer.
 
 ### 2. The v0.1 schema is anchored. Do not modify it.
 
@@ -94,7 +94,7 @@ Always. Read them again if you suspect context drift.
 
 ## The "hardstuff" principle
 
-When you find yourself proposing "Phase 2," "later," or "follow-up commit" on something that affects the live site, the demo, or stated promises — **STOP**.
+When you find yourself proposing "Phase 2," "later," or "follow-up commit" on something that affects the live site, the demo, or stated promises, **STOP**.
 
 Ask: "is this hard, or just hard right now?"
 
@@ -128,7 +128,7 @@ Before inventing a convention, look at what Bitcoin/Linux/Apache/Mozilla/Stripe/
 When CI is green and the PR is ready, STOP and report. Don't merge without explicit operator approval.
 
 ### Execute on doctrine, consult on strategy
-Code, file moves, refactors, ceremonies, builds — execute. Strategic decisions, naming, customer-facing prose, irreversible actions — consult.
+Code, file moves, refactors, ceremonies, builds: execute. Strategic decisions, naming, customer-facing prose, irreversible actions: consult.
 
 ### During v0.1 pre-release
 The author (Nic Chavez) decides all changes. No governance windows, no community vote. v0.2+ will have community governance.
@@ -176,12 +176,12 @@ Don't say "this will take 5 minutes" if you don't know. Either give a range with
 - Well-known files: `static/.well-known/...`
 
 ### Layouts
-- `_default/baseof.html` — page shell
-- `_default/single.html` — article pages
-- `_default/list.html` — index pages
+- `_default/baseof.html`: page shell
+- `_default/single.html`: article pages
+- `_default/list.html`: index pages
 - `partials/header.html`, `partials/footer.html`
-- `index.html` — front page
-- `404.html` — error page
+- `index.html`: front page
+- `404.html`: error page
 
 ### Theme system
 - Light mode default
@@ -223,7 +223,7 @@ Don't say "this will take 5 minutes" if you don't know. Either give a range with
 ## Spec conventions
 
 ### Worked example: Diverse.org (self-referential)
-Section 7 of v0.1 uses Diverse.org as the worked example. This is intentional — protocol-uses-itself pattern (Bitcoin docs use Bitcoin, Linux docs use Linux).
+Section 7 of v0.1 uses Diverse.org as the worked example. This is intentional: protocol-uses-itself pattern (Bitcoin docs use Bitcoin, Linux docs use Linux).
 
 If you ever see "Serval" anywhere in the repo, it's stale. Replace with Diverse.org. (Serval is also a Greyfront commercial customer name; using it as a fictional example created a customer-relationship issue.)
 
@@ -266,7 +266,7 @@ If you ever see "Serval" anywhere in the repo, it's stale. Replace with Diverse.
 ### Typography
 - Display + body: Inter (300, 400, 500, 600, 700)
 - Code: JetBrains Mono (400, 500)
-- Currently via Google Fonts (self-hosting deferred — see BACKLOG.md)
+- Currently via Google Fonts (self-hosting deferred; see BACKLOG.md)
 
 ### Type scale
 - Hero h1: 3rem mobile / 4rem desktop, weight 600
@@ -319,8 +319,8 @@ If you ever see "Serval" anywhere in the repo, it's stale. Replace with Diverse.
 - 1Password holds: signing key, GitHub PAT, Cloudflare credentials
 
 ### Branches in active use
-- `main` — production
-- `static-hugo` — historical migration branch (preserved, not deleted)
+- `main`: production
+- `static-hugo`: historical migration branch (preserved, not deleted)
 
 ---
 
@@ -330,7 +330,7 @@ Long agentic sessions accumulate stale context. Signs of drift:
 
 - You reference Mintlify as if it's still the publishing platform (it's Hugo)
 - You forget the OTS proofs are already Bitcoin-anchored
-- You confuse llmo.org and llmo.com (org vs. com — different entities)
+- You confuse llmo.org and llmo.com (org vs. com, different entities)
 - You describe Serval as the worked example (it's Diverse.org now)
 - You assume CI is broken or DNS is wrong without checking
 - You propose deferring something that's actually demo-blocking
@@ -361,6 +361,6 @@ If you discover a project convention that should be codified, add it. If a previ
 When updating:
 - Make the smallest change that captures the principle
 - Reference specific exchanges or decisions if they're load-bearing
-- Don't accumulate rationale here — link to BACKLOG.md or LIP discussions for that
+- Don't accumulate rationale here; link to BACKLOG.md or LIP discussions for that
 
 Updates to CLAUDE.md should be committed alongside the work that motivated the update, not in a separate "doc cleanup" commit. They're part of the work.
