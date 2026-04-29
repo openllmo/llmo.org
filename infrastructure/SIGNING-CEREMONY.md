@@ -46,7 +46,7 @@ Computed over the canonical JSON serialization of the public JWK (`crv`, `kid`, 
 8. Copy `llmo-signed.json` to `static/.well-known/llmo.json` in the repo.
 9. Commit and push. Cloudflare Pages auto-deploys.
 10. Verify live: `curl https://llmo.org/.well-known/llmo.json | jq` and run the verify script against the live URL.
-11. Validate against `validate.llmo.org`.
+11. Validate against https://llmo.org/validator/.
 
 ## Validity windows
 
@@ -84,7 +84,7 @@ Editing `static/.well-known/llmo.json` after publication invalidates the signatu
 
 ## Ceremony log
 
-- **2026-04-26 v1** (`~/llmo-key-ceremony-2026-04-26/`): initial signing. Failed Standard tier S3 (`primary_domain="diverse.org"` did not match the serving domain `llmo.org`) and S4 (chairman `verification` URL pointed at `github.com`, a third-party domain not in the owned set). Document at this version was published briefly under commit 6778b88 but failed validate.llmo.org checks.
+- **2026-04-26 v1** (`~/llmo-key-ceremony-2026-04-26/`): initial signing. Failed Standard tier S3 (`primary_domain="diverse.org"` did not match the serving domain `llmo.org`) and S4 (chairman `verification` URL pointed at `github.com`, a third-party domain not in the owned set). Document at this version was published briefly under commit 6778b88 but failed validator checks.
 - **2026-04-26 v2** (`~/llmo-key-ceremony-2026-04-26-v2/`): re-signed with corrected payload. `primary_domain="llmo.org"`; aliases now `["diverse.org", "kbp.org", "emerging.org"]`. Chairman `verification` URL removed pending `https://diverse.org/about/leadership` (Priority 14c). Same key (`kid: diverse-2026-01`), same `valid_from`/`valid_until` window. Canonicalized payload size: 1778 bytes (was 1826 in v1).
 
 When re-signing in 90 days for the next quarterly window, copy the v2 ceremony's `sign.py`/`verify.py` (already retargeted to `*-v2`) into a new dated ceremony directory, retarget the `CEREMONY_DIR` constant once more, and update `valid_from`/`valid_until` and `document_id` in the new payload.

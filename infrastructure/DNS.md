@@ -22,12 +22,13 @@ Verify the current authoritative nameservers with:
 
 To change DNS records, use the Cloudflare dashboard (https://dash.cloudflare.com) or a scoped API token (see "API access" below). The wrangler OAuth flow grants only `zone:read`; record edits require a custom API token with `Zone → DNS → Edit` on the llmo.org zone.
 
-## Records (as of 2026-04-20, post-migration)
+## Records (as of 2026-04-29, post-Mintlify-retirement and post-validator-consolidation)
 
 | Type  | Name                         | Content                                                       | Prio | Proxy |
 |-------|------------------------------|---------------------------------------------------------------|------|-------|
-| A     | llmo.org                     | 76.76.21.21 (Vercel/Mintlify apex)                            | -    | off   |
-| CNAME | www.llmo.org                 | llmo.org                                                      | -    | off   |
+| A     | llmo.org                     | Cloudflare Pages (anycast; resolves via proxied edge)         | -    | on    |
+| CNAME | www.llmo.org                 | llmo.org                                                      | -    | on    |
+| CNAME | validate.llmo.org            | llmo-validator.pages.dev (legacy; intercepted by Bulk Redirect, see notes) | - | on |
 | MX    | llmo.org                     | aspmx.l.google.com                                            | 1    | -     |
 | MX    | llmo.org                     | alt1.aspmx.l.google.com                                       | 5    | -     |
 | MX    | llmo.org                     | alt2.aspmx.l.google.com                                       | 5    | -     |
@@ -40,17 +41,18 @@ To change DNS records, use the Cloudflare dashboard (https://dash.cloudflare.com
 
 Notes on the records:
 
-- The apex `A` record points at Vercel/Mintlify's shared edge IP. Cloudflare proxying is deliberately OFF (grey cloud). Mintlify and Vercel manage their own TLS termination; proxying through Cloudflare can interact poorly with their edge.
-- The `www` CNAME is a plain alias to the apex. Proxy off for the same reason.
+- The apex `A` record now resolves through Cloudflare Pages (proxied). The Pages project `llmo-org` serves the Hugo-built site for both `llmo.org` and `www.llmo.org` via the standard Cloudflare Pages custom-domain mechanism. Vercel and Mintlify are no longer in the path; the prior Mintlify-era `76.76.21.21` apex IP is retired.
+- The `www` CNAME is a plain alias to the apex, now proxied for consistency with the apex's proxied status.
+- `validate.llmo.org` exists for legacy compatibility. The CNAME still points at the `llmo-validator` Pages project (which historically served the validator), but a Cloudflare account-level Bulk Redirect rule intercepts all `validate.llmo.org/*` requests at the edge and 301s them to `https://llmo.org/validator/*` (path and query preserved). The Pages project itself is no longer the source of truth for the validator and is scheduled for deletion approximately 6 months after the 2026-04-29 migration. The Bulk Redirect rule is independent of the Pages project; deleting the project will not break the redirect.
 - Mail is handled by Google Workspace. All five standard Google MX records are present with correct priorities.
-- SPF was migrated from a GoDaddy-specific two-hop flattener (`_spfm.llmo.org` indirection) to a direct single-hop record on migration day.
+- SPF was migrated from a GoDaddy-specific two-hop flattener (`_spfm.llmo.org` indirection) to a direct single-hop record on the 2026-04-20 DNS migration.
 - DMARC is currently report-only (`p=none`). Moving to `p=quarantine` or `p=reject` requires first monitoring aggregate reports for a period to confirm no legitimate mail will be affected. Deferred.
-- No AAAA records (Mintlify/Vercel apex is IPv4 only). Revisit after the site migrates off Mintlify.
+- No AAAA records (Cloudflare Pages handles IPv6 at the edge transparently when proxied). Cloudflare's anycast network responds to AAAA queries on proxied hostnames; explicit AAAA records on the zone are not required.
 - No CAA records yet. Adding CAA restrictions to specific certificate authorities is a defensive hardening step queued for a follow-up.
 
 ## Hosting
 
-**Specification site (`llmo.org`):** Mintlify. Mintlify builds from the GitHub repository `openllmo/llmo.org` on pushes to `main`. Mintlify is expected to be replaced for specific interactive surfaces (such as the validator) by self-controlled infrastructure. See `infrastructure/VALIDATOR.md` (Phase 2) for validator hosting.
+**Specification site (`llmo.org`):** Cloudflare Pages, project `llmo-org`. Pages builds the Hugo site from the GitHub repository `openllmo/llmo.org` on pushes to `main`. Build command: `hugo --minify`. The validator at `/validator/` is part of this same build (no separate Pages project). See `infrastructure/VALIDATOR.md`.
 
 **Mail (`@llmo.org`):** Google Workspace, delivered via the MX records above. The editor's address `spec@llmo.org` is functional.
 
@@ -73,6 +75,10 @@ Do not commit the token to the repo. Do not paste it into PR descriptions. Token
 ## Migration log
 
 **2026-04-20:** DNS migrated from GoDaddy nameservers (`ns45.domaincontrol.com`, `ns46.domaincontrol.com`) to Cloudflare (`liv.ns.cloudflare.com`, `noah.ns.cloudflare.com`). SPF rewritten from GoDaddy-specific two-hop flattener to direct single-hop include of `_spf.google.com`. All other records carried over unchanged. Nameserver change completed at registrar at approximately 2026-04-20T18:15 UTC; full propagation across major public resolvers within 35 minutes, with residual caching on Google's `8.8.8.8` clearing within the hour. Site and mail remained functional throughout the cutover; no downtime observed.
+
+**2026-04-27:** Mintlify retired. Spec site rebuilt on Hugo and re-hosted on Cloudflare Pages (project `llmo-org`). Apex `A` record changed from `76.76.21.21` (Vercel/Mintlify) to Cloudflare Pages anycast, with proxy on. `www.llmo.org` proxy turned on for consistency.
+
+**2026-04-29:** Validator consolidated into the main site at `https://llmo.org/validator/`. The legacy `validate.llmo.org` subdomain becomes a 301 redirect handled by an account-level Cloudflare Bulk Redirect rule (preserving path and query). The DNS CNAME for `validate.llmo.org` and the legacy `llmo-validator` Pages project both remain in place during a ~6-month decay window before final cleanup, but neither is on the live serving path: Bulk Redirect intercepts at the edge.
 
 ## Contact
 

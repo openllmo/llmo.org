@@ -7,10 +7,10 @@ LLMO takes security seriously. This document describes how to report security vu
 This policy covers security vulnerabilities in:
 
 - **The LLMO protocol specification**, where a flaw in the specification enables attacks against conformant implementations or against publishers whose documents conform to the specification.
-- **The reference validator** at validate.llmo.org, including the source at github.com/openllmo/llmo-validator.
+- **The reference validator** at https://llmo.org/validator/, source in this repository under `static/js/validator.js` and `layouts/validator/`.
 - **The OpenTimestamps anchoring scripts** at github.com/openllmo/llmo.org in the scripts/ directory.
 - **CI workflows and automation** in either repository that, if compromised, could enable supply-chain attacks against the specification or validator.
-- **DNS and infrastructure configuration** for llmo.org and validate.llmo.org, where misconfiguration enables attacks against users.
+- **DNS and infrastructure configuration** for llmo.org (including the redirect from validate.llmo.org), where misconfiguration enables attacks against users.
 
 The following are explicitly out of scope for this policy:
 

@@ -19,7 +19,7 @@ Consumers fetch the document, validate against the schema, verify signatures, an
 - Specification v0.1 at `/spec/v0.1/`
 - JSON schema at `/spec/v0.1/schema/`
 - Five test vectors at `/spec/v0.1/test-vectors/` covering valid documents, invalid documents, and edge cases
-- Reference validator at https://validate.llmo.org
+- Reference validator at https://llmo.org/validator/
 - LIP governance process with three accepted improvement proposals: LIP-1 (process), LIP-2 (core proposal mechanics, in governance window), LIP-3 (authoring conventions)
 - OpenTimestamps anchoring for accepted LIPs, proof files adjacent to source documents at `/spec/lips/`
 
@@ -27,7 +27,7 @@ Consumers fetch the document, validate against the schema, verify signatures, an
 
 1. Read the specification at https://llmo.org/spec
 2. Construct your `llmo.json` document following the schema at `/spec/v0.1/schema/`
-3. Validate your document at https://validate.llmo.org
+3. Validate your document at https://llmo.org/validator/
 4. Publish at `https://<your-domain>/.well-known/llmo.json`
 
 ## For consumers
@@ -73,7 +73,7 @@ Code in this repository is licensed under MIT. See `LICENSE-CODE`.
 ## Links
 
 - Specification: https://llmo.org
-- Reference validator: https://validate.llmo.org
+- Reference validator: https://llmo.org/validator/
 - LIP index: https://llmo.org/spec/lips
 - Issues: https://github.com/openllmo/llmo.org/issues
 - Contact: spec@llmo.org

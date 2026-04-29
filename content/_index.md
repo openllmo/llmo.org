@@ -22,11 +22,11 @@ The protocol is vendor-neutral, open, and intended to be widely implemented.
 
 ## What exists today
 
-Specification v0.1 is published with a JSON schema, five test vectors, and a reference validator at [validate.llmo.org](https://validate.llmo.org). A governance process is active with three accepted improvement proposals covering the process itself, core-proposal submission mechanics, and authoring conventions. OpenTimestamps anchoring is live for accepted proposals.
+Specification v0.1 is published with a JSON schema, five test vectors, and a reference [validator](/validator/). A governance process is active with three accepted improvement proposals covering the process itself, core-proposal submission mechanics, and authoring conventions. OpenTimestamps anchoring is live for accepted proposals.
 
 ## Where to go next
 
-**If you're evaluating LLMO as a publisher:** read the [specification](/spec), validate a draft document against the [reference validator](https://validate.llmo.org), and publish at your domain's `/.well-known/llmo.json`.
+**If you're evaluating LLMO as a publisher:** read the [specification](/spec), validate a draft document against the [reference validator](/validator/), and publish at your domain's `/.well-known/llmo.json`.
 
 **If you're evaluating LLMO as a consumer:** read the [specification](/spec) to understand the document structure, fetch documents from publishers you care about, and apply whatever trust model fits your use case.
 
@@ -41,7 +41,7 @@ LLMO is stewarded by [Diverse.org](https://diverse.org), a California 501(c)(3) 
 - [Specification](/spec)
 - [JSON schema](/spec/v0.1/schema)
 - [Test vectors](/spec/v0.1/test-vectors)
-- [Reference validator](https://validate.llmo.org)
+- [Reference validator](/validator/)
 - [Improvement proposals](/spec/lips)
 - [Governance](/about/governance)
 - [GitHub](https://github.com/openllmo/llmo.org)

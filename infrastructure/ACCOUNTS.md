@@ -22,7 +22,7 @@ The two entities that own production infrastructure today, plus a third grouping
 - **Resources owned:**
   - DNS zone for `llmo.org`
   - Pages project `llmo-org` (serves `llmo.org` and `www.llmo.org`)
-  - Pages project `llmo-validator` (serves `validate.llmo.org`)
+  - Pages project `llmo-validator` (legacy; held as a redirect after the validator migrated into `llmo.org/validator/` on 2026-04-29; scheduled for deletion ~6 months later. The `validate.llmo.org/* -> llmo.org/validator/*` redirect is held by an account-level Cloudflare Bulk Redirect rule, independent of this Pages project.)
 - **API access:** the wrangler OAuth flow on this account grants `zone:read`. DNS edits are done through the dashboard manually; no long-lived API token exists. If programmatic edits become needed, mint a scoped token per `infrastructure/DNS.md` "API access".
 
 ### Google Workspace

@@ -279,6 +279,8 @@ Common issues and fixes:
 | `JWKS unreachable` | Confirm `llmo-keys.json` is at `/.well-known/llmo-keys.json` on the same domain, with `Cache-Control: max-age <= 86400`. |
 | `Cache-Control max-age > 86400` on JWKS | Lower it. The spec caps JWKS cache at 24 hours. |
 
+For a shareable verification link you can send to colleagues or include in announcements, paste your domain into the [LLMO validator](/validator/): same checks, results in a browser.
+
 ## Maintenance
 
 Republish your `llmo.json` quarterly or when material changes happen

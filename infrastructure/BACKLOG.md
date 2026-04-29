@@ -16,7 +16,7 @@ This document tracks deferred work, scheduled commitments, and open decisions fo
 
 **How:** Procedure documented in `infrastructure/SIGNING-CEREMONY.md`. The previous v2 ceremony directory at `~/llmo-key-ceremony-2026-04-26-v2/` has working `sign.py` and `verify.py`. Create a new dated ceremony directory; copy the private key from 1Password ("LLMO ES256 signing key — diverse-2026-01"); update `valid_from`, `valid_until`, and `document_id` in payload; run sign + verify; commit signed JSON.
 
-**Verification step:** After publishing, validate at https://validate.llmo.org. Must pass Strict tier. If it fails, do not consider the rotation complete until the failure is fixed.
+**Verification step:** After publishing, validate at https://llmo.org/validator/. Must pass Strict tier. If it fails, do not consider the rotation complete until the failure is fixed.
 
 **Calendar reminder set:** Confirm Nic has set this in his calendar. If not, do that as the first action of any post-conference work session.
 
@@ -147,7 +147,7 @@ Async — they'll reply when they reply. Not blocking anything.
 
 5. Publish JWKS at `diverse.org/.well-known/llmo-keys.json`. **Same JWKS content** (same public key) as llmo.org's. The JWKS is per-domain by spec convention but the underlying key is the same entity's.
 
-6. Validate at https://validate.llmo.org. Must pass Strict tier.
+6. Validate at https://llmo.org/validator/. Must pass Strict tier.
 
 7. **Update §7 prose in llmo.org's spec** to reflect both URLs are now live: change "Diverse.org will mirror at https://diverse.org/.well-known/llmo.json once Diverse.org's own site launches" to "The same signed document is also published at https://diverse.org/.well-known/llmo.json."
 

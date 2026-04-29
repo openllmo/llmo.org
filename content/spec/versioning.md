@@ -75,6 +75,6 @@ Once v0.1 is superseded by v0.2, this pre-release posture ends. From v0.2 forwar
 
 ## Relationship to implementations
 
-The reference validator at [validate.llmo.org](https://validate.llmo.org) tracks the specification version it implements. When the specification bumps, the validator bumps to match. Validator-only housekeeping (UI improvements, copy changes, non-behavioral fixes) does not produce a version bump.
+The reference [validator](/validator/) tracks the specification version it implements. When the specification bumps, the validator bumps to match. Validator-only housekeeping (UI improvements, copy changes, non-behavioral fixes) does not produce a version bump.
 
 Alternative implementations of LLMO, when they exist, are expected to declare which specification version they conform to. They are not expected to match the reference validator's release cadence.

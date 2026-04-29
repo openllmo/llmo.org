@@ -690,7 +690,7 @@ This section walks through a complete `llmo.json` for Diverse.org, Inc., the non
 - `disavowal` pairs a category-level disavowal (`commercial_subsidiary`, asserting Diverse.org has no commercial arm) with a specific disavowal (an unaffiliated domain). Consumers reasoning about Diverse.org get both a class assertion and a concrete instance to match against.
 - The document-level signature covers all fields except `signature` itself. A consumer verifies by fetching `https://llmo.org/.well-known/llmo-keys.json`, locating the key with `kid: "diverse-2026-01"`, and verifying the ES256 signature over the JCS-canonicalized payload.
 
-The signed instance of this `llmo.json` is currently published at [`https://llmo.org/.well-known/llmo.json`](https://llmo.org/.well-known/llmo.json), with the corresponding JWKS at [`https://llmo.org/.well-known/llmo-keys.json`](https://llmo.org/.well-known/llmo-keys.json). Diverse.org will mirror at `https://diverse.org/.well-known/llmo.json` once Diverse.org's own site launches. Either copy should validate identically against this spec via [validate.llmo.org](https://validate.llmo.org) or any conforming validator.
+The signed instance of this `llmo.json` is currently published at [`https://llmo.org/.well-known/llmo.json`](https://llmo.org/.well-known/llmo.json), with the corresponding JWKS at [`https://llmo.org/.well-known/llmo-keys.json`](https://llmo.org/.well-known/llmo-keys.json). Diverse.org will mirror at `https://diverse.org/.well-known/llmo.json` once Diverse.org's own site launches. Either copy should validate identically against this spec via [the reference validator](/validator/) or any conforming validator.
 
 ---
 
