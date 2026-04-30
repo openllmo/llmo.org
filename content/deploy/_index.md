@@ -286,9 +286,20 @@ For a shareable verification link you can send to colleagues or include in annou
 ## Maintenance
 
 Republish your `llmo.json` quarterly or when material changes happen
-(new canonical URL, new disavowal, key rotation). The `valid_until`
-window is a soft expiration: stale documents are still verifiable
-but consumers will weight them lower or refetch.
+(new canonical URL, new disavowal, key rotation). After `valid_until`
+passes, conforming consumers treat the document as stale and refetch;
+per [specification §2.4](/spec/v0.1#24-caching-and-freshness), stale
+documents should not be used to answer high-stakes queries even though
+their signatures remain mathematically verifiable.
+
+The 90-day default balances signing operational overhead against
+publisher exposure: short enough that abandoned documents go stale
+within a quarter, long enough that re-signing isn't a monthly chore.
+Publishers in regulated industries, those who change canonical claims
+frequently, or those concerned about key custody may want a 30- or
+60-day window via `llmo init --validity-days 30`. The specification
+caps Standard- and Strict-tier windows at 180 days; Minimal-tier
+allows up to 365.
 
 To rotate keys:
 
