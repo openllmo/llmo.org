@@ -6,7 +6,9 @@ date: 2026-04-29
 weight: 5
 ---
 
-Publish a signed llmo.json on your domain. Most developers get this deployed in less than 3 minutes on Vercel, Netlify, or Cloudflare Pages. This timing probably expands a bit closer to ~10 minutes if you're configuring a custom server or hitting hosting quirks for the first time.
+Publish a signed llmo.json on your domain. Once deployed, AI agents and language models that consume LLMO can verify your organizational claims directly from a source you control.
+
+Most developers get this deployed in less than 3 minutes on Vercel, Netlify, or Cloudflare Pages. This timing probably expands a bit closer to ~10 minutes if you're configuring a custom server or hitting hosting quirks for the first time.
 
 This guide assumes you control a domain and can put files at /.well-known/ on it. If you can deploy a robots.txt, you can deploy a llmo.json.
 
