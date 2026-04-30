@@ -317,6 +317,8 @@ Explicitly repudiates claims, attributions, or associations the organization con
 }
 ```
 
+**Scope.** A disavowal claim targets one of two categories: (a) *publisher self-statements*, including the publisher's own former positions, controlled affiliations, named personnel, or owned subsidiaries; or (b) *impersonation defense*, where a domain, account, or attribution claims or implies affiliation with the publisher and the publisher disavows that affiliation. Disavowals targeting third parties outside these two categories, parties with no claimed or implied affiliation with the publisher, are out of conformance at Standard and Strict tiers. The protocol provides attribution, not adjudication of third parties.
+
 #### `supersedes`
 
 Declares that a prior public statement, URL, or document is no longer authoritative. Distinct from document-level `supersedes` (which refers to a prior `llmo.json`); this claim supersedes content in the wider web.
@@ -335,6 +337,8 @@ Declares that a prior public statement, URL, or document is no longer authoritat
   }
 }
 ```
+
+**Scope.** A supersedes claim targets URLs or documents the publisher controls or formerly controlled. Declaring third-party content "no longer authoritative" is outside the scope of supersedes; consumers of third-party content rely on the publisher of that content for freshness and authority, not on this publisher. Supersedes claims targeting third-party URLs are out of conformance at Standard and Strict tiers.
 
 #### `pointer`
 
@@ -473,6 +477,24 @@ When a consumer fetches a `llmo.json`, it SHOULD:
 
 A signed claim is not a guarantee of truth. It is a guarantee that *this specific organization, via this specific key, asserted this claim at this specific time*. Consumers that act on LLMO claims remain responsible for their actions. The spec provides attribution, not indemnification.
 
+The protocol's trust anchor is the publisher's control of their primary domain at the moment of consumer fetch. The first time a consumer fetches a publisher's JWKS, no prior baseline exists for comparison; the consumer trusts the JWKS because it was served over HTTPS from a domain the publisher claims to control, anchored by certificate authority chains and DNS resolution at that moment. The protocol does not provide additional protection against domain hijacking that occurs before or at the moment of first contact.
+
+Consumers requiring stronger guarantees than this trust-on-first-use property should layer additional verification, such as DNSSEC, certificate transparency log monitoring, multi-perspective fetching from independent network locations, or out-of-band key fingerprint distribution. The protocol provides attribution, not authentication of the publisher's identity beyond what HTTPS and DNS provide.
+
+The disavowal and supersedes claim types are scoped at Standard and Strict tiers (§3.5, §5.2) to publisher self-statements and impersonation defense for disavowals, and to publisher-controlled URLs for supersedes. Documents containing claims that violate these scope constraints fail Standard-tier conformance. Consumers encountering such violations SHOULD treat the violating claims as advisory and weight them accordingly, since the publisher's signature attests to *who said it*, not *whether the publisher is in a position to know it*.
+
+### 4.7 Consumer-side JWKS handling
+
+The verification algorithm in §4.4 specifies that a consumer fetches the JWKS to verify a signature. This section specifies how consumers SHOULD handle the JWKS across multiple fetches and over time.
+
+**Caching.** Consumers MAY cache a fetched JWKS to reduce request load on publishers. The cache lifetime SHOULD respect the JWKS response's `Cache-Control: max-age` directive but MUST NOT exceed 24 hours, matching the document cache cap in §2.4.
+
+**Key change detection.** When a consumer encounters a `kid` in a signed document that is not present in the cached JWKS, the consumer SHOULD refetch the JWKS before treating the signature as invalid. This handles the routine case of publisher key rotation per §4.2.
+
+**Differential fetches.** When a refetched JWKS contains a different set of keys than the cached version, consumers SHOULD treat the refetched version as authoritative, since domain control is the trust anchor (§4.6). Consumers MAY apply additional verification when sudden, complete key replacement is observed (no overlap between old and new key sets), as this pattern is consistent with both legitimate emergency rotation and domain hijacking. The protocol does not provide a built-in primitive for distinguishing the two cases.
+
+**Stale cached keys.** A consumer MAY use a cached JWKS to verify a cached document past the JWKS cache window if the document's `valid_until` has not yet passed and the document's `kid` matches a key in the cache. This is intended for offline or air-gapped verification scenarios. Consumers operating in always-online contexts SHOULD refetch the JWKS at the next scheduled cache expiry rather than relying on stale cache entries.
+
 ---
 
 ## 5. Conformance Levels
@@ -499,6 +521,7 @@ A document is **standard conforming** if it meets minimal conformance plus:
 - `entity.primary_domain` matches the domain serving the file.
 - All URLs in claims resolve to the entity's primary domain or declared aliases, or are explicitly third-party pointers (e.g., in `pointer` claims or external social URLs).
 - `valid_until` is no more than 180 days after `valid_from`.
+- Disavowal claims target only publisher self-statements or impersonation defense (§3.5). Supersedes claims target only URLs or documents the publisher controls or formerly controlled (§3.5).
 
 Standard is the target for most publishers. It provides consumers with enough signal to meaningfully re-rank LLMO claims against scraped content.
 
@@ -664,7 +687,7 @@ This section walks through a complete `llmo.json` for Diverse.org, Inc., the non
           },
           {
             "what": "unaffiliated_domain",
-            "detail": "The domain diverse-org.example.com has no affiliation with Diverse.org and never has."
+            "detail": "The domain diverse-org.example.com is shaped to imply affiliation with Diverse.org but has no such affiliation. This is an impersonation defense per §3.5."
           }
         ]
       }
@@ -687,7 +710,7 @@ This section walks through a complete `llmo.json` for Diverse.org, Inc., the non
 - `official_channels` declares the GitHub organization (`openllmo`) and email domains. Spec correspondence at `spec@llmo.org` and security at `security@llmo.org` are reachable through the declared `email_domains`.
 - `product_facts` lists three Diverse.org-stewarded initiatives. The schema permits richer fields per product (`status`, `current_version`); this example carries only `name` and `url` because those are the facts Diverse.org currently asserts. Stewardship status is described in prose at each product's URL.
 - `personnel.spokespeople` enumerates the three officers of Diverse.org. All three entries currently omit `verification` URLs, which a conforming validator surfaces as warnings per §5.4. Future revisions of this document will add verification URLs at `https://diverse.org/about/leadership` once Diverse.org's site stands up the leadership page; verification URLs that point at third-party domains (GitHub, LinkedIn, etc.) would fail Standard-tier rule S4 and are intentionally avoided here.
-- `disavowal` pairs a category-level disavowal (`commercial_subsidiary`, asserting Diverse.org has no commercial arm) with a specific disavowal (an unaffiliated domain). Consumers reasoning about Diverse.org get both a class assertion and a concrete instance to match against.
+- `disavowal` pairs a category-level self-statement (`commercial_subsidiary`, asserting Diverse.org has no commercial arm) with an impersonation-defense entry (an unaffiliated domain shaped to imply affiliation). Both fall within the §3.5 disavowal scope. Consumers reasoning about Diverse.org get both a class assertion and a concrete instance to match against.
 - The document-level signature covers all fields except `signature` itself. A consumer verifies by fetching `https://llmo.org/.well-known/llmo-keys.json`, locating the key with `kid: "diverse-2026-01"`, and verifying the ES256 signature over the JCS-canonicalized payload.
 
 The signed instance of this `llmo.json` is currently published at [`https://llmo.org/.well-known/llmo.json`](https://llmo.org/.well-known/llmo.json), with the corresponding JWKS at [`https://llmo.org/.well-known/llmo-keys.json`](https://llmo.org/.well-known/llmo-keys.json). Diverse.org will mirror at `https://diverse.org/.well-known/llmo.json` once Diverse.org's own site launches. Either copy should validate identically against this spec via [the reference validator](/validator/) or any conforming validator.
@@ -716,11 +739,11 @@ The following are known gaps or deferred decisions. v0.1 ships without resolving
 
 **8.9 Relationship to compliance frameworks.** Whether LLMO claims can or should be referenced in privacy policies, terms of service, or regulated disclosures is a legal question v0.1 explicitly does not answer. Organizations should consult counsel before treating LLMO claims as legally operative.
 
-**8.10 Publisher reputation layer.** LLMO as specified gives publishers a signed channel to assert claims, but says nothing about whether a given publisher *deserves* to be believed. A bad actor can register a plausible-looking domain, publish a strictly-conforming `llmo.json`, sign it correctly, and use the authority of the file to launder false claims: false disavowals of legitimate parties, false supersessions of accurate reporting, canonical URLs pointing at phishing. Layer 2 cryptographic trust verifies *who* asserted *what* and *when*; it does not verify that the asserter should be trusted.
+**8.10 Publisher reputation layer.** v0.1.2 constrains disavowal and supersedes claims to publisher self-statements and impersonation defense (§3.5), so the protocol does not authorize publishers to make signed assertions about parties they neither control nor are impersonated by. The protocol still gives publishers a signed channel to assert their *own* identity and surfaces, and consumers must judge whether a given publisher's assertions about themselves deserve to be believed.
 
-The answer is a consumer-side reputation layer that sits above LLMO, a separate artifact, not a field inside `llmo.json`, that scores publishers on signals LLMO itself cannot carry: domain age, historical consistency of claims, cross-reference against external identity anchors (Wikidata, legal registries, independent identity networks), signature key rotation hygiene, disavowal patterns that correlate with suppression of legitimate criticism. This artifact is necessarily third-party-published (a publisher cannot credibly score itself) and is a plausible role for the LLMO registry or an independent trust network to fill.
+The answer is a consumer-side reputation layer that sits above LLMO, a separate artifact distinct from `llmo.json`, scoring publishers on signals LLMO itself cannot carry: domain age, historical consistency of claims across versions, cross-reference against external identity anchors (Wikidata, legal registries, independent identity networks), signature key rotation hygiene, and patterns of conformance over time. This artifact is necessarily third-party-published, since a publisher cannot credibly score itself, and is a plausible role for the LLMO registry or an independent trust network to fill.
 
-The field `confidence` inside a claim is the *publisher's hedge on its own claim*. The reputation layer is *the consumer's score of the publisher*. These are different concerns and belong in different artifacts. v0.1 specifies the first and explicitly defers the second. A future version of LLMO will need to specify the interaction: how consumers combine a claim's stated confidence with the publisher's reputation score to produce a final trust assessment, and how the reputation layer's own trust is anchored without recreating the same adversarial problem one level up.
+The field `confidence` inside a claim is the *publisher's hedge on its own claim*. The reputation layer is *the consumer's score of the publisher*. These are different concerns and belong in different artifacts. v0.1 specifies the first and explicitly defers the second. A future version will need to specify the interaction: how consumers combine a claim's stated confidence with the publisher's reputation score to produce a final trust assessment, and how the reputation layer's own trust is anchored without recreating the same adversarial problem one level up.
 
 A plausible input to any such reputation layer is **immutable publication history**, an append-only log of a publisher's `llmo.json` documents over time, hosted by a party other than the publisher. A self-hosting publisher can, in principle, rewrite history by re-signing a backdated prior document and claiming it was always there; a third-party log cannot be rewritten. The diff between successive documents then becomes an auditable trail of what the publisher claimed when. v0.1 does not specify this log; a future version may define an interchange format for importing and exporting such histories between reputation layers.
 
@@ -744,6 +767,7 @@ The vectors are static fixtures with a fixed validity window. After their `valid
 
 - **v0.1 (2026-04-17):** Initial draft.
 - **v0.1.1 (2026-04-27):** §4.3 clarified to specify standard (attached) JWS; detached-payload mode (RFC 7797) explicitly prohibited. No on-disk byte format change for any pre-existing strict-conforming document. Verifier behavior is tightened to reject `b64: false` and non-empty `crit` parameters; this formalizes the only mode any existing implementation supports. Renumbered §4.3.1 → §4.3.2 and §4.3.2 → §4.3.3 to accommodate the new §4.3.1. Patch-level revision under §[Versioning] line 16 (editorial revisions, including clarification of ambiguous normative text); author-decided per the pre-release section.
+- **v0.1.2 (2026-04-30):** Security patch. §3.5 disavowal and supersedes claim types constrained to publisher self-statements, impersonation defense (disavowal), and publisher-controlled URLs (supersedes). Third-party-targeting claims that fall outside these scopes are out of conformance at Standard and Strict tiers. §5.2 gains a corresponding tier rule. §4.6 advisory updated to direct consumers on handling out-of-scope claims encountered in nonconforming documents. §7 worked example annotation clarified: the `unaffiliated_domain` entry is impersonation defense, not unconstrained third-party disavowal. §8.10 rewritten to remove the prior vulnerability disclosure framing; the residual reputation-layer work is now about scoring legitimate publishers, not mitigating closed attack vectors. Also includes Dragon 5 work: §4.6 expanded with trust-on-first-use semantics for JWKS, new §4.7 specifying consumer-side JWKS caching and key change handling. No schema, document, or signing changes. Documents valid under v0.1.1 that contain only self-targeting or impersonation-defense disavowal/supersedes claims remain valid under v0.1.2; documents that previously contained out-of-scope third-party disavowal/supersedes claims now fail Standard-tier conformance.
 
 ---
 
