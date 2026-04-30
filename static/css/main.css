@@ -228,6 +228,92 @@ small {
   }
 }
 
+/* ===== Mobile nav (hamburger + drawer) ===== */
+
+/* Defensive specificity bump: hardens the .site-nav hide rule above with
+   a higher-specificity variant placed later in source order.
+   Specificity 0,0,2,0 vs the existing 0,0,1,0 plus later source order
+   means this wins the cascade unconditionally; no !important required. */
+@media (max-width: 768px) {
+  .site-header .site-nav {
+    display: none;
+  }
+}
+
+.hamburger-toggle {
+  display: none;
+  background: transparent;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--fg);
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+  padding: 0;
+  font: inherit;
+}
+
+.hamburger-toggle:hover {
+  background: var(--code-bg);
+}
+
+.hamburger-toggle:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+  .hamburger-toggle {
+    display: flex;
+  }
+}
+
+.mobile-nav-drawer {
+  display: none;
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  background: var(--header-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+  z-index: 99;
+}
+
+.mobile-nav-drawer[aria-hidden="false"] {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mobile-nav-drawer a {
+  color: var(--fg);
+  text-decoration: none;
+  font-size: 1.125rem;
+  font-weight: 500;
+  padding: 8px 0;
+}
+
+.mobile-nav-drawer a:hover {
+  color: var(--fg-secondary);
+}
+
+/* Categorical hide of the drawer above the mobile breakpoint. The
+   !important here is the only one in the file. Justified: defensive
+   guarantee that the drawer can never appear on desktop regardless
+   of JS state, prior cascade ordering, or class manipulation. This
+   is a hard invariant, not a specificity workaround. */
+@media (min-width: 769px) {
+  .mobile-nav-drawer {
+    display: none !important;
+  }
+}
+
 /* ===== Hero ===== */
 
 .hero {
