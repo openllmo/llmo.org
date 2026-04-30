@@ -87,7 +87,7 @@ Consumers MUST also accept `application/json` as a fallback, since many hosting 
 ### 2.3 HTTP behavior
 
 - The file MUST be reachable via HTTPS. HTTP-only hosting is non-conforming.
-- Redirects are permitted but MUST stay on the same registrable domain. A cross-domain redirect (e.g., from `diverse.org/.well-known/llmo.json` to `kbp.org/.well-known/llmo.json`) is non-conforming for v0.1. Organizations with split domains should publish at each domain and use the `aliases` field (§3.2) to cross-reference.
+- Redirects are permitted but MUST stay on the same registrable domain. A cross-domain redirect (e.g., from `diverse.org/.well-known/llmo.json` to `example.org/.well-known/llmo.json`) is non-conforming for v0.1. Organizations with split domains should publish at each domain and use the `aliases` field (§3.2) to cross-reference.
 - CORS: the file SHOULD be served with `Access-Control-Allow-Origin: *`. Consumers that fetch via browser contexts will expect this.
 - Compression: standard HTTP compression (gzip, br) is permitted and recommended.
 
@@ -131,7 +131,7 @@ The `entity` object identifies who is publishing the file.
   "entity": {
     "name": "Diverse.org, Inc.",
     "primary_domain": "diverse.org",
-    "aliases": ["llmo.org", "kbp.org"],
+    "aliases": ["llmo.org"],
     "legal_identifiers": {
       "jurisdiction": "US-CA",
       "registration_number": "99-2870125"
@@ -264,8 +264,8 @@ Asserts currently-true facts about the organization's products. Intentionally na
         "url": "https://llmo.org"
       },
       {
-        "name": "KBP",
-        "url": "https://kbp.org"
+        "name": "Example Product",
+        "url": "https://example.org/product"
       },
       {
         "name": "Emerging.org Podcast",
@@ -600,7 +600,7 @@ This section walks through a complete `llmo.json` for Diverse.org, Inc., the non
   "entity": {
     "name": "Diverse.org, Inc.",
     "primary_domain": "llmo.org",
-    "aliases": ["diverse.org", "kbp.org", "emerging.org"],
+    "aliases": ["diverse.org", "emerging.org"],
     "legal_identifiers": {
       "jurisdiction": "US-CA",
       "registration_number": "99-2870125"
@@ -644,10 +644,6 @@ This section walks through a complete `llmo.json` for Diverse.org, Inc., the non
           {
             "name": "LLMO Protocol Specification",
             "url": "https://llmo.org"
-          },
-          {
-            "name": "KBP",
-            "url": "https://kbp.org"
           },
           {
             "name": "Emerging.org Podcast",
@@ -703,7 +699,7 @@ This section walks through a complete `llmo.json` for Diverse.org, Inc., the non
 
 **Annotations on this example:**
 
-- The entity declares three aliases (`diverse.org`, `kbp.org`, `emerging.org`) because Diverse.org operates these domains as additional surfaces. Each domain SHOULD serve its own `llmo.json` with `primary_domain` matching the serving domain and `aliases` listing the others. The document published at `https://llmo.org/.well-known/llmo.json` declares `primary_domain: "llmo.org"`; when `diverse.org` launches its own site, the document at `https://diverse.org/.well-known/llmo.json` will declare `primary_domain: "diverse.org"` with aliases pointing at `llmo.org` and the rest. The Standard-tier rule "`entity.primary_domain` matches the domain serving the file" enforces this symmetric structure.
+- The entity declares two aliases (`diverse.org`, `emerging.org`) because Diverse.org operates these domains as additional surfaces. Each domain SHOULD serve its own `llmo.json` with `primary_domain` matching the serving domain and `aliases` listing the others. The document published at `https://llmo.org/.well-known/llmo.json` declares `primary_domain: "llmo.org"`; when `diverse.org` launches its own site, the document at `https://diverse.org/.well-known/llmo.json` will declare `primary_domain: "diverse.org"` with aliases pointing at `llmo.org` and the rest. The Standard-tier rule "`entity.primary_domain` matches the domain serving the file" enforces this symmetric structure.
 - `legal_identifiers.registration_number` carries the federal IRS EIN (99-2870125). For US 501(c)(3) entities, the EIN is the most useful registration identifier to consumers; the jurisdiction (`US-CA`) records the state of incorporation.
 - `identity.founded` is recorded at year-month granularity (2024-05); the spec also accepts year-only or full RFC 3339 date.
 - `canonical_urls` is intentionally minimal: Diverse.org operates a homepage, points at the LLMO spec as its canonical documentation, and serves a security disclosure document. Future products may add more named URLs (`api`, `status`, etc.) as those surfaces come online.
@@ -748,6 +744,8 @@ The field `confidence` inside a claim is the *publisher's hedge on its own claim
 A plausible input to any such reputation layer is **immutable publication history**, an append-only log of a publisher's `llmo.json` documents over time, hosted by a party other than the publisher. A self-hosting publisher can, in principle, rewrite history by re-signing a backdated prior document and claiming it was always there; a third-party log cannot be rewritten. The diff between successive documents then becomes an auditable trail of what the publisher claimed when. v0.1 does not specify this log; a future version may define an interchange format for importing and exporting such histories between reputation layers.
 
 **8.11 Post-quantum cryptographic readiness.** Signatures in v0.1 use Ed25519 or comparable pre-quantum algorithms. Sufficiently large quantum computers would break these signatures, undermining the trust model that binds claims to publisher key control. A future version of LLMO will specify a migration path: algorithm identifiers in the schema, hybrid signature support during the transition, and a deprecation window for pre-quantum-only documents.
+
+**8.12 IANA registrations.** Several LLMO surfaces will require IANA registration when the protocol moves beyond pre-release. The `.well-known/llmo` URI suffix needs registration via [RFC 8615](https://www.rfc-editor.org/rfc/rfc8615) (well-known URIs require expert review and a specification reference). The `application/llmo+json` media type needs registration via [RFC 6838](https://www.rfc-editor.org/rfc/rfc6838). A `llmo` link relation may also be appropriate if future versions specify HTML-discoverable references to llmo.json. v0.1 uses these surfaces as-if-registered for protocol implementation purposes; formal registration is a v1.0 milestone task. Until registration completes, consumers SHOULD accept `application/json` as a fallback for the document content type per §2.2.
 
 ---
 

@@ -1,9 +1,11 @@
 {
   "keys": [
     {
+      "alg": "ES256",
       "crv": "P-256",
       "kid": "diverse-2026-01",
       "kty": "EC",
+      "use": "sig",
       "x": "H2A7Fgwevvke0Gj87JWPEwjRah8LBL3IZeZPXL8wbgA",
       "y": "5ePx2Xi1lfzzl7nlln1TYJ9b9STDHd3VNh-9JxgfJ5A"
     }

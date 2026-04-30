@@ -116,8 +116,8 @@ Each product object may contain `name` (required), `url`, `status` (one of `gene
         "url": "https://llmo.org"
       },
       {
-        "name": "KBP",
-        "url": "https://kbp.org"
+        "name": "Example Product",
+        "url": "https://example.org/product"
       },
       {
         "name": "Emerging.org Podcast",

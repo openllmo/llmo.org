@@ -39,7 +39,7 @@ The reputation layer sits above LLMO and is out of scope for the specification.
 
 ## Origin
 
-The work that became LLMO was committed to publicly in October 2025, after Nic Chavez left his role as CISO of Data and AI at IBM. From the [announcement post](https://www.linkedin.com/posts/activity-7396519567826747393-pzSr):
+The work that became LLMO was committed to publicly in November 2025, after Nic Chavez left his role as CISO of Data and AI at IBM. From the [announcement post](https://www.linkedin.com/posts/activity-7396519567826747393-pzSr):
 
 > As of today I am no longer CISO of Data & AI at IBM.
 >
@@ -53,13 +53,13 @@ The post reached 286,000 impressions and surfaced a clear pattern in the respons
 
 LLMO is the protocol layer of the broader thesis. Reputation layers, moderation systems, and commercial trust services are out of scope for the specification, but the specification is designed to support them.
 
-[A local archive of the announcement post](/about/announcement-2025-10/) is preserved against future LinkedIn URL changes.
+[A local archive of the announcement post](/about/announcement-2025-11/) is preserved against future LinkedIn URL changes.
 
 ## Timeline
 
 Structural questions about the information layer underlying organizational identity have been under consideration by the editor since 2023.
 
-The work was publicly committed to in October 2025 (see Origin, above).
+The work was publicly committed to in November 2025 (see Origin, above).
 
 Diverse.org, a California 501(c)(3) nonprofit, was established to steward the specification and related open-standards work.
 

@@ -133,7 +133,7 @@ Async; they'll reply when they reply. Not blocking anything.
 
 2. Construct payload similar to llmo.org's, but:
    - `primary_domain`: `"diverse.org"` (matches serving domain; Standard tier S3)
-   - `aliases`: `["llmo.org", "kbp.org", "emerging.org"]` (the others)
+   - `aliases`: `["llmo.org", "emerging.org"]` (the others)
    - Same identity claim, leadership claim, disavowal claim
    - `canonical_urls.docs`: `https://llmo.org/spec` (still points at the spec)
    - `canonical_urls.homepage`: `https://diverse.org` (now exists per 14c)

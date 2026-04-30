@@ -1,17 +1,21 @@
 ---
-title: "October 2025 announcement (archive)"
-linkTitle: "October 2025 announcement"
-description: "Local archive of the October 2025 LinkedIn announcement that publicly committed to building LLMO."
-date: 2025-10-13
+title: "November 2025 announcement (archive)"
+linkTitle: "November 2025 announcement"
+description: "Local archive of the November 2025 LinkedIn announcement that publicly committed to building LLMO."
+date: 2025-11-18
+aliases:
+  - /about/announcement-2025-10/
 ---
 
 This page is a local archive of the public announcement that publicly committed to building what became LLMO. It is preserved here so the source material remains reachable independent of any future LinkedIn URL changes, account states, or platform availability.
+
+**Posted:** November 18, 2025.
 
 The original post is at [https://www.linkedin.com/posts/activity-7396519567826747393-pzSr](https://www.linkedin.com/posts/activity-7396519567826747393-pzSr).
 
 ## Screenshot
 
-![Screenshot of the October 2025 announcement post on LinkedIn](/about/announcement-2025-10.png)
+![Screenshot of the November 2025 announcement post on LinkedIn](/about/announcement-2025-11.png)
 
 ## Full text (transcribed verbatim)
 

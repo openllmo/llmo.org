@@ -123,6 +123,8 @@ You need to publish two files at well-known paths over HTTPS:
 
 How you do this depends on your hosting. Common patterns:
 
+> **Note:** The `application/llmo+json` media type is preferred per [spec §2.2](/spec/v0.1#22-content-type) but is not yet registered with IANA. Some hosts may not recognize custom `+json` suffixes; serving as `application/json` is a valid fallback. Both content types are accepted by conforming validators. IANA registration is tracked as a v1.0 milestone in spec §8.12.
+
 ### Vercel / Next.js
 
 Place the files in `public/.well-known/` in your repo. Vercel serves

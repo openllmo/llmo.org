@@ -22,7 +22,7 @@ Diverse.org and Greyfront are distinct legal entities with separate governance, 
 
 ## Decision process
 
-During v0.1 pre-release, the author decides changes without governance windows. See the [versioning policy](/spec/versioning) pre-release section for the full rule. From v0.2 forward, the 14-day governance window applies to substantive changes per the LIP process, and the editor assumes custodial responsibility for the specification.
+During v0.1 pre-release, the author decides changes without governance windows. See the [versioning policy](/spec/versioning) pre-release section for the full rule. From v0.2 forward, the 14-day governance window applies to substantive changes per the LIP process, and the editor assumes custodial responsibility for the specification. The pre-release regime ends when LLMO is declared Generally Available, beyond limited announcements or beta testing.
 
 From v0.2 forward, **substantive changes** to normative requirements (new MUST/SHOULD/MAY clauses, changes to the JSON Schema, changes to the trust model, changes to discovery, changes to conformance tiers) require a public discussion period of at least 14 days and solicited implementer feedback before acceptance.
 

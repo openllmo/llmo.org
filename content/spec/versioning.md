@@ -71,7 +71,7 @@ LLMO is currently in its pre-v1 initial build. During this period:
 
 The rationale for this posture: LLMO has no external implementers during pre-v1. A governance window whose purpose is protecting implementers from surprising protocol changes serves no function when no implementers exist. The window becomes meaningful at v0.2 and beyond, when the pre-v1 initial build has shipped and implementations depend on stable semantics.
 
-Once v0.1 is superseded by v0.2, this pre-release posture ends. From v0.2 forward, the governance window applies to substantive changes per the LIP process, and the editor role takes over custodial responsibilities from the author.
+The pre-release author-decides regime ends when LLMO is declared Generally Available, beyond limited announcements or beta testing. At that point, v0.2 development begins under the full LIP process and the editor assumes custodial responsibilities from the author. From v0.2 forward, the governance window applies to substantive changes per the LIP process, and the editor role takes over custodial responsibilities from the author.
 
 ## Relationship to implementations
 
