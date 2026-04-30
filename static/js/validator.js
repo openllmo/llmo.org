@@ -14,6 +14,7 @@
   var schema = null;
   var strictVectorText = null;
   var ajvValidate = null;
+  var canonicalizeFn = null;
 
   document.addEventListener("DOMContentLoaded", function () {
     fillFooter();
@@ -119,8 +120,9 @@
   function loadAjvDynamic() {
     return Promise.all([
       import("https://esm.sh/ajv@8/dist/2020.js"),
-      import("https://esm.sh/ajv-formats@3")
-    ]).then(function (mods) { return { ajvMod: mods[0], formatsMod: mods[1] }; });
+      import("https://esm.sh/ajv-formats@3"),
+      import("https://esm.sh/canonicalize@2.0.0")
+    ]).then(function (mods) { return { ajvMod: mods[0], formatsMod: mods[1], canonMod: mods[2] }; });
   }
 
   function loadAjvViaScriptTag() {
@@ -132,11 +134,12 @@
       s.textContent =
         "(async () => {\n" +
         "  try {\n" +
-        "    const [ajvMod, formatsMod] = await Promise.all([\n" +
+        "    const [ajvMod, formatsMod, canonMod] = await Promise.all([\n" +
         "      import('https://esm.sh/ajv@8/dist/2020.js'),\n" +
-        "      import('https://esm.sh/ajv-formats@3')\n" +
+        "      import('https://esm.sh/ajv-formats@3'),\n" +
+        "      import('https://esm.sh/canonicalize@2.0.0')\n" +
         "    ]);\n" +
-        "    window.__llmo_validator_ajv = { ajvMod, formatsMod };\n" +
+        "    window.__llmo_validator_ajv = { ajvMod, formatsMod, canonMod };\n" +
         "    window.dispatchEvent(new CustomEvent('__llmo_validator_ajv_ready'));\n" +
         "  } catch (err) {\n" +
         "    window.__llmo_validator_ajv_err = err;\n" +
@@ -181,11 +184,14 @@
     }).then(function (mods) {
       var Ajv = pickCallable(mods.ajvMod, "default") || pickCallable(mods.ajvMod, "Ajv2020");
       var addFormats = pickCallable(mods.formatsMod, "default");
+      var canon = pickCallable(mods.canonMod, "default");
       if (!Ajv) throw new Error("AJV module did not expose a callable default export");
       if (!addFormats) throw new Error("ajv-formats module did not expose a callable default export");
+      if (!canon) throw new Error("canonicalize module did not expose a callable default export");
       var ajv = new Ajv({ allErrors: true, strict: false });
       addFormats(ajv);
       ajvValidate = ajv.compile(schema);
+      canonicalizeFn = canon;
     });
   }
 
@@ -206,6 +212,18 @@
     var std = s.replace(/-/g, "+").replace(/_/g, "/");
     var pad = std.length % 4;
     return atob(pad ? std + "=".repeat(4 - pad) : std);
+  }
+  function base64UrlDecodeToString(s) { return b64urlDecode(s); }
+  function base64UrlDecodeToBytes(s) {
+    var raw = b64urlDecode(s);
+    var bytes = new Uint8Array(raw.length);
+    for (var i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+    return bytes;
+  }
+  function base64UrlEncode(bytes) {
+    var s = "";
+    for (var i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+    return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
   }
   function check(id, cite, desc, status, note) {
     return { id: id, cite: cite, desc: desc, status: status, note: note || null };
@@ -384,13 +402,23 @@
         "at least one canonical_urls claim has a URL on the entity's owned domain",
         x4ok ? "PASS" : "FAIL", x4ok ? null : "no canonical_urls URL matches primary_domain or aliases"));
 
-      // X2 / X3: deferred in URL mode (resolved by caller); SKIP in paste mode.
+      // X2 / X3 / X5: deferred in URL mode (resolved by caller); SKIP in paste mode.
+      var hasSig = doc.signature && typeof doc.signature === "object";
       if (urlContext) {
         strict.push({ id: "X2", cite: "§5.3", desc: "JWKS retrievable at /.well-known/llmo-keys.json", status: "DEFERRED", note: null });
         strict.push({ id: "X3", cite: "§5.3", desc: "JWKS Cache-Control max-age is <= 86400", status: "DEFERRED", note: null });
+        if (hasSig) {
+          strict.push({ id: "X5", cite: "§4.3, §5.3", desc: "document signature cryptographically verifies", status: "DEFERRED", note: null });
+        } else {
+          strict.push(check("X5", "§4.3, §5.3", "document signature cryptographically verifies", "SKIP", "no document-level signature present"));
+        }
       } else {
         strict.push(check("X2", "§5.3", "JWKS retrievable at /.well-known/llmo-keys.json", "SKIP", "skipped in paste mode"));
         strict.push(check("X3", "§5.3", "JWKS Cache-Control max-age is <= 86400", "SKIP", "skipped in paste mode"));
+        var x5PasteNote = hasSig
+          ? "skipped in paste mode (origin needed for JWKS fetch)"
+          : "no document-level signature present";
+        strict.push(check("X5", "§4.3, §5.3", "document signature cryptographically verifies", "SKIP", x5PasteNote));
       }
 
       var docInternalOk = x1ok && x4ok;
@@ -445,7 +473,7 @@
     };
   }
 
-  function finalizeStrictForUrlMode(ev, urlContext) {
+  function finalizeStrictForUrlMode(ev, doc, urlContext) {
     var jwksUrl = "https://" + urlContext.primaryDomainHost + "/.well-known/llmo-keys.json";
     return fetch(jwksUrl, { cache: "no-store" }).then(function (resp) {
       var x2, x2n, x3, x3n;
@@ -477,8 +505,10 @@
       });
     }).catch(function (err) {
       return applyX23(ev, "SKIP",
-        "Could not fetch JWKS due to network or CORS restriction. This is not necessarily a spec violation; the JWKS may exist but not permit cross-origin requests from validate.llmo.org. (" + (err && err.message ? err.message : err) + ")",
+        "Could not fetch JWKS due to network or CORS restriction. This is not necessarily a spec violation; the JWKS may exist but not permit cross-origin requests from llmo.org/validator/. (" + (err && err.message ? err.message : err) + ")",
         "SKIP", "skipped because JWKS fetch did not resolve");
+    }).then(function (evAfterX23) {
+      return verifyAndApplyX5(evAfterX23, doc, urlContext);
     });
   }
 
@@ -497,6 +527,162 @@
       else { ev.tier = "standard"; ev.tierBadge = { label: "Standard", variant: "pass" }; }
     }
     return ev;
+  }
+
+  // ---- X5: cryptographic signature verification ------------------------
+
+  async function verifyDocumentSignature(doc, urlContext) {
+    if (!doc || !doc.signature || !doc.signature.protected || !doc.signature.signature) {
+      return { applicable: false, reason: "no_signature" };
+    }
+    if (!urlContext || !urlContext.hostname) {
+      return { applicable: false, reason: "paste_mode_no_origin" };
+    }
+
+    var header;
+    try {
+      var protectedJson = base64UrlDecodeToString(doc.signature.protected);
+      header = JSON.parse(protectedJson);
+    } catch (err) {
+      return { applicable: true, verified: false, error: "protected_header_decode_failed" };
+    }
+
+    if (!header.alg || !header.kid) {
+      return { applicable: true, verified: false, error: "protected_header_missing_alg_or_kid" };
+    }
+    if (header.alg !== "ES256") {
+      return { applicable: true, verified: false, error: "unsupported_alg", alg: header.alg };
+    }
+
+    var jwks;
+    try {
+      var proxyUrl = "/api/fetch-jwks?domain=" + encodeURIComponent(urlContext.hostname);
+      var resp = await fetch(proxyUrl);
+      if (!resp.ok) {
+        var errBody = await resp.json().catch(function () { return {}; });
+        return { applicable: true, verified: false, error: "jwks_unreachable", detail: errBody.error || ("proxy_status_" + resp.status) };
+      }
+      jwks = await resp.json();
+    } catch (err) {
+      return { applicable: true, verified: false, error: "jwks_fetch_failed" };
+    }
+
+    if (!jwks.keys || !Array.isArray(jwks.keys)) {
+      return { applicable: true, verified: false, error: "jwks_malformed" };
+    }
+    var key = jwks.keys.find(function (k) { return k.kid === header.kid; });
+    if (!key) {
+      return { applicable: true, verified: false, error: "kid_not_in_jwks", kid: header.kid };
+    }
+    if (key.kty !== "EC" || key.crv !== "P-256") {
+      return { applicable: true, verified: false, error: "key_type_mismatch_for_es256" };
+    }
+
+    var publicKey;
+    try {
+      publicKey = await crypto.subtle.importKey(
+        "jwk",
+        { kty: "EC", crv: "P-256", x: key.x, y: key.y, ext: true },
+        { name: "ECDSA", namedCurve: "P-256" },
+        false,
+        ["verify"]
+      );
+    } catch (err) {
+      return { applicable: true, verified: false, error: "key_import_failed" };
+    }
+
+    var payloadCanonical;
+    try {
+      var docCopy = JSON.parse(JSON.stringify(doc));
+      delete docCopy.signature;
+      var canonicalString = canonicalizeFn(docCopy);
+      payloadCanonical = new TextEncoder().encode(canonicalString);
+    } catch (err) {
+      return { applicable: true, verified: false, error: "canonicalization_failed" };
+    }
+
+    var protectedB64 = doc.signature.protected;
+    var payloadB64 = base64UrlEncode(payloadCanonical);
+    var signingInput = new TextEncoder().encode(protectedB64 + "." + payloadB64);
+
+    var signatureBytes;
+    try {
+      signatureBytes = base64UrlDecodeToBytes(doc.signature.signature);
+    } catch (err) {
+      return { applicable: true, verified: false, error: "signature_decode_failed" };
+    }
+    if (signatureBytes.length !== 64) {
+      return { applicable: true, verified: false, error: "signature_wrong_length", length: signatureBytes.length };
+    }
+
+    var verified;
+    try {
+      verified = await crypto.subtle.verify(
+        { name: "ECDSA", hash: "SHA-256" },
+        publicKey,
+        signatureBytes,
+        signingInput
+      );
+    } catch (err) {
+      return { applicable: true, verified: false, error: "verify_threw" };
+    }
+
+    return { applicable: true, verified: verified, kid: header.kid, alg: header.alg };
+  }
+
+  function verifyAndApplyX5(ev, doc, urlContext) {
+    var x5Current = ev.strict.find(function (c) { return c.id === "X5"; });
+    if (!x5Current || x5Current.status !== "DEFERRED") {
+      return Promise.resolve(ev);
+    }
+    return verifyDocumentSignature(doc, urlContext).then(function (sigResult) {
+      var status, note;
+      if (!sigResult.applicable) {
+        status = "SKIP";
+        note = sigResult.reason === "no_signature"
+          ? "no document-level signature present"
+          : "cryptographic verification requires URL mode (origin known)";
+      } else if (sigResult.verified) {
+        status = "PASS";
+        note = "signature cryptographically verified against JWKS key kid=" + sigResult.kid + " (" + sigResult.alg + ")";
+      } else if (sigResult.error === "jwks_unreachable" || sigResult.error === "jwks_fetch_failed") {
+        status = "SKIP";
+        note = "could not fetch JWKS for verification: " + (sigResult.detail || sigResult.error);
+      } else {
+        status = "FAIL";
+        note = "signature verification failed: " + sigResult.error + (sigResult.detail ? " (" + sigResult.detail + ")" : "");
+      }
+      ev.strict = ev.strict.map(function (c) {
+        return c.id === "X5"
+          ? check("X5", "§4.3, §5.3", "document signature cryptographically verifies", status, note)
+          : c;
+      });
+      var x1 = ev.strict.find(function (c) { return c.id === "X1"; });
+      var x4 = ev.strict.find(function (c) { return c.id === "X4"; });
+      var x2 = ev.strict.find(function (c) { return c.id === "X2"; });
+      var x3 = ev.strict.find(function (c) { return c.id === "X3"; });
+      var x5 = ev.strict.find(function (c) { return c.id === "X5"; });
+      var docOk = x1.status === "PASS" && x4.status === "PASS";
+      if (docOk) {
+        if (x5.status === "FAIL") {
+          ev.tier = "strict-invalid-signature";
+          ev.tierBadge = { label: "Strict (invalid signature)", variant: "fail" };
+        } else if (x5.status === "SKIP") {
+          ev.tier = "strict-unverified";
+          ev.tierBadge = { label: "Strict (unverified)", variant: "partial" };
+        } else if (x5.status === "PASS" && x2.status === "PASS" && x3.status === "PASS") {
+          ev.tier = "strict";
+          ev.tierBadge = { label: "Strict", variant: "pass" };
+        } else if (x5.status === "PASS" && x2.status === "SKIP") {
+          ev.tier = "strict-partial-cors";
+          ev.tierBadge = { label: "Strict (partial, CORS)", variant: "partial" };
+        } else {
+          ev.tier = "standard";
+          ev.tierBadge = { label: "Standard", variant: "pass" };
+        }
+      }
+      return ev;
+    });
   }
 
   // ---- paste + URL entry points -----------------------------------------
@@ -609,9 +795,10 @@
         var schemaErrors = ok ? [] : (ajvValidate.errors || []).map(function (e) {
           return { path: e.instancePath || "(root)", message: e.message || "(no message)", schemaPath: e.schemaPath };
         });
-        var urlContext = { fetchedUrl: fetchedUrl, primaryDomainHost: host };
+        // hostname is an alias of primaryDomainHost; both point at the same string. The alias exists so verifyDocumentSignature can read urlContext.hostname without a rename.
+        var urlContext = { fetchedUrl: fetchedUrl, primaryDomainHost: host, hostname: host };
         var ev = evaluate(doc, ok, schemaErrors, urlContext);
-        Promise.resolve(ev.tier === "strict-pending-jwks" ? finalizeStrictForUrlMode(ev, urlContext) : ev).then(function (finalEv) {
+        Promise.resolve(ev.tier === "strict-pending-jwks" ? finalizeStrictForUrlMode(ev, doc, urlContext) : ev).then(function (finalEv) {
           base.schemaErrors = schemaErrors;
           base.checks = { minimal: finalEv.minimal, standard: finalEv.standard, strict: finalEv.strict };
           base.warnings = finalEv.warnings;
@@ -743,12 +930,18 @@
 
   function buildSummaryLine(result) {
     var tier = result.tier;
-    if (tier === "strict") return "This document meets Strict conformance.";
+    if (tier === "strict") return "This document meets Strict conformance and its signature cryptographically verifies against the publisher's JWKS.";
+    if (tier === "strict-invalid-signature") {
+      return "This document is structurally Strict, but its document-level signature does not verify against the publisher's JWKS. The signature attests to nothing.";
+    }
+    if (tier === "strict-unverified") {
+      return "This document is structurally Strict, but cryptographic signature verification could not be completed (no signature present, paste mode, or JWKS could not be fetched).";
+    }
     if (tier === "strict-paste") {
-      return "The document passes every Strict-tier check that does not require a live server fetch. X2 and X3 (JWKS retrievability and Cache-Control) could not be evaluated in this mode.";
+      return "The document passes every Strict-tier check that does not require a live server fetch. X2, X3, and X5 (JWKS retrievability, Cache-Control, and signature verification) could not be evaluated in this mode.";
     }
     if (tier === "strict-partial-cors") {
-      return "The document passes every Strict-tier check that could be evaluated. X2 and X3 could not be evaluated because the JWKS URL did not permit cross-origin requests from validate.llmo.org.";
+      return "The document passes every Strict-tier check that could be evaluated. X2 and X3 could not be evaluated because the JWKS URL did not permit cross-origin requests from llmo.org/validator/.";
     }
     if (tier === "standard") {
       var reason = firstFailingReason(result.checks && result.checks.strict, STRICT_REASONS) || "a Strict-tier check failed";
