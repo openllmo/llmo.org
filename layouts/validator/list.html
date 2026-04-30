@@ -23,6 +23,8 @@
       --fail: #a61e1e;
       --warn: #b87500;
       --skip: #666;
+      --warn-bg: #FFF8E1;
+      --warn-fg: #5A3800;
       --badge-partial-bg: #b87500;
       --badge-pass-bg: #1a7f3a;
       --badge-fail-bg: #a61e1e;
@@ -31,6 +33,24 @@
       line-height: 1.5;
       color: var(--fg);
       margin-top: 2rem;
+    }
+    [data-theme="dark"] .validator-app {
+      --fg: #F5F5F7;
+      --fg-dim: #A8A8B0;
+      --fg-faint: #7C7C85;
+      --bg: #100F0D;
+      --bg-soft: #1A1815;
+      --bg-panel: #23201C;
+      --border: #2A2722;
+      --border-strong: #3D3934;
+      --accent: #F5F5F7;
+      --link: #6BB5FF;
+      --pass: #4ADE80;
+      --fail: #F87171;
+      --warn: #FBBF24;
+      --skip: #A8A8B0;
+      --warn-bg: #2A1F0A;
+      --warn-fg: #FBBF24;
     }
     .validator-app * { box-sizing: border-box; }
     .validator-app h2 { font-size: 1.15rem; margin: 2rem 0 0.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; font-weight: 600; }
@@ -55,7 +75,7 @@
       padding: 0.5rem;
       border: 1px solid var(--border-strong);
       border-radius: 0.25rem;
-      background: #fff;
+      background: var(--bg-soft);
       color: var(--fg);
     }
     .validator-app textarea { resize: vertical; min-height: 14rem; }
@@ -64,16 +84,16 @@
     .validator-app button.primary[disabled] { background: #aaa; cursor: not-allowed; }
     .validator-app button.secondary { font: inherit; padding: 0.5rem 1rem; background: #fff; color: var(--accent); border: 1px solid var(--accent); border-radius: 0.25rem; cursor: pointer; font-weight: 600; }
     .validator-app button.secondary[disabled] { color: #aaa; border-color: #ccc; cursor: not-allowed; }
-    .validator-app .confirm-banner { background: #fff8e1; border: 1px solid var(--warn); padding: 0.6rem 0.75rem; border-radius: 0.25rem; margin: 0.5rem 0; color: #5a3800; }
+    .validator-app .confirm-banner { background: var(--warn-bg); border: 1px solid var(--warn); padding: 0.6rem 0.75rem; border-radius: 0.25rem; margin: 0.5rem 0; color: var(--warn-fg); }
     .validator-app .confirm-banner .btnrow { margin-top: 0.5rem; }
     .validator-app .tier-badge { display: inline-block; padding: 0.6rem 1.1rem; border-radius: 0.375rem; font-weight: 700; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 1rem; color: #fff; }
     .validator-app .tier-pass    { background: var(--badge-pass-bg); }
     .validator-app .tier-partial { background: var(--badge-partial-bg); }
     .validator-app .tier-fail    { background: var(--badge-fail-bg); }
-    .validator-app .tier-summary { color: #333; font-size: 1.1rem; line-height: 1.5; margin: 0.6rem 0 0.25rem; }
+    .validator-app .tier-summary { color: var(--fg); font-size: 1.1rem; line-height: 1.5; margin: 0.6rem 0 0.25rem; }
     .validator-app .tier-sub { color: var(--fg-dim); font-size: 0.9rem; margin-top: 0.4rem; }
     .validator-app .checks { list-style: none; padding: 0; margin: 0.5rem 0 0; }
-    .validator-app .checks li { padding: 0.25rem 0; border-bottom: 1px solid #f0f0f0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.875rem; }
+    .validator-app .checks li { padding: 0.25rem 0; border-bottom: 1px solid var(--border); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.875rem; }
     .validator-app .checks li:last-child { border-bottom: 0; }
     .validator-app .mark { display: inline-block; width: 1.25rem; font-weight: 700; }
     .validator-app .mark-pass { color: var(--pass); }
