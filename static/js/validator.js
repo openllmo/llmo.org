@@ -243,11 +243,11 @@
     } else if (t === "product_facts") {
       if (Array.isArray(s.products)) s.products.forEach(function (p) { if (p && p.url) push(p.url, false); });
     } else if (t === "personnel") {
-      if (Array.isArray(s.spokespeople)) s.spokespeople.forEach(function (sp) { if (sp && sp.verification) push(sp.verification, false); });
+      if (Array.isArray(s.spokespeople)) s.spokespeople.forEach(function (sp) { if (sp && sp.verification) push(sp.verification, true); });
     } else if (t === "disavowal") {
       if (Array.isArray(s.disavowed)) s.disavowed.forEach(function (d) { if (d && d.url) push(d.url, true); });
     } else if (t === "supersedes") {
-      if (Array.isArray(s.superseded)) s.superseded.forEach(function (x) { if (x && x.url) push(x.url, true); });
+      if (Array.isArray(s.superseded)) s.superseded.forEach(function (x) { if (x && x.url) push(x.url, false); });
     } else if (t === "pointer") {
       if (s.url) push(s.url, true);
     }
