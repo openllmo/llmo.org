@@ -133,11 +133,20 @@
       "additionalProperties": true,
       "properties": {
         "type": {
-          "type": "string",
-          "description": "Core claim type (no dots) or namespaced extension type (contains dots).",
-          "minLength": 1,
-          "maxLength": 128,
-          "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*$"
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": ["identity", "canonical_urls", "official_channels", "product_facts", "personnel", "disavowal", "supersedes", "pointer"],
+              "description": "Core claim type. The eight core types defined in §3.5."
+            },
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*$",
+              "minLength": 3,
+              "maxLength": 128,
+              "description": "Namespaced extension claim type per §3.6. Requires at least one dot."
+            }
+          ]
         },
         "statement": {
           "type": "object",
@@ -251,7 +260,8 @@
       "properties": {
         "founded": {
           "type": "string",
-          "description": "RFC 3339 date, year, or year-month."
+          "pattern": "^[0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?$",
+          "description": "Year (YYYY), year-month (YYYY-MM), or full date (YYYY-MM-DD)."
         },
         "headquarters": { "type": "string" },
         "description": { "type": "string", "maxLength": 2048 }
