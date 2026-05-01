@@ -112,6 +112,22 @@ The CLI will print a reminder verbatim:
 This matters. If your hosting platform reformats JSON files (some
 do), the signature breaks. More on this in Step 5.
 
+### Optional: per-claim signing
+
+The default signs the entire document with one key. Publishers may also sign individual claims independently using `--claim <claim_id>`:
+
+```bash
+llmo sign llmo.json \
+  --key ./llmo-private-yourname-2026-01.pem \
+  --kid yourname-2026-01 \
+  --claim disavowal-affiliations \
+  --in-place
+```
+
+Per-claim signing is useful when different organizational functions assert different claim types: legal signs `disavowal` claims with one key, ops signs `canonical_urls` with another. Each claim's signature is independently verifiable and uses any `kid` resolvable in the publisher's JWKS (per spec §4.4).
+
+Per-claim signatures are evaluated under the X6 strict-tier rule (§5.3). The reference validator at `https://llmo.org/validator/` and `llmo verify` both verify per-claim signatures when present. Documents with no per-claim signatures pass X6 trivially.
+
 ## Step 5: Deploy to your domain
 
 You need to publish two files at well-known paths over HTTPS:
