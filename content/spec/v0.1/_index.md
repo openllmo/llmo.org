@@ -462,6 +462,9 @@ When a consumer fetches a `llmo.json`, it SHOULD:
 3. Check `valid_from` and `valid_until`. If expired, mark as stale.
 4. If a document-level `signature` is present, fetch the JWKS, verify. If verification fails, downgrade trust to Layer 1 only and log.
 5. For each claim, if it carries its own `signature`, verify it. Unsigned claims in a document-signed document inherit the document signature.
+
+   Note: per-claim signatures MAY use a different `kid` than the document-level signature, provided the per-claim `kid` resolves to a key in the same publisher JWKS. This supports patterns where different organizational functions sign different claim types (legal signs `disavowal` claims, ops signs `canonical_urls`) using distinct keys all hosted in the same publisher key set.
+
 6. Produce a per-claim trust assessment: `{claim, trust_level: "layer1" | "layer2", issues: [...]}`.
 
 ### 4.5 Behavior when signatures are absent or invalid
@@ -518,12 +521,12 @@ Minimal conformance does not require any signatures or any specific claim types.
 
 A document is **standard conforming** if it meets minimal conformance plus:
 
-- Contains at least one `canonical_urls` claim.
-- Contains at least one `official_channels` claim.
-- `entity.primary_domain` matches the domain serving the file.
-- All URLs in claims resolve to the entity's primary domain or declared aliases, except for fields whose semantic role is third-party reference. The third-party-allowed fields in v0.1 are: `pointer.url` (external standards manifests), `disavowal.disavowed[].url` (impersonating or unaffiliated domains being disavowed), `official_channels.community[].url` (third-party platforms like Discord or Slack), and `personnel.spokespeople[].verification` (third-party identity attestation, e.g., GitHub, LinkedIn, faculty pages, news articles). All other URL-typed fields, including `canonical_urls.*`, `product_facts.products[].url`, and `supersedes.superseded[].url`, MUST resolve to the owned domain set.
-- `valid_until` is no more than 180 days after `valid_from`.
-- Disavowal claims target only publisher self-statements or impersonation defense (§3.5). Supersedes claims target only URLs or documents the publisher controls or formerly controlled (§3.5).
+- **S1.** Contains at least one `canonical_urls` claim.
+- **S2.** Contains at least one `official_channels` claim.
+- **S3.** `entity.primary_domain` matches the domain serving the file.
+- **S4.** All URLs in claims resolve to the entity's primary domain or declared aliases, except for fields whose semantic role is third-party reference. The third-party-allowed fields in v0.1 are: `pointer.url` (external standards manifests), `disavowal.disavowed[].url` (impersonating or unaffiliated domains being disavowed), `official_channels.community[].url` (third-party platforms like Discord or Slack), and `personnel.spokespeople[].verification` (third-party identity attestation, e.g., GitHub, LinkedIn, faculty pages, news articles). All other URL-typed fields, including `canonical_urls.*`, `product_facts.products[].url`, and `supersedes.superseded[].url`, MUST resolve to the owned domain set.
+- **S5.** `valid_until` is no more than 180 days after `valid_from`.
+- **S6.** Disavowal claims target only publisher self-statements or impersonation defense (§3.5). Supersedes claims target only URLs or documents the publisher controls or formerly controlled (§3.5).
 
 Standard is the target for most publishers. It provides consumers with enough signal to meaningfully re-rank LLMO claims against scraped content.
 
@@ -531,10 +534,12 @@ Standard is the target for most publishers. It provides consumers with enough si
 
 A document is **strictly conforming** if it meets standard conformance plus:
 
-- Carries a valid document-level JWS signature.
-- The signing key is retrievable at `/.well-known/llmo-keys.json` on the same domain.
-- The JWKS itself is served with `Cache-Control: max-age ≤ 86400`.
-- All claims carrying URLs include at least one `canonical_urls` reference demonstrating domain ownership of any URLs referenced.
+- **X1.** Document-level `signature` field is structurally valid: present, well-formed JWS object with `protected` and `signature` fields, protected header decodes to valid JSON declaring an `alg` value in the §4.2 allowed set (ES256, ES384, or EdDSA) and a `kid` value. Cryptographic verification is X5.
+- **X2.** Signing key is retrievable at `/.well-known/llmo-keys.json` on the same domain as the serving document.
+- **X3.** JWKS is served with `Cache-Control: max-age` no greater than 86400 seconds.
+- **X4.** All claims carrying URLs include at least one `canonical_urls` reference demonstrating domain ownership of any URLs referenced.
+- **X5.** Document-level signature cryptographically verifies against a key in the publisher's JWKS using the algorithm declared in the protected header (one of the §4.2 allowed algorithms). Evaluation requires knowledge of the document's serving domain; documents validated without domain context (e.g., paste-mode validation without explicit domain assertion) cannot achieve Strict tier.
+- **X6.** All present per-claim signatures cryptographically verify against keys in the publisher's JWKS. A claim's signature MAY use a different `kid` than the document-level signature provided that `kid` resolves to a key in the same JWKS. Per-claim signature failure does not invalidate other claims (§4.5) but does prevent the document from achieving Strict tier. Documents with no per-claim signatures pass X6 trivially.
 
 Strict conformance is intended for organizations whose LLMO claims carry significant consequence: regulated industries, widely-impersonated brands, organizations whose statements are frequently mis-attributed.
 
@@ -544,7 +549,9 @@ A reference validator at `llmo.org/validate` will check these tiers. It will rep
 
 - Which tier the document achieves.
 - For any missed tier, which specific checks failed.
-- Warnings for practices that are conformant but discouraged (e.g., a `valid_until` 364 days out, a `personnel` claim with no `verification` URL).
+- Warnings for practices that are conformant but discouraged. The reference validator emits the following warning codes:
+  - **W1.** Validity window exceeds 180 days but does not exceed 365 days. Standard-tier conformance requires `valid_until` no more than 180 days after `valid_from` (§5.2 S5); windows between 181 and 365 days remain Minimal-tier conforming but are flagged as discouraged.
+  - **W2.** A `personnel.spokespeople` entry omits the `verification` URL. The claim remains conforming but consumers have no corroborating reference for the named individual; the §3.5 worked example shows the recommended pattern.
 
 ---
 
@@ -688,6 +695,10 @@ This section walks through a complete `llmo.json` for Diverse.org, Inc., the non
             "detail": "The domain diverse-org.example.com is shaped to imply affiliation with Diverse.org but has no such affiliation. This is an impersonation defense per §3.5."
           }
         ]
+      },
+      "signature": {
+        "protected": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImRpdmVyc2UtMjAyNi0wMSJ9",
+        "signature": "PER_CLAIM_SIGNATURE_EXAMPLE_PLACEHOLDER_VALUE_NOT_VERIFIABLE_xxxxxxxxxxxxxxxxxxxxx"
       }
     }
   ],
@@ -709,6 +720,7 @@ This section walks through a complete `llmo.json` for Diverse.org, Inc., the non
 - `product_facts` lists three Diverse.org-stewarded initiatives. The schema permits richer fields per product (`status`, `current_version`); this example carries only `name` and `url` because those are the facts Diverse.org currently asserts. Stewardship status is described in prose at each product's URL.
 - `personnel.spokespeople` enumerates the three officers of Diverse.org. The chairman entry carries `verification: "https://github.com/thegigachav"`, which §5.2 S4 explicitly permits as third-party identity attestation. The director and secretary entries omit `verification` and are surfaced as W2 warnings per §5.4 pending appropriate verification URLs (which may be third-party platforms or first-party leadership pages; both are conforming).
 - `disavowal` pairs a category-level self-statement (`commercial_subsidiary`, asserting Diverse.org has no commercial arm) with an impersonation-defense entry (an unaffiliated domain shaped to imply affiliation). Both fall within the §3.5 disavowal scope. Consumers reasoning about Diverse.org get both a class assertion and a concrete instance to match against.
+- The `disavowal` claim carries its own `signature` field in addition to (and covered by) the document-level signature. Per-claim signing of disavowal claims demonstrates the §4.3 "claim-level signing" pattern, where security-sensitive claims may be cryptographically attested by a different organizational function than the rest of the document. The example here uses the same key as the document-level signature (kid `diverse-2026-01`) for clarity; production deployments may use distinct keys per claim type per §4.4. Per-claim signatures are evaluated under the new §5.3 X6 rule.
 - The document-level signature covers all fields except `signature` itself. A consumer verifies by fetching `https://llmo.org/.well-known/llmo-keys.json`, locating the key with `kid: "diverse-2026-01"`, and verifying the ES256 signature over the JCS-canonicalized payload.
 
 The signed instance of this `llmo.json` is currently published at [`https://llmo.org/.well-known/llmo.json`](https://llmo.org/.well-known/llmo.json), with the corresponding JWKS at [`https://llmo.org/.well-known/llmo-keys.json`](https://llmo.org/.well-known/llmo-keys.json). Diverse.org will mirror at `https://diverse.org/.well-known/llmo.json` once Diverse.org's own site launches. Either copy should validate identically against this spec via [the reference validator](/validator/) or any conforming validator.
@@ -770,6 +782,7 @@ The vectors are static fixtures with a fixed validity window. After their `valid
 - **v0.1.2 (2026-04-30):** Security patch. §3.5 disavowal and supersedes claim types constrained to publisher self-statements, impersonation defense (disavowal), and publisher-controlled URLs (supersedes). Third-party-targeting claims that fall outside these scopes are out of conformance at Standard and Strict tiers. §5.2 gains a corresponding tier rule. §4.6 advisory updated to direct consumers on handling out-of-scope claims encountered in nonconforming documents. §7 worked example annotation clarified: the `unaffiliated_domain` entry is impersonation defense, not unconstrained third-party disavowal. §8.10 rewritten to remove the prior vulnerability disclosure framing; the residual reputation-layer work is now about scoring legitimate publishers, not mitigating closed attack vectors. Also includes Dragon 5 work: §4.6 expanded with trust-on-first-use semantics for JWKS, new §4.7 specifying consumer-side JWKS caching and key change handling. No schema, document, or signing changes. Documents valid under v0.1.1 that contain only self-targeting or impersonation-defense disavowal/supersedes claims remain valid under v0.1.2; documents that previously contained out-of-scope third-party disavowal/supersedes claims now fail Standard-tier conformance.
 - **v0.1.3 (2026-04-30):** S4 semantic alignment. §5.2 S4 (URL ownership) clarified to explicitly enumerate third-party-allowed fields: `pointer.url`, `disavowal.disavowed[].url`, `official_channels.community[].url`, and `personnel.spokespeople[].verification`. The `personnel.verification` field was previously subject to the ownership check despite the §3.5 example explicitly showing `https://github.com/thegigachav` as the canonical pattern; the validator now treats it as third-party-allowed. The `supersedes.superseded[].url` validator behavior corrected to enforce ownership per v0.1.2's §3.5 Scope language (was previously too permissive). §7 worked example annotation on `personnel.spokespeople` updated to reflect the corrected rule. No schema, document, or signing changes; the live llmo.json signed in the v3 ceremony with chairman `verification: https://github.com/thegigachav` is correct as-published and now passes Standard tier under the patched validator.
 - **v0.1.4 (2026-05-01):** Schema completeness pass. Two corrections to `static/spec/v0.1/schema.json` closing prose-vs-schema drift identified by the v0.1.4 audit. First, `statement_identity.founded` gains a pattern constraint enforcing year (`YYYY`), year-month (`YYYY-MM`), or full RFC 3339 date (`YYYY-MM-DD`); previously the field accepted any string including free-text values like "yesterday". Second, `claim.type` now uses a `oneOf` requiring either exact match against the eight reserved core types defined in §3.5 (`identity`, `canonical_urls`, `official_channels`, `product_facts`, `personnel`, `disavowal`, `supersedes`, `pointer`) or a namespaced pattern with at least one dot per §3.6; previously the bare pattern accepted arbitrary lowercase strings as types, letting documents with malformed types parse as schema-valid even though no validator branch handled them. §3.6 prose tightened to make the bipartite "core or namespaced" rule explicit. No artifact changes required for the live llmo.json (which uses only core types and a properly-formatted `founded` value). Implementations validating against the updated schema will reject documents that previously passed schema validation but contained malformed types or non-date `founded` values.
+- **v0.1.5 (2026-05-01):** Per-claim signature verification and rule labeling pass. Three corrections plus one new normative rule. First, §5.2 Standard tier and §5.3 Strict tier bullets gain explicit labels (S1-S6 and X1-X6 respectively) matching what conforming validators emit; the prior unlabeled bullets created cross-reference drift between spec text and validator output. Second, §5.3 splits the prior single "valid document-level signature" bullet into X1 (structural validity of the signature field including protected header decoding and alg/kid presence) and X5 (cryptographic verification of the signature against the publisher's JWKS). Third, §5.3 adds a new X6 rule requiring all present per-claim signatures to cryptographically verify; per-claim signatures MAY use a different kid than the document-level signature provided the kid resolves to a key in the same publisher JWKS. Fourth, §5.4 W1 and W2 warning codes are defined explicitly to match validator emission. §4.4 consumer verification algorithm gains a clarifying note on per-claim kid resolution. §7 worked example updated to show a per-claim signature on the disavowal claim with corresponding annotation. The live llmo.json document gains a per-claim signature on its disavowal claim in a parallel signing ceremony. Implementations conforming to v0.1.4 with document-level signatures only continue to conform under v0.1.5; X6 evaluates as PASS trivially for documents with no per-claim signatures.
 
 ---
 
