@@ -16,7 +16,7 @@ The validator confirms three things:
 
 - **Shape.** The file parses against the [v0.1 JSON Schema](/spec/v0.1/schema.json).
 - **Conformance.** The claims follow the rules at [§5.1 Minimal](/spec/v0.1#51-minimal-conformance), [§5.2 Standard](/spec/v0.1#52-standard-conformance), or [§5.3 Strict](/spec/v0.1#53-strict-conformance).
-- **Signature.** If the document is signed, the signature matches the contents and was made with a key the publisher hosts at their own domain.
+- **Signature.** If the document is signed, the signature matches the contents and was made with a key the publisher hosts at their own domain. If individual claims carry their own signatures, those are also verified, letting publishers cryptographically attest specific claims independently of the document-level signature (per §4.3).
 
 That last check is what makes the protocol useful. A signed `llmo.json` proves the document hasn't been tampered with since the publisher signed it, and proves it was the publisher who signed it.
 

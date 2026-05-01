@@ -166,9 +166,9 @@
     <section aria-labelledby="limits-heading" class="limits">
       <h2 id="limits-heading">Current limitations and future work</h2>
       <ol>
-        <li><strong>Signature verification is not performed by this tool in v0.1</strong> due to cross-origin constraints on fetching external JWKS from client JavaScript. Implementers verify signatures using the procedure in <a href="/spec/v0.1#4-trust-model">§4</a> and the JWS signing-input reference at <a href="/spec/v0.1/test-vectors/signed-strict-payload.json"><code>/spec/v0.1/test-vectors/signed-strict-payload.json</code></a>.</li>
-        <li><strong>URL-mode validation depends on the target domain permitting cross-origin requests.</strong> Most domains do not. Paste mode is the reliable path.</li>
-        <li><strong>A server-side validator built as a self-hostable service</strong> (for example, on Cloudflare workerd or an equivalent open runtime) is a reasonable future project. It would unblock signature verification, remove the CORS dependency, and allow headers like <code>Cache-Control</code> on the JWKS response to be observed directly. Out of scope for this version.</li>
+        <li><strong>Cryptographic signature verification requires URL mode.</strong> Paste mode validates document shape, conformance rules, and signature presence, but cannot fetch the publisher's JWKS without a known serving domain. URL mode performs full verification (X5 for the document, X6 for any per-claim signatures) by routing the JWKS fetch through a Cloudflare Pages Function on llmo.org that bypasses cross-origin restrictions on the publisher's <code>/.well-known/llmo-keys.json</code> endpoint.</li>
+        <li><strong>URL mode requires the target domain to permit cross-origin requests on the document itself.</strong> The validator fetches <code>/.well-known/llmo.json</code> directly from the publisher's domain; if that endpoint blocks cross-origin requests, paste mode is the fallback. Note that JWKS retrievability (X2) is independent: the JWKS fetch is proxied server-side and does not require CORS on the JWKS endpoint.</li>
+        <li><strong>Cryptographic verification currently supports ES256 only.</strong> §4.2 of the spec permits ES256, ES384, and EdDSA; the structural check (X1) accepts all three, but the cryptographic checks (X5 and X6) only verify ES256 in v0.1.5. Documents signed with ES384 or EdDSA pass X1 but receive SKIP on X5 and X6 with reason <code>unsupported_alg</code>. Full algorithm support is planned for a forthcoming patch.</li>
       </ol>
     </section>
 
