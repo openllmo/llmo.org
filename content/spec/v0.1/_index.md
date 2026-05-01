@@ -22,6 +22,8 @@ This is a protocol for **machine-facing identity**. It governs the small, high-c
 
 The file answers a narrow question with broad consequences: *when an automated system needs to know something load-bearing about this organization, what does the organization itself say is true, right now, in a form the system can verify?* Operational truth, in this spec, means facts that change over time and carry consequence when wrong: which URLs are canonical, who speaks for the organization, which products and pricing pages are current, which public claims the organization repudiates, which prior statements are superseded by newer ones.
 
+An organization publishing an LLMO document acts as what credit-reporting infrastructure calls a "data furnisher": the authoritative source of structured organizational facts about itself. Throughout this specification, the term "publisher" is used to align with conventions in adjacent web standards.
+
 ### 1.2 What `llmo.json` is not
 
 It is not a descriptive catalog of the organization in the style of schema.org. It is not a media-provenance format in the style of C2PA. It is not a capability manifest in the style of MCP or agent.json. It is not a security disclosure channel in the style of `security.txt`. It borrows discovery conventions from some of these and defers outright to others (see §6).
