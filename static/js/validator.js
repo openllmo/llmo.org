@@ -16,6 +16,41 @@
   var ajvValidate = null;
   var canonicalizeFn = null;
 
+  var jwksCache = {};
+
+  function resetJwksCache() {
+    jwksCache = {};
+  }
+
+  async function fetchJwksOnce(urlContext) {
+    var hostname = urlContext && urlContext.hostname;
+    if (!hostname) {
+      return { error: "no_hostname" };
+    }
+    if (jwksCache[hostname]) {
+      return jwksCache[hostname];
+    }
+    var promise = (async function () {
+      try {
+        var proxyUrl = "/api/fetch-jwks?domain=" + encodeURIComponent(hostname);
+        var resp = await fetch(proxyUrl);
+        if (!resp.ok) {
+          var errBody = await resp.json().catch(function () { return {}; });
+          return { error: "jwks_unreachable", detail: errBody.error || ("proxy_status_" + resp.status) };
+        }
+        var jwks = await resp.json();
+        if (!jwks.keys || !Array.isArray(jwks.keys)) {
+          return { error: "jwks_malformed" };
+        }
+        return { jwks: jwks };
+      } catch (err) {
+        return { error: "jwks_fetch_failed" };
+      }
+    })();
+    jwksCache[hostname] = promise;
+    return promise;
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     fillFooter();
     readEmbeds();
@@ -229,6 +264,15 @@
     return { id: id, cite: cite, desc: desc, status: status, note: note || null };
   }
 
+  function canonicalizeWithoutSignature(obj) {
+    if (!canonicalizeFn) {
+      throw new Error("canonicalize module not loaded");
+    }
+    var copy = JSON.parse(JSON.stringify(obj));
+    delete copy.signature;
+    return canonicalizeFn(copy);
+  }
+
   function collectClaimUrls(claim) {
     var urls = [];
     var t = claim.type;
@@ -255,6 +299,7 @@
   }
 
   function evaluate(doc, schemaOk, schemaErrors, urlContext) {
+    resetJwksCache();
     var claims = Array.isArray(doc.claims) ? doc.claims : [];
     var entity = doc.entity && typeof doc.entity === "object" ? doc.entity : {};
     var owned = [entity.primary_domain].concat(Array.isArray(entity.aliases) ? entity.aliases : [])
@@ -421,6 +466,22 @@
         strict.push(check("X5", "§4.3, §5.3", "document signature cryptographically verifies", "SKIP", x5PasteNote));
       }
 
+      var hasAnyClaimSig = claims.some(function (c) {
+        return c && c.signature && typeof c.signature === "object";
+      });
+      if (urlContext) {
+        if (!hasAnyClaimSig) {
+          strict.push(check("X6", "§5.3", "all present per-claim signatures cryptographically verify",
+            "PASS", "no per-claim signatures present"));
+        } else {
+          strict.push({ id: "X6", cite: "§5.3", desc: "all present per-claim signatures cryptographically verify",
+            status: "DEFERRED", note: null });
+        }
+      } else {
+        strict.push(check("X6", "§5.3", "all present per-claim signatures cryptographically verify",
+          "SKIP", "skipped in paste mode (origin needed for JWKS fetch)"));
+      }
+
       var docInternalOk = x1ok && x4ok;
       if (docInternalOk) {
         if (urlContext) {
@@ -460,9 +521,18 @@
     });
 
     var signatureReport = {
-      document_level: doc.signature ? "present" : "absent",
+      document_level: {
+        presence: doc.signature ? "present" : "absent",
+        verification: null
+      },
       per_claim: claims.map(function (c, i) {
-        return { index: i, claim_id: (c && c.claim_id) || null, type: (c && c.type) || null, signature: c && c.signature ? "present" : "absent" };
+        return {
+          index: i,
+          claim_id: (c && c.claim_id) || null,
+          type: (c && c.type) || null,
+          presence: c && c.signature ? "present" : "absent",
+          verification: null
+        };
       })
     };
 
@@ -508,7 +578,7 @@
         "Could not fetch JWKS due to network or CORS restriction. This is not necessarily a spec violation; the JWKS may exist but not permit cross-origin requests from llmo.org/validator/. (" + (err && err.message ? err.message : err) + ")",
         "SKIP", "skipped because JWKS fetch did not resolve");
     }).then(function (evAfterX23) {
-      return verifyAndApplyX5(evAfterX23, doc, urlContext);
+      return verifyAndApplyX5X6(evAfterX23, doc, urlContext);
     });
   }
 
@@ -554,22 +624,12 @@
       return { applicable: true, verified: false, error: "unsupported_alg", alg: header.alg };
     }
 
-    var jwks;
-    try {
-      var proxyUrl = "/api/fetch-jwks?domain=" + encodeURIComponent(urlContext.hostname);
-      var resp = await fetch(proxyUrl);
-      if (!resp.ok) {
-        var errBody = await resp.json().catch(function () { return {}; });
-        return { applicable: true, verified: false, error: "jwks_unreachable", detail: errBody.error || ("proxy_status_" + resp.status) };
-      }
-      jwks = await resp.json();
-    } catch (err) {
-      return { applicable: true, verified: false, error: "jwks_fetch_failed" };
+    var jwksResult = await fetchJwksOnce(urlContext);
+    if (jwksResult.error) {
+      return { applicable: true, verified: false, error: jwksResult.error, detail: jwksResult.detail };
     }
+    var jwks = jwksResult.jwks;
 
-    if (!jwks.keys || !Array.isArray(jwks.keys)) {
-      return { applicable: true, verified: false, error: "jwks_malformed" };
-    }
     var key = jwks.keys.find(function (k) { return k.kid === header.kid; });
     if (!key) {
       return { applicable: true, verified: false, error: "kid_not_in_jwks", kid: header.kid };
@@ -593,9 +653,7 @@
 
     var payloadCanonical;
     try {
-      var docCopy = JSON.parse(JSON.stringify(doc));
-      delete docCopy.signature;
-      var canonicalString = canonicalizeFn(docCopy);
+      var canonicalString = canonicalizeWithoutSignature(doc);
       payloadCanonical = new TextEncoder().encode(canonicalString);
     } catch (err) {
       return { applicable: true, verified: false, error: "canonicalization_failed" };
@@ -630,59 +688,225 @@
     return { applicable: true, verified: verified, kid: header.kid, alg: header.alg };
   }
 
-  function verifyAndApplyX5(ev, doc, urlContext) {
-    var x5Current = ev.strict.find(function (c) { return c.id === "X5"; });
-    if (!x5Current || x5Current.status !== "DEFERRED") {
-      return Promise.resolve(ev);
+  async function verifyClaimSignature(claim, urlContext) {
+    if (!claim || !claim.signature || !claim.signature.protected || !claim.signature.signature) {
+      return { applicable: false, reason: "no_signature" };
     }
-    return verifyDocumentSignature(doc, urlContext).then(function (sigResult) {
-      var status, note;
+    if (!urlContext || !urlContext.hostname) {
+      return { applicable: false, reason: "paste_mode_no_origin" };
+    }
+
+    var header;
+    try {
+      var protectedJson = base64UrlDecodeToString(claim.signature.protected);
+      header = JSON.parse(protectedJson);
+    } catch (err) {
+      return { applicable: true, verified: false, error: "protected_header_decode_failed" };
+    }
+
+    if (!header.alg || !header.kid) {
+      return { applicable: true, verified: false, error: "protected_header_missing_alg_or_kid" };
+    }
+    if (header.alg !== "ES256") {
+      return { applicable: true, verified: false, error: "unsupported_alg", alg: header.alg };
+    }
+
+    var jwksResult = await fetchJwksOnce(urlContext);
+    if (jwksResult.error) {
+      return { applicable: true, verified: false, error: jwksResult.error, detail: jwksResult.detail };
+    }
+    var jwks = jwksResult.jwks;
+
+    var key = jwks.keys.find(function (k) { return k.kid === header.kid; });
+    if (!key) {
+      return { applicable: true, verified: false, error: "kid_not_in_jwks", kid: header.kid };
+    }
+    if (key.kty !== "EC" || key.crv !== "P-256") {
+      return { applicable: true, verified: false, error: "key_type_mismatch_for_es256" };
+    }
+
+    var publicKey;
+    try {
+      publicKey = await crypto.subtle.importKey(
+        "jwk",
+        { kty: "EC", crv: "P-256", x: key.x, y: key.y, ext: true },
+        { name: "ECDSA", namedCurve: "P-256" },
+        false,
+        ["verify"]
+      );
+    } catch (err) {
+      return { applicable: true, verified: false, error: "key_import_failed" };
+    }
+
+    var payloadCanonical;
+    try {
+      var canonicalString = canonicalizeWithoutSignature(claim);
+      payloadCanonical = new TextEncoder().encode(canonicalString);
+    } catch (err) {
+      return { applicable: true, verified: false, error: "canonicalization_failed" };
+    }
+
+    var protectedB64 = claim.signature.protected;
+    var payloadB64 = base64UrlEncode(payloadCanonical);
+    var signingInput = new TextEncoder().encode(protectedB64 + "." + payloadB64);
+
+    var signatureBytes;
+    try {
+      signatureBytes = base64UrlDecodeToBytes(claim.signature.signature);
+    } catch (err) {
+      return { applicable: true, verified: false, error: "signature_decode_failed" };
+    }
+    if (signatureBytes.length !== 64) {
+      return { applicable: true, verified: false, error: "signature_wrong_length", length: signatureBytes.length };
+    }
+
+    var verified;
+    try {
+      verified = await crypto.subtle.verify(
+        { name: "ECDSA", hash: "SHA-256" },
+        publicKey,
+        signatureBytes,
+        signingInput
+      );
+    } catch (err) {
+      return { applicable: true, verified: false, error: "verify_threw" };
+    }
+
+    return { applicable: true, verified: verified, kid: header.kid, alg: header.alg };
+  }
+
+  async function verifyAndApplyX5X6(ev, doc, urlContext) {
+    var x5Current = ev.strict.find(function (c) { return c.id === "X5"; });
+    var x6Current = ev.strict.find(function (c) { return c.id === "X6"; });
+
+    if (x5Current && x5Current.status === "DEFERRED") {
+      var sigResult = await verifyDocumentSignature(doc, urlContext);
+      var x5Status, x5Note;
       if (!sigResult.applicable) {
-        status = "SKIP";
-        note = sigResult.reason === "no_signature"
+        x5Status = "SKIP";
+        x5Note = sigResult.reason === "no_signature"
           ? "no document-level signature present"
           : "cryptographic verification requires URL mode (origin known)";
       } else if (sigResult.verified) {
-        status = "PASS";
-        note = "signature cryptographically verified against JWKS key kid=" + sigResult.kid + " (" + sigResult.alg + ")";
+        x5Status = "PASS";
+        x5Note = "signature cryptographically verified against JWKS key kid=" + sigResult.kid + " (" + sigResult.alg + ")";
       } else if (sigResult.error === "jwks_unreachable" || sigResult.error === "jwks_fetch_failed") {
-        status = "SKIP";
-        note = "could not fetch JWKS for verification: " + (sigResult.detail || sigResult.error);
+        x5Status = "SKIP";
+        x5Note = "could not fetch JWKS for verification: " + (sigResult.detail || sigResult.error);
       } else {
-        status = "FAIL";
-        note = "signature verification failed: " + sigResult.error + (sigResult.detail ? " (" + sigResult.detail + ")" : "");
+        x5Status = "FAIL";
+        x5Note = "signature verification failed: " + sigResult.error + (sigResult.detail ? " (" + sigResult.detail + ")" : "");
       }
       ev.strict = ev.strict.map(function (c) {
         return c.id === "X5"
-          ? check("X5", "§4.3, §5.3", "document signature cryptographically verifies", status, note)
+          ? check("X5", "§4.3, §5.3", "document signature cryptographically verifies", x5Status, x5Note)
           : c;
       });
-      var x1 = ev.strict.find(function (c) { return c.id === "X1"; });
-      var x4 = ev.strict.find(function (c) { return c.id === "X4"; });
-      var x2 = ev.strict.find(function (c) { return c.id === "X2"; });
-      var x3 = ev.strict.find(function (c) { return c.id === "X3"; });
-      var x5 = ev.strict.find(function (c) { return c.id === "X5"; });
-      var docOk = x1.status === "PASS" && x4.status === "PASS";
-      if (docOk) {
-        if (x5.status === "FAIL") {
-          ev.tier = "strict-invalid-signature";
-          ev.tierBadge = { label: "Strict (invalid signature)", variant: "fail" };
-        } else if (x5.status === "SKIP") {
-          ev.tier = "strict-unverified";
-          ev.tierBadge = { label: "Strict (unverified)", variant: "partial" };
-        } else if (x5.status === "PASS" && x2.status === "PASS" && x3.status === "PASS") {
-          ev.tier = "strict";
-          ev.tierBadge = { label: "Strict", variant: "pass" };
-        } else if (x5.status === "PASS" && x2.status === "SKIP") {
-          ev.tier = "strict-partial-cors";
-          ev.tierBadge = { label: "Strict (partial, CORS)", variant: "partial" };
-        } else {
-          ev.tier = "standard";
-          ev.tierBadge = { label: "Standard", variant: "pass" };
+      if (ev.signatureReport && ev.signatureReport.document_level) {
+        ev.signatureReport.document_level.verification =
+          x5Status === "PASS" ? "verified" :
+          x5Status === "FAIL" ? "failed" :
+          x5Status === "SKIP" ? "unverified" : null;
+      }
+    }
+
+    if (x6Current && x6Current.status === "DEFERRED") {
+      var claimResults = [];
+      var anyFail = false, anySkip = false;
+      for (var i = 0; i < doc.claims.length; i++) {
+        var c = doc.claims[i];
+        if (c && c.signature) {
+          var cResult = await verifyClaimSignature(c, urlContext);
+          claimResults.push({ index: i, claim_id: c.claim_id || null, result: cResult });
+          if (cResult.applicable) {
+            if (cResult.verified) {
+              // verified
+            } else if (cResult.error === "jwks_unreachable" || cResult.error === "jwks_fetch_failed") {
+              anySkip = true;
+            } else {
+              anyFail = true;
+            }
+          } else {
+            anySkip = true;
+          }
         }
       }
-      return ev;
-    });
+      if (ev.signatureReport && Array.isArray(ev.signatureReport.per_claim)) {
+        ev.signatureReport.per_claim.forEach(function (pc) {
+          var match = claimResults.find(function (r) { return r.index === pc.index; });
+          if (match) {
+            if (match.result.applicable && match.result.verified) {
+              pc.verification = "verified";
+            } else if (match.result.applicable && !match.result.verified) {
+              if (match.result.error === "jwks_unreachable" || match.result.error === "jwks_fetch_failed") {
+                pc.verification = "unverified";
+              } else {
+                pc.verification = "failed";
+              }
+            } else {
+              pc.verification = "unverified";
+            }
+          } else if (pc.presence === "absent") {
+            pc.verification = null;
+          }
+        });
+      }
+      var x6Status, x6Note;
+      if (anyFail) {
+        x6Status = "FAIL";
+        var failed = claimResults.filter(function (r) {
+          return r.result.applicable && !r.result.verified
+            && r.result.error !== "jwks_unreachable" && r.result.error !== "jwks_fetch_failed";
+        });
+        x6Note = failed.length + " per-claim signature(s) failed verification";
+      } else if (anySkip) {
+        x6Status = "SKIP";
+        x6Note = "could not verify one or more per-claim signatures (JWKS issue)";
+      } else {
+        x6Status = "PASS";
+        x6Note = claimResults.length + " per-claim signature(s) cryptographically verified";
+      }
+      ev.strict = ev.strict.map(function (c) {
+        return c.id === "X6"
+          ? check("X6", "§5.3", "all present per-claim signatures cryptographically verify", x6Status, x6Note)
+          : c;
+      });
+    }
+
+    var x1 = ev.strict.find(function (c) { return c.id === "X1"; });
+    var x2 = ev.strict.find(function (c) { return c.id === "X2"; });
+    var x3 = ev.strict.find(function (c) { return c.id === "X3"; });
+    var x4 = ev.strict.find(function (c) { return c.id === "X4"; });
+    var x5 = ev.strict.find(function (c) { return c.id === "X5"; });
+    var x6 = ev.strict.find(function (c) { return c.id === "X6"; });
+    var docOk = x1.status === "PASS" && x4.status === "PASS";
+    if (docOk) {
+      var x5Fail = x5.status === "FAIL";
+      var x6Fail = x6.status === "FAIL";
+      if (x5Fail && x6Fail) {
+        ev.tier = "strict-invalid-both-signatures";
+        ev.tierBadge = { label: "Strict (signature failures)", variant: "fail" };
+      } else if (x5Fail) {
+        ev.tier = "strict-invalid-signature";
+        ev.tierBadge = { label: "Strict (invalid signature)", variant: "fail" };
+      } else if (x6Fail) {
+        ev.tier = "strict-invalid-claim-signature";
+        ev.tierBadge = { label: "Strict (invalid claim signature)", variant: "fail" };
+      } else if (x5.status === "SKIP" || x6.status === "SKIP") {
+        ev.tier = "strict-unverified";
+        ev.tierBadge = { label: "Strict (unverified)", variant: "partial" };
+      } else if (x5.status === "PASS" && x6.status === "PASS" && x2.status === "PASS" && x3.status === "PASS") {
+        ev.tier = "strict";
+        ev.tierBadge = { label: "Strict", variant: "pass" };
+      } else if (x5.status === "PASS" && x6.status === "PASS" && x2.status === "SKIP") {
+        ev.tier = "strict-partial-cors";
+        ev.tierBadge = { label: "Strict (partial, CORS)", variant: "partial" };
+      } else {
+        ev.tier = "standard";
+        ev.tierBadge = { label: "Standard", variant: "pass" };
+      }
+    }
+    return ev;
   }
 
   // ---- paste + URL entry points -----------------------------------------
@@ -824,7 +1048,7 @@
     return {
       source: source, mode: mode, jsonParseOk: false, parseError: null,
       schemaErrors: [], checks: { minimal: [], standard: [], strict: [] },
-      warnings: [], confidenceInfo: [], signatureReport: { document_level: "absent", per_claim: [] },
+      warnings: [], confidenceInfo: [], signatureReport: { document_level: { presence: "absent", verification: null }, per_claim: [] },
       tier: "none", tierBadge: { label: "None", variant: "fail" }
     };
   }
@@ -1038,13 +1262,22 @@
       body.appendChild(el("p", { cls: "muted", text: "Per §3.7: provisional confidence should be used sparingly. No action required; this is informational." }));
     }
 
-    body.appendChild(el("h3", { text: "Signature presence" }));
-    body.appendChild(el("p", { html: "Document-level: <strong>" + escapeHtml(result.signatureReport.document_level) + "</strong>" }));
+    body.appendChild(el("h3", { text: "Signature" }));
+    var docLevel = result.signatureReport.document_level;
+    var docLine = "Document-level: <strong>" + escapeHtml(docLevel.presence) + "</strong>";
+    if (docLevel.verification) {
+      docLine += " (" + escapeHtml(docLevel.verification) + ")";
+    }
+    body.appendChild(el("p", { html: docLine }));
     if (result.signatureReport.per_claim.length > 0) {
       var pul = el("ul", { cls: "plain" });
       result.signatureReport.per_claim.forEach(function (pc) {
         var lbl = pc.claim_id ? '"' + pc.claim_id + '"' : "index " + pc.index;
-        pul.appendChild(el("li", { text: "claim " + lbl + " (" + pc.type + "): " + pc.signature }));
+        var line = "claim " + lbl + " (" + pc.type + "): " + pc.presence;
+        if (pc.verification) {
+          line += " (" + pc.verification + ")";
+        }
+        pul.appendChild(el("li", { text: line }));
       });
       body.appendChild(pul);
     } else {
@@ -1124,14 +1357,23 @@
       lines.push("  Per §3.7: provisional confidence should be used sparingly. No action required; this is informational.");
     }
     lines.push("");
-    lines.push("Signature presence:");
-    lines.push("  Document-level: " + result.signatureReport.document_level);
+    lines.push("Signature:");
+    var pdocLevel = result.signatureReport.document_level;
+    var pdocLine = "  Document-level: " + pdocLevel.presence;
+    if (pdocLevel.verification) {
+      pdocLine += " (" + pdocLevel.verification + ")";
+    }
+    lines.push(pdocLine);
     if (result.signatureReport.per_claim.length === 0) {
       lines.push("  Per-claim: no claims");
     } else {
       result.signatureReport.per_claim.forEach(function (pc) {
         var lbl = pc.claim_id ? '"' + pc.claim_id + '"' : "index " + pc.index;
-        lines.push("  Per-claim " + lbl + " (" + pc.type + "): " + pc.signature);
+        var line = "  Per-claim " + lbl + " (" + pc.type + "): " + pc.presence;
+        if (pc.verification) {
+          line += " (" + pc.verification + ")";
+        }
+        lines.push(line);
       });
     }
     return lines.join("\n");
