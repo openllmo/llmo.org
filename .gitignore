@@ -4,3 +4,9 @@
 public/
 resources/
 .hugo_build.lock
+
+# Local development artifacts
+.wrangler/
+
+# User working notes (not part of the project)
+TASKS/

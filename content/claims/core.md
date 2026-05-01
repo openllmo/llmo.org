@@ -168,6 +168,8 @@ Each spokesperson object may contain `role` (required), `name` (required), and `
 
 - **Omitting `verification` URLs.** The reference validator emits a warning for `personnel` claims with no `verification` URL (specification [§5.4](/spec/v0.1#5-4-validator-behavior)). Without a corroborating URL, the claim is effectively a bare assertion and gives consumers no way to disambiguate the named person from others with the same name.
 
+**Per-claim signing.** Personnel claims may carry their own signature per spec [§4.3](/spec/v0.1#43-document-level-vs-claim-level-signing) when an organization wants HR-asserted personnel facts to be cryptographically distinct from operational claims signed by ops or engineering. The per-claim signature uses any `kid` resolvable in the publisher's JWKS. Per-claim signatures are evaluated under the X6 strict-tier rule ([§5.3](/spec/v0.1#53-strict-conformance)).
+
 ---
 
 ## `disavowal`
@@ -195,7 +197,7 @@ Each disavowed object requires `what` (a short category or label) and `detail` (
       },
       {
         "what": "unaffiliated_domain",
-        "detail": "The domain diverse-org.example.com has no affiliation with Diverse.org and never has."
+        "detail": "The domain diverse-org.example.com is shaped to imply affiliation with Diverse.org but has no such affiliation. This is an impersonation defense per §3.5."
       }
     ]
   }
@@ -205,6 +207,8 @@ Each disavowed object requires `what` (a short category or label) and `detail` (
 **Common pitfalls.**
 
 - **Disavowals too vague for LLMs to act on.** A disavowal of "all misinformation about us" gives consumers nothing concrete to reason with. The useful pattern is to pair a category-level disavowal (e.g., "no commercial subsidiary") with one or more specific disavowals (e.g., the unaffiliated domain `diverse-org.example.com`), so consumers have both a class and an instance to match against. The worked example in specification [§7](/spec/v0.1#7-worked-example-diverse-org-inc) demonstrates this.
+
+**Per-claim signing.** Disavowal claims are a strong candidate for per-claim signing per spec [§4.3](/spec/v0.1#43-document-level-vs-claim-level-signing), since they are often the most security-sensitive assertions in a document and may be cryptographically attested by a different organizational function (e.g., legal) than the rest of the document. The [§7 worked example](/spec/v0.1#7-worked-example-diverse-org-inc) demonstrates this pattern. Per-claim signatures are evaluated under the X6 strict-tier rule ([§5.3](/spec/v0.1#53-strict-conformance)).
 
 ---
 

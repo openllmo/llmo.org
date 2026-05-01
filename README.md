@@ -16,10 +16,11 @@ Consumers fetch the document, validate against the schema, verify signatures, an
 
 ## What exists today
 
-- Specification v0.1 at `/spec/v0.1/`
-- JSON schema at `/spec/v0.1/schema/`
+- Specification v0.1.5 at `/spec/v0.1/` (current revision; see `/spec/changelog/` for the patch series v0.1.1 through v0.1.5)
+- JSON schema at `/spec/v0.1/schema.json`
 - Five test vectors at `/spec/v0.1/test-vectors/` covering valid documents, invalid documents, and edge cases
-- Reference validator at https://llmo.org/validator/
+- Reference validator at `https://llmo.org/validator/` performing schema, conformance tier, and cryptographic signature verification (document-level X5 and per-claim X6 per §5.3)
+- Reference CLI tool `llmo` (open source at `github.com/openllmo/cli`) for signing, verifying, and operating on `llmo.json` documents
 - LIP governance process with three accepted improvement proposals: LIP-1 (process), LIP-2 (core proposal mechanics, in governance window), LIP-3 (authoring conventions)
 - OpenTimestamps anchoring for accepted LIPs, proof files adjacent to source documents at `/spec/lips/`
 
@@ -40,16 +41,25 @@ Consumers fetch the document, validate against the schema, verify signatures, an
 ## Repository layout
 
 ```
-spec/               Specification content
-  v0.1/             Versioned spec documents
-    schema/         JSON Schema definitions
-    test-vectors/   Canonical test cases
-  lips/             LLMO Improvement Proposals
-  anchoring.mdx     OpenTimestamps anchoring documentation
-scripts/            Validator, anchoring, and registry tooling
-claims.mdx          Core and extension claim documentation
-about/              Project governance, license, contact
-.github/workflows/  CI workflows
+content/             Hugo Markdown sources for all rendered pages
+  spec/              Specification content
+    v0.1/            Versioned spec documents
+    lips/            LLMO Improvement Proposals
+    changelog.md     Standalone changelog
+    anchoring.md     OpenTimestamps anchoring documentation
+  claims/            Core and extension claim type catalog
+  validator/         Reference validator page (intro)
+  deploy/            Publisher deployment guide
+  about/             Project governance, license, contact
+static/              Static assets served as-is by Hugo
+  spec/v0.1/         schema.json and test-vectors/
+  js/                Validator JavaScript
+  .well-known/       Live llmo.json and llmo-keys.json
+layouts/             Hugo layout templates
+functions/api/       Cloudflare Pages Functions (JWKS proxy)
+infrastructure/      Operational documentation (signing ceremony, etc.)
+scripts/             LIP anchoring shell scripts
+.github/workflows/   CI workflows
 ```
 
 ## Improvement proposals

@@ -27,8 +27,6 @@ Language models trained on this corpus inherit the distortions. Agents making de
 
 If the systems that increasingly mediate human decisions are trained on a corrupted information layer, the quality of those decisions degrades in ways that are difficult to detect and harder to reverse.
 
-This matters at civilizational scale.
-
 The protocol cannot fix the problem alone, but it can give organizations a signed, time-bounded, machine-verifiable channel to publish their own canonical assertions, which is one of the preconditions for a healthier information layer.
 
 The design intent is to create a virtuous cycle. Organizations that publish verifiable claims are easier to reason about than organizations that don't. Systems that consume verifiable claims produce better outputs than systems that consume unverifiable ones. Better outputs create demand for more verifiable claims.
