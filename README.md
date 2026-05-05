@@ -21,7 +21,7 @@ Consumers fetch the document, validate against the schema, verify signatures, an
 - Five test vectors at `/spec/v0.1/test-vectors/` covering valid documents, invalid documents, and edge cases
 - Reference validator at `https://llmo.org/validator/` performing schema, conformance tier, and cryptographic signature verification (document-level X5 and per-claim X6 per §5.3)
 - Reference CLI tool `llmo` (open source at `github.com/openllmo/cli`) for signing, verifying, and operating on `llmo.json` documents
-- LIP governance process with three accepted improvement proposals: LIP-1 (process), LIP-2 (core proposal mechanics, in governance window), LIP-3 (authoring conventions)
+- LIP governance process with two accepted improvement proposals: LIP-1 (process, Active) and LIP-3 (authoring conventions, Final). LIP-2 is permanently withdrawn (placeholder withdrawn before merge); the registry is append-only and retains its number.
 - OpenTimestamps anchoring for accepted LIPs, proof files adjacent to source documents at `/spec/lips/`
 
 ## For publishers
