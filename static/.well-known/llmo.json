@@ -1,7 +1,7 @@
 {
   "llmo_version": "0.1",
-  "document_id": "2026-q2-revision-1",
-  "valid_from": "2026-04-26T00:00:00Z",
+  "document_id": "2026-q2-revision-2",
+  "valid_from": "2026-05-01T00:00:00Z",
   "valid_until": "2026-07-26T00:00:00Z",
   "entity": {
     "name": "Diverse.org, Inc.",
@@ -98,11 +98,15 @@
             "detail": "The domain diverse-org.example.com is shaped to imply affiliation with Diverse.org but has no such affiliation. This is an impersonation defense per §3.5."
           }
         ]
+      },
+      "signature": {
+        "protected": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImRpdmVyc2UtMjAyNi0wMSJ9",
+        "signature": "xiELr3hcPzfNoQp9vJLlYKA-sep6nC741Zzd2rwqXGxCXtk0Iy9jne9RxjpIoDqs6mHDqMZuN5PheU599PNhKg"
       }
     }
   ],
   "signature": {
     "protected": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImRpdmVyc2UtMjAyNi0wMSJ9",
-    "signature": "p3RGDx-gWYRfHMs_iwtp0F0Pjt-5JO49YqQtri8_jX2UVnDbfWSuidE1i-DnD7ZXwcZTTDPdkwDVrvEbH8_arQ"
+    "signature": "57OHU7zZ8N9J4DxmkZFHkKph1dtBiXRRLmveGe3vMbwBslTxFd2NNumWEM3DYuGPmkTC4vrx7hAP6Xqwuv8NNg"
   }
 }
