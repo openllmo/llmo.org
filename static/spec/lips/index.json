@@ -1,6 +1,6 @@
 {
   "schema_version": "0.1",
-  "generated": "2026-04-26",
+  "generated": "2026-05-05",
   "lips": [
     {
       "lip": 1,
@@ -15,7 +15,7 @@
       "lip": 3,
       "title": "LIP Authoring Conventions",
       "author": "Nic Chavez",
-      "status": "Draft",
+      "status": "Final",
       "type": "Informational",
       "created": "2026-04-21",
       "path": "/spec/lips/lip-0003/"
