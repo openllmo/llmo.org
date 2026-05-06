@@ -40,6 +40,8 @@ LIP-vs-ADR scope rule: a decision that changes `content/spec/` is a LIP candidat
 
 Cross-linking discipline: from ADR-0001 onward, operational ADRs include a `## References` section listing relevant pull requests and changelog versions where the decision is load-bearing or visible. Cross-references use immutable identifiers (PR numbers, changelog version anchors) so they remain valid as the project evolves. ADRs with no applicable cross-references omit the section rather than pad it with tenuous links. ADR-0000 is exempt as bootstrap: it establishes the practice rather than demonstrating it.
 
+Amendment vs supersession: clarifying amendments that do not change the decided position MAY be made to a decided ADR in-place (typo and factual corrections, sharpening of practice that does not reverse the decision, context that was always implicit). Substantive overturns MUST go through supersession: the prior ADR moves to Superseded, and a new ADR with a new number records the new decision and references the old. The distinguishing test is whether the edit changes what the ADR decided or clarifies what it already decided; if the former, supersede; if the latter, amend in-place. This rule applies to ADRs only and is consistent with how IETF errata and PEP post-history handle equivalent cases; the LIP process has its own amendment rules per LIP-1.
+
 ## Consequences
 
 **Positive.**
