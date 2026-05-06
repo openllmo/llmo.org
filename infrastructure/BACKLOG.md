@@ -8,6 +8,21 @@ This document tracks deferred work, scheduled commitments, and open decisions fo
 
 ---
 
+## Track conventions
+
+Every backlog item carries a `**Track:**` field declaring the artifact the item is expected to produce. Four values:
+
+- **`lip`**: produces a LIP. Resolution goes through the LIP-1 process (DNS TXT proof of control for Standards Track, 7-day public discussion window with non-author response, editor-mediated review for Process and Informational types). The append-only LIP registry records the result.
+- **`adr`**: produces an ADR. Operational decision recorded in `content/adr/` per Nygard format. Cross-linking discipline per ADR-0000 applies (the ADR's `## References` section back-links to PRs and changelog versions where the decision is load-bearing).
+- **`changelog`**: produces a changelog entry but does not rise to the LIP threshold. Spec patches in this category are typo fixes, factual corrections, schema clarifications, and other editorial revisions that do not change normative content. Resolution is a commit that updates `content/spec/changelog.md`.
+- **`none`**: produces no documentation artifact. Operational work, dependency updates, infrastructure tweaks. Resolution is recorded in the COMPLETED section of this file with the resolving commit's SHA.
+
+When an item resolves, the resolving commit either includes a `Resolves: BACKLOG#item-id` line in its message or moves the item to the COMPLETED section of this file in the same commit. CI enforces this discipline for items tagged `lip`, `adr`, or `changelog` (see `.github/workflows/backlog-discipline.yml`).
+
+Existing items predate this convention and do not yet carry Track tags. New items added going forward include a `**Track:**` line at creation. Existing items get tags opportunistically when next touched. Backfilling all 30+ existing items in one pass is overengineering and likely to introduce error.
+
+---
+
 ## SCHEDULED COMMITMENTS (date-bound, must happen)
 
 ### 2026-07-15: Re-sign Diverse.org's llmo.json
