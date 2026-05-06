@@ -6,25 +6,91 @@ date: 2026-04-26
 
 ## About this changelog
 
-This changelog records substantive and editorial changes to the LLMO specification. Entries are grouped by version per the [versioning policy](/spec/versioning). Patch revisions within an active minor version are listed in reverse chronological order under that minor's entry.
+This changelog records substantive and editorial changes to the LLMO specification. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) with release sections grouped by patch version per the [versioning policy](/spec/versioning).
 
 During v0.1 pre-release, changes are author-decided and no governance window applies. From v0.2 forward, changes follow the LIP process and the editor applies editorial revisions per the [governance page](/about/governance).
 
-## v0.1
+## [Unreleased]
 
-**Published:** 2026-04-17.
+### Changed
+- Appendix B of the v0.1 specification document replaced with a pointer to this changelog. The standalone changelog at `/spec/changelog/` is the single source of truth for version history; the in-spec mirror was removed to eliminate drift.
 
-**Status:** active initial line. Currently being refined during the pre-v1 initial build per the versioning policy. The specification text, schema, and test vectors at `/spec/v0.1/` may receive author-decided revisions during this period. When v0.1 is superseded by v0.2, the path will be frozen.
+## [0.1.5] - 2026-05-05
 
-### Author-decided revisions in v0.1
+Per-claim signature verification and rule labeling pass. Documents conforming to v0.1.4 with document-level signatures only continue to conform under v0.1.5; X6 evaluates as PASS trivially for documents with no per-claim signatures. The live `llmo.json` at `/.well-known/llmo.json` was re-signed in a parallel ceremony to gain a per-claim signature on its disavowal claim, exercising the new rule end-to-end.
 
-- **2026-05-05 (v0.1.5):** Per-claim signature verification and rule labeling pass. Three corrections plus one new normative rule. First, §5.2 Standard tier and §5.3 Strict tier bullets gain explicit labels (S1-S6 and X1-X6 respectively) matching what conforming validators emit; the prior unlabeled bullets created cross-reference drift between spec text and validator output. Second, §5.3 splits the prior single "valid document-level signature" bullet into X1 (structural validity of the signature field including protected header decoding and alg/kid presence) and X5 (cryptographic verification of the signature against the publisher's JWKS). Third, §5.3 adds a new X6 rule requiring all present per-claim signatures to cryptographically verify; per-claim signatures MAY use a different kid than the document-level signature provided the kid resolves to a key in the same publisher JWKS. Fourth, §5.4 W1 and W2 warning codes are defined explicitly to match validator emission. §4.4 consumer verification algorithm gains a clarifying note on per-claim kid resolution. §7 worked example updated to show a per-claim signature on the disavowal claim with corresponding annotation. The live llmo.json document gains a per-claim signature on its disavowal claim in a parallel signing ceremony. Implementations conforming to v0.1.4 with document-level signatures only continue to conform under v0.1.5; X6 evaluates as PASS trivially for documents with no per-claim signatures.
-- **2026-05-01 (v0.1.4):** Schema completeness pass. Two corrections to `static/spec/v0.1/schema.json` closing prose-vs-schema drift identified by the v0.1.4 audit. First, `statement_identity.founded` gains a pattern constraint enforcing year (`YYYY`), year-month (`YYYY-MM`), or full RFC 3339 date (`YYYY-MM-DD`); previously the field accepted any string including free-text values like "yesterday". Second, `claim.type` now uses a `oneOf` requiring either exact match against the eight reserved core types defined in §3.5 (`identity`, `canonical_urls`, `official_channels`, `product_facts`, `personnel`, `disavowal`, `supersedes`, `pointer`) or a namespaced pattern with at least one dot per §3.6; previously the bare pattern accepted arbitrary lowercase strings as types, letting documents with malformed types parse as schema-valid even though no validator branch handled them. §3.6 prose tightened to make the bipartite "core or namespaced" rule explicit. No artifact changes required for the live llmo.json document. Implementations validating against the updated schema will reject documents that previously passed schema validation but contained malformed types or non-date `founded` values.
-- **2026-04-30 (v0.1.3):** S4 semantic alignment patch. Two corrections to §5.2 Standard tier S4 (URL ownership) rule. First, `personnel.spokespeople[].verification` no longer fails S4. Verification URLs are third-party identity attestation by design (the §3.5 example explicitly showed `https://github.com/thegigachav` as the canonical pattern, but the original S4 rule incorrectly flagged third-party attestation URLs as ownership violations). Second, `supersedes.superseded[].url` now correctly enforces ownership per v0.1.2's §3.5 Scope language; previously the validator marked the field as third-party-allowed and skipped the check. §5.2 S4 wording rewritten to enumerate third-party-allowed fields explicitly. §7 worked example annotation updated. No artifact changes required: the live llmo.json document is correct as-published.
-- **2026-04-30 (v0.1.2):** Security patch. §3.5 disavowal and supersedes claim types constrained to publisher self-statements, impersonation defense (disavowal), and publisher-controlled URLs (supersedes). Third-party-targeting claims that fall outside these scopes are out of conformance at Standard and Strict tiers. §5.2 gains a corresponding tier rule. §4.6 advisory updated to direct consumers on handling out-of-scope claims encountered in nonconforming documents. §7 worked example annotation clarified: the `unaffiliated_domain` entry is impersonation defense, not unconstrained third-party disavowal. §8.10 rewritten to remove the prior vulnerability disclosure framing; the residual reputation-layer work is now about scoring legitimate publishers, not mitigating closed attack vectors. Also includes Dragon 5 work: §4.6 expanded with trust-on-first-use semantics for JWKS, new §4.7 specifying consumer-side JWKS caching and key change handling. No schema, document, or signing changes. Documents valid under v0.1.1 that contain only self-targeting or impersonation-defense disavowal/supersedes claims remain valid under v0.1.2; documents that previously contained out-of-scope third-party disavowal/supersedes claims now fail Standard-tier conformance.
-- **2026-04-27 (v0.1.1):** Clarified §4.3 to specify standard (attached) JWS per RFC 7515 as the required signing mode. Prohibited detached-payload JWS (RFC 7797, `b64: false`); verifiers MUST reject documents whose protected header asserts `b64: false` or whose `crit` parameter is non-empty. Inserted new §4.3.1 (JWS payload encoding) and renumbered prior §4.3.1 (Canonicalization) to §4.3.2 and §4.3.2 (Publisher guidance) to §4.3.3. Tightened the schema at `/spec/v0.1/schema.json`: `signature.protected` description carries the `b64`/`crit` prohibition, and both `signature.protected` and `signature.signature` gain a `minLength: 16` floor. On-disk shape of the `signature` field is unchanged; the live document at `https://llmo.org/.well-known/llmo.json` and the published test vectors at `/spec/v0.1/test-vectors/` were already in standard mode and remain conforming without modification. Patch-level revision under §[Versioning] line 16 (editorial revisions, including clarification of ambiguous normative text); author-decided per the pre-release section.
-- **2026-04-22:** Removed em-dashes from specification text per authoring conventions (LIP-3). Renamed §8 from "Open Questions for v0.2" to "Open Questions for Future Versions" and retired version-specific commitments throughout the section. Added §8.11 covering post-quantum cryptographic readiness. Added adjacent anchor reference update in claims.mdx.
+### Added
+- §5.3 X6 rule requiring all present per-claim signatures to cryptographically verify against keys in the publisher's JWKS. Per-claim signatures MAY use a different `kid` than the document-level signature, provided the `kid` resolves to a key in the same publisher JWKS.
+- §5.4 W1 (validity window 181 to 365 days) and W2 (`personnel.spokespeople` entry without a `verification` URL) warning codes defined explicitly to match validator emission.
+- §4.4 consumer verification algorithm gains a clarifying note on per-claim `kid` resolution.
 
-## Initial release
+### Changed
+- §5.2 Standard tier bullets gain explicit S1 through S6 labels matching what conforming validators emit. Prior unlabeled bullets created cross-reference drift between spec text and validator output.
+- §5.3 Strict tier bullets gain explicit X1 through X6 labels for the same reason.
+- §5.3's prior single "valid document-level signature" bullet split into X1 (structural validity of the signature field including protected header decoding and `alg`/`kid` presence) and X5 (cryptographic verification of the signature against the publisher's JWKS).
+- §7 worked example updated to show a per-claim signature on the disavowal claim, with corresponding annotation.
 
-- **v0.1 (2026-04-17):** Initial publication of the LLMO specification.
+## [0.1.4] - 2026-05-01
+
+Schema completeness pass closing prose-vs-schema drift identified by audit. No artifact changes required for the live llmo.json. Implementations validating against the updated schema will reject documents that previously passed schema validation but contained malformed types or non-date `founded` values.
+
+### Fixed
+- `static/spec/v0.1/schema.json`: `statement_identity.founded` gains a pattern constraint enforcing year (`YYYY`), year-month (`YYYY-MM`), or full RFC 3339 date (`YYYY-MM-DD`). The field previously accepted any string, including free-text values like "yesterday".
+- `static/spec/v0.1/schema.json`: `claim.type` now uses a `oneOf` requiring either exact match against the eight reserved core types defined in §3.5 (`identity`, `canonical_urls`, `official_channels`, `product_facts`, `personnel`, `disavowal`, `supersedes`, `pointer`) or a namespaced pattern with at least one dot per §3.6. The prior bare pattern accepted arbitrary lowercase strings as types, letting documents with malformed types parse as schema-valid even though no validator branch handled them.
+
+### Changed
+- §3.6 prose tightened to make the bipartite "core or namespaced" claim type rule explicit.
+
+## [0.1.3] - 2026-04-30
+
+S4 (URL ownership) semantic alignment patch. No artifact changes required: the live llmo.json document is correct as-published.
+
+### Fixed
+- §5.2 S4 (URL ownership) no longer flags `personnel.spokespeople[].verification` as a violation. Verification URLs are third-party identity attestation by design; the §3.5 example explicitly showed `https://github.com/thegigachav` as the canonical pattern, but the original S4 rule incorrectly treated third-party attestation URLs as ownership violations.
+- §5.2 S4 now correctly enforces ownership on `supersedes.superseded[].url` per v0.1.2's §3.5 Scope language. The validator previously marked the field as third-party-allowed and skipped the check.
+
+### Changed
+- §5.2 S4 wording rewritten to enumerate third-party-allowed fields explicitly: `pointer.url`, `disavowal.disavowed[].url`, `official_channels.community[].url`, and `personnel.spokespeople[].verification`.
+- §7 worked example annotation on `personnel.spokespeople` updated to reflect the corrected rule.
+
+## [0.1.2] - 2026-04-30
+
+Security patch constraining disavowal and supersedes claim scope, plus consumer-side JWKS handling improvements. Documents valid under v0.1.1 that contain only self-targeting or impersonation-defense disavowal/supersedes claims remain valid under v0.1.2; documents that previously contained out-of-scope third-party disavowal/supersedes claims now fail Standard-tier conformance. No schema, document, or signing changes.
+
+### Security
+- §3.5 disavowal claim type constrained to publisher self-statements and impersonation defense. Third-party-targeting disavowals (claims about parties the publisher neither controls nor is being impersonated by) are out of conformance at Standard and Strict tiers.
+- §3.5 supersedes claim type constrained to URLs and documents the publisher controls or formerly controlled. Third-party-targeting supersedes claims are out of conformance at Standard and Strict tiers.
+- §5.2 gains a corresponding tier rule enforcing the scope constraints above.
+- §4.6 trust-on-first-use semantics for JWKS made explicit: domain control is the trust anchor, and first-fetch JWKS is trusted because it was served over HTTPS from a domain the publisher claims to control.
+- §4.7 (new) specifying consumer-side JWKS handling: caching cap of 24 hours matching §2.4, key change detection on unrecognized `kid`, and differential-fetch policy when sudden full key replacement is observed.
+
+### Changed
+- §4.6 advisory updated to direct consumers on handling out-of-scope claims encountered in nonconforming documents.
+- §7 worked example annotation clarified: the `unaffiliated_domain` entry is impersonation defense, not unconstrained third-party disavowal.
+- §8.10 rewritten to remove the prior vulnerability-disclosure framing. The residual reputation-layer work is now about scoring legitimate publishers, not mitigating closed attack vectors.
+
+## [0.1.1] - 2026-04-27
+
+Standard JWS clarification, RFC 7797 prohibition, and editorial cleanup folded forward from work landed 2026-04-22. On-disk shape of the `signature` field is unchanged; the live document at `https://llmo.org/.well-known/llmo.json` and the published test vectors at `/spec/v0.1/test-vectors/` were already in standard mode and remain conforming without modification.
+
+### Added
+- §4.3.1 (JWS payload encoding) specifying standard attached JWS per RFC 7515 as the required signing mode.
+- §8.11 covering post-quantum cryptographic readiness as an open question for future versions.
+
+### Changed
+- §4.3 clarified to require standard attached JWS per RFC 7515.
+- Prior §4.3.1 (Canonicalization) renumbered to §4.3.2.
+- Prior §4.3.2 (Publisher guidance) renumbered to §4.3.3.
+- §8 renamed from "Open Questions for v0.2" to "Open Questions for Future Versions"; version-specific commitments throughout the section retired.
+- Em-dashes removed from specification text per authoring conventions in LIP-3.
+- Adjacent anchor reference update in `claims.mdx`.
+- `static/spec/v0.1/schema.json`: `signature.protected` description carries the `b64`/`crit` prohibition. `signature.protected` and `signature.signature` gain a `minLength: 16` floor.
+
+### Security
+- Detached-payload JWS (RFC 7797, `b64: false`) prohibited. Verifiers MUST reject documents whose protected header asserts `b64: false` or whose `crit` parameter is non-empty.
+
+## [0.1.0] - 2026-04-17
+
+Initial publication of the LLMO specification.
+
+The v0.1 specification series is the active initial line. The specification text, schema, and test vectors at `/spec/v0.1/` may receive author-decided revisions during this period. When v0.1 is superseded by v0.2, the path will be frozen.
