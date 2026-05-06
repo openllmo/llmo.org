@@ -193,6 +193,40 @@ Don't say "this will take 5 minutes" if you don't know. Either give a range with
 
 ---
 
+## Backlog discipline
+
+`infrastructure/BACKLOG.md` is the durable list of deferred work and scheduled commitments. Two mechanical rules keep it from going stale (the COMPLETED section once drifted ten days behind merged work; the rules below replace honor-system tracking with CI enforcement).
+
+### Track conventions
+
+Every BACKLOG item declares a **Track** that names which artifact surface, if any, the work will produce. Defined in `infrastructure/BACKLOG.md` under "Track conventions". Four values:
+
+- `lip`: produces a new LIP under `content/spec/lips/`
+- `adr`: produces a new ADR under `content/adr/` (excluding ADR-0000, which is bootstrap)
+- `changelog`: produces a new `## [X.Y.Z]` version section in `content/spec/changelog.md`
+- `none`: no artifact surface (tooling, infrastructure, ceremonies, etc.)
+
+New items get a Track at creation. Existing items get one opportunistically when touched.
+
+### Resolves discipline
+
+When a commit adds an artifact-surface file (new ADR, new LIP, or a new `## [X.Y.Z]` changelog version section), it MUST do one of:
+
+1. include a `Resolves: BACKLOG#<item-id>` line in the commit message (case-insensitive on `Resolves`); or
+2. modify `infrastructure/BACKLOG.md` in the same commit (typically moving the item to COMPLETED).
+
+Modifications to existing ADRs, additions to the changelog `[Unreleased]` block, registry maintenance under `_index.md`, and changes to ADR-0000 are not artifact-creation events and do not trigger the rule. ADR amendment-vs-supersession is governed by `content/adr/0000-record-architecture-decisions.md`.
+
+`.github/workflows/backlog-discipline.yml` enforces the rule on every PR and push to main. The PR template (`.github/pull_request_template.md`) includes a checklist line so authors do the bookkeeping before CI has to.
+
+### Weekly activity digest
+
+`.github/workflows/weekly-digest.yml` runs every Monday at 13:00 UTC (= 09:00 US/Eastern in EDT) and writes `infrastructure/weekly-digest/YYYY-WNN.md` with commits from the previous full ISO week, categorized by file path (spec / LIP / ADR / BACKLOG / infra / other) plus summary statistics. The script is `scripts/weekly-digest.py`; pass `START_DATE END_DATE` (YYYY-MM-DD) to override the range. The workflow commits under `github-actions[bot]` and exits cleanly when nothing changed.
+
+The digest is a tripwire, not a deliverable: when artifact-producing work appears in the digest without a matching BACKLOG transition, that is a sign the discipline above slipped and needs a follow-up commit.
+
+---
+
 ## Cryptographic conventions
 
 ### Signing keys
