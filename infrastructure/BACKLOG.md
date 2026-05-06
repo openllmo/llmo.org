@@ -62,6 +62,93 @@ Async; they'll reply when they reply. Not blocking anything.
 
 ---
 
+## ANNOUNCEMENT BLOCKERS (gate the v0.1 announcement)
+
+Items in this section gate the v0.1 public-launch announcement. The conference (April 28) has happened; these items separate "we showed it" from "we shipped it." Sequence is not encoded in the order; sequencing is decided at the moment of work against current state.
+
+### Test vectors at /spec/v0.1/test-vectors/
+
+**Track:** `changelog` (resolution likely lands with a v0.1.6 cut bringing the vector set and any associated fixes to a clean closure)
+
+**Status:** Partial. `content/spec/v0.1/test-vectors.md` describes three vectors (unsigned-minimal, unsigned-standard, signed-strict) plus the JWKS and canonical payload. An announcement-grade vector set covers each conformance rule (S1-S6, X5, X6) with both pass and fail cases.
+
+**Estimate:** 6-10 hours, risk-adjusted to 12 if scope expands.
+
+**Why blocker:** Enables third-party self-certification without requiring the validator. Highest single-item leverage on announcement-readiness: implementers who would never run our validator can still verify their implementation against published vectors.
+
+**Scope:** Vectors covering Strict-pass, Strict-invalid-claim-signature, Strict-invalid-both-signatures, Standard-pass, Standard-failed-tier (one per S1-S6), schema-only failures, malformed-input failures. Use a published test JWKS distinct from production keys (the existing `signed-strict-key.json` is already labeled test-only).
+
+### Self-host AJV, ajv-formats, and canonicalize in validator
+
+**Track:** `none`
+
+**Status:** Not started. The validator at `static/js/validator.js` currently dynamic-imports `ajv@8/dist/2020.js`, `ajv-formats@3`, and `canonicalize@2.0.0` from `https://esm.sh/...` at runtime (verified at lines 157-160).
+
+**Estimate:** 1-2 hours, up to 3 if a build step is introduced.
+
+**Why blocker:** esm.sh is a runtime SPOF. If esm.sh is down, every validator load fails. For a tool whose product thesis is "publishers control their own identity," depending on a third-party CDN to verify their own conformance is structurally backwards. Bundle locally as static assets under `static/js/vendor/`.
+
+**Scope:** Download the three modules (correct ESM builds), place under `static/js/vendor/`, update `validator.js` to import via relative paths. Verify each tier vector still passes after the change. Supersedes the carry-over "Self-hosted AJV for the validator" item, with broader scope (all three packages, not just AJV).
+
+### CLI v0.1.5 npm release
+
+**Track:** `none`
+
+**Status:** Shipped to GitHub `main` as commit `c880fd0` in the llmo-cli repo (separate from this repo). Not yet published to the npm registry.
+
+**Estimate:** 1-2 hours, up to 4 if combined with npm provenance setup (see post-conference parallel-clock work).
+
+**Why blocker:** End users running `npm install -g llmo` get an older version. Closes the v0.1.5 user-facing story (per-claim signature verification, alg dispatch in the CLI).
+
+---
+
+## ANNOUNCEMENT CREDIBILITY (soft, not strict gating)
+
+Items in this section materially weaken external credibility if absent at announcement time, but do not strictly gate the announcement. A security-minded reviewer (including IETF Internet-Draft reviewers) hits these first when LLMO gets external attention.
+
+### ES384 and EdDSA support in validator
+
+**Track:** `none`
+
+**Status:** Spec §4.2 permits ES256, ES384, and EdDSA. Validator hardcodes ES256 in the X5 (per-claim) and X6 (document-level) signature paths. CLI already handles all three.
+
+**Estimate:** 3-5 hours, up to 7 if a library swap is needed.
+
+**Why credibility:** A reviewer who reads §4.2 and then runs an ES384-signed document through the validator gets a misleading failure. Reference implementation narrower than the spec is a soft credibility hit.
+
+**Scope:** Extend `verifyClaimSignature` and `verifyAndApplyX5X6` to read `alg` from the protected header and dispatch to the appropriate verification routine. Handle JWKS key-type matching (EC P-256, EC P-384, OKP Ed25519). Port the CLI's TypeScript verification logic into `validator.js` with WebCrypto-API adaptations.
+
+### SECURITY.md reconciliation
+
+**Track:** `none` (reclassified from notepad's `adr` proposal: this is operational reconciliation, not an architectural decision; channels and timelines are already committed)
+
+**Status:** SECURITY.md is reasonably complete (response timelines, safe harbor, scope, channels). Two unresolved drift points:
+
+1. Line 10 says validator source is in this repo (`static/js/validator.js`, `layouts/validator/`, verified accurate against current state).
+2. Line 30 references a separate `openllmo/llmo-validator` repo's advisory URL, implying the validator lives in a separate repo.
+
+These contradict. Line 10 is correct; line 30 either points at a stale plan or at a repo that has since been consolidated.
+
+**Estimate:** 1-2 hours.
+
+**Why credibility:** A reviewer who tries to file a private advisory follows the line 30 URL, hits a dead end, then has to figure out where to actually report. First-impression friction on the highest-stakes path (vulnerability disclosure).
+
+**Scope:** Verify `openllmo/llmo-validator` state. If the validator has fully consolidated into this repo, remove the separate-repo reference from line 30. Otherwise correct line 10. Verify the PGP key link at line 39 resolves.
+
+### Threat model document
+
+**Track:** `adr`
+
+**Status:** Implicit in §8 attack vectors, not documented as a standalone threat model.
+
+**Estimate:** 4-8 hours.
+
+**Why credibility:** IETF reviewers and security-minded readers routinely ask "where's the threat model?" before reading the spec. Having one document the answer raises signal-to-noise on early review passes.
+
+**Scope:** Document attacks LLMO defends against (existing §8.x prose), attacks it explicitly does NOT defend against (consumer-side attacks against publishers, social engineering of publishers, registrar-layer DNS attacks, etc.), and abuse surfaces (publisher reputation laundering, false disavowals, false supersessions, key compromise scenarios). Format as ADR per Nygard structure.
+
+---
+
 ## ACTIVE PRIORITIES (sequenced for upcoming work)
 
 ### Priority 14c: Diverse.org's own Hugo site
@@ -305,6 +392,164 @@ Async; they'll reply when they reply. Not blocking anything.
 
 ---
 
+### IETF Internet-Draft submission
+
+**Track:** `none`
+
+**Status:** Not submitted. Parallel-clock: long async wait; start now, complete async.
+
+**Estimate:** 4-6 hours to prepare the draft from existing v0.1 spec, plus IETF datatracker registration time.
+
+**Scope:** Working title `draft-chavez-llmo-protocol-00`. Convert v0.1 spec to xml2rfc or kramdown-rfc format. Submit via datatracker.ietf.org. Once submitted the draft becomes citable in formal contexts and assigns a tracking number.
+
+---
+
+### IANA RFC 8615 well-known URI registration
+
+**Track:** `none`
+
+**Status:** Not submitted.
+
+**Estimate:** 2-3 hours (forms and email).
+
+**Scope:** Register `/.well-known/llmo.json` per RFC 8615.
+
+---
+
+### IANA RFC 6838 media type registration
+
+**Track:** `none`
+
+**Status:** Not submitted.
+
+**Estimate:** 2-3 hours.
+
+**Scope:** Register `application/llmo+json` per RFC 6838.
+
+---
+
+### OpenSSF Scorecard activation
+
+**Track:** `none`
+
+**Status:** Not activated for openllmo repos.
+
+**Estimate:** 1 hour.
+
+**Why:** Signals project hygiene to security reviewers. Cosmetic on its own; the marker matters for credibility even when the underlying score is initially low.
+
+---
+
+### npm provenance via GitHub Actions
+
+**Track:** `none`
+
+**Status:** Not configured.
+
+**Estimate:** 2-3 hours.
+
+**Scope:** Sign npm packages from CI, attaching SLSA provenance attestations. Improves supply-chain credibility. May naturally bundle with the CLI v0.1.5 npm release work.
+
+---
+
+### GitHub branch protection on main
+
+**Track:** `none`
+
+**Status:** Unknown. Verify state on both `openllmo/llmo.org` and `openllmo/cli`.
+
+**Estimate:** 30 minutes once verified.
+
+**Scope:** Require PRs, require status checks, no force-push. Currently mostly enforced by convention; the rule should be mechanical, not honor-system.
+
+---
+
+### Defensive domain registrations
+
+**Track:** `none`
+
+**Status:** Not started. Distinct from the existing carry-over registrar transfer item: that was about consolidating already-owned domains under a single registrar; this is about preventing squatters on names not yet held.
+
+**Estimate:** 2-3 hours.
+
+**Scope:** Register `llmo.dev`, `llmo.io`, `llmo.protocol` (if available), anti-typosquatting variants (`llmoo.org`, `llmo-protocol.org`, etc.). Verify `llmo.com` status (Greyfront-operated). Park under the entity that holds the relevant brand: protocol-name variants under Diverse.org / team@diverse.org; commercial-product variants under Greyfront.
+
+---
+
+### Social handle reservations
+
+**Track:** `none`
+
+**Status:** Not started.
+
+**Estimate:** 1-2 hours.
+
+**Scope:** Reserve `@llmo` (or `@llmoprotocol` if `@llmo` is taken) across X, Bluesky, Mastodon, GitHub.
+
+---
+
+### Package registry reservations
+
+**Track:** `none`
+
+**Status:** Not started.
+
+**Estimate:** 1 hour.
+
+**Scope:** Reserve `llmo` on crates.io, PyPI, Docker Hub. Plus relevant scoped packages where naming conventions differ.
+
+---
+
+### GitHub `llmo` and npm `llmo` reclamation
+
+**Track:** `none`
+
+**Status:** Not started. Outcome depends on platform processes; likely weeks of waiting per platform.
+
+**Estimate:** Variable.
+
+**Scope:** If `llmo` is squatted on GitHub or npm, file reclamation requests through each platform's trademark/project-name policy.
+
+---
+
+### Author identity infrastructure
+
+**Track:** `none`
+
+**Status:** Not started.
+
+**Estimate:** 2-3 hours total.
+
+**Scope:** Create ORCID iD for Nic Chavez. IETF datatracker author profile. OpenSSF Best Practices badge for `openllmo/llmo.org`. These are durable cross-references that connect spec authorship to a portable identity not tied to any single platform.
+
+---
+
+### Claude Code skill for non-developer publishers (v0.2-class)
+
+**Track:** `none`
+
+**Status:** Not started. v0.2-class deliverable; not announcement-blocking.
+
+**Estimate:** 6-10 hours.
+
+**Why deferred:** Closes the gap between "publishers who can use the CLI" and "publishers who can use any LLM that knows about the skill." Strategic for adoption beyond the developer cohort.
+
+**Scope:** A guided workflow walking a non-technical organization through key generation, llmo.json drafting, signing, and deployment. Distributed via the standard Claude Code skills mechanism, adaptable to other agentic AI clients.
+
+---
+
+### CLI command coverage audit (v0.2-class)
+
+**Track:** `none`
+
+**Status:** Not started. v0.2-class scoping work.
+
+**Estimate:** 2-3 hours for the audit. Implementation of any missing commands is separate effort and gets new BACKLOG entries when prioritized.
+
+**Scope:** Read llmo-cli source. Enumerate every command actually implemented. Compare against publisher needs (init, keygen, sign, verify, validate-against-URL, rotate, revoke, deploy-helpers, help, version). Surface gaps. Identify command-line UX gaps (does `sign` accept stdin? does `verify` accept a URL or only a file?). Output is a recommendations document for the v0.2 cycle.
+
+---
+
 ### Carry-over from pre-handoff BACKLOG (2026-04-20 origin)
 
 These items were captured in the original repo-root `BACKLOG.md` on 2026-04-20 and predate the comprehensive handoff structure above. Preserved here verbatim. Most are low-to-medium priority; surface during post-conference cleanup or when a related task naturally touches them.
@@ -317,7 +562,6 @@ These items were captured in the original repo-root `BACKLOG.md` on 2026-04-20 a
 
 **Validator**
 
-- **Self-hosted AJV for the validator** (M): Eliminate esm.sh as a runtime single point of failure. Bundle AJV with the validator, serve from Cloudflare Pages alongside `index.html`. Added 2026-04-20.
 - **Defensive fallback cleanup in validator `index.html`** (L): Change `|| "none"` fallback in the `cls` assignment to `|| "fail"` so an undefined variant renders as red rather than unstyled. Latent, not currently triggered. Added 2026-04-20.
 - **Server-side validator on workerd** (L): A self-hostable validator service would unblock signature verification (JWKS fetch without CORS) and allow observing headers like `Cache-Control` on the JWKS response. Out of scope for v0.1. Added 2026-04-20.
 
@@ -354,6 +598,16 @@ The current S4 rule is "verification URLs must resolve to owned domain or be mar
 ### Verified-transaction review proof mechanism
 
 Concept: a cryptographic proof (zero-knowledge or equivalent) that a real transaction occurred between business X and customer Z, which entitles Z to publish a verifiable review of X. Investigation needed to determine whether this is a claim type LIP (publishers attest that review at URL Y is backed by transaction proof), a substantive future-version feature of LLMO, or a separate adjacent protocol that interoperates with LLMO. Originally surfaced 2026-04-22 during Priority 9 work; deferred pending clearer framing.
+
+### Key rotation and revocation
+
+**Track:** `lip`
+
+**Status:** Not started. Spec is currently silent on what happens when a publisher's private key is compromised. v0.2-class spec feature, not a v0.1 patch.
+
+**Estimate:** 8-12 hours total: spec language, `llmo rotate` and `llmo revoke` CLI commands, validator handling of revoked keys.
+
+**Scope:** A new LIP defines rotation and revocation semantics: how a publisher signals that a previous key is compromised, how validators discover and respect revocations, what the JWKS transition policy is during overlap windows. Resolution updates the spec series via the LIP-1 process plus CLI and validator implementation.
 
 ---
 
