@@ -538,6 +538,20 @@ These contradict. Line 10 is correct; line 30 either points at a stale plan or a
 
 ---
 
+### Codify squash-merge as the project convention in PR template and CLAUDE.md
+
+**Track:** `none`
+
+**Status:** Not started. Surfaced 2026-05-06 after the PR #33 / #34 / #35 sequence under enforced branch protection.
+
+**Estimate:** 30 minutes.
+
+**Why:** The PR is the unit of intent; one PR equals one logical change. Squash-merge collapses the back-and-forth mechanics of getting CI green (e.g., PR #34's two-commit thread to escape the validator's circular freshness check) into a single commit that reflects the intent. Two side benefits: (1) main's history reads as PRs rather than commits, matching how a human summarizes the week; (2) the weekly digest produces one entry per merge instead of multiplying entries for multi-commit PRs that don't add information.
+
+**Scope:** Update `.github/pull_request_template.md` to note that PRs are merged via squash. Update `CLAUDE.md`'s "Repository conventions" section (or add a short merge-strategy subsection) to codify the same. Optional: tighten the GitHub repo settings to disable merge-commit and rebase-merge as merge methods, leaving squash as the only available choice. The codification PR is itself a small follow-up; this BACKLOG item exists so the directive is not lost.
+
+---
+
 ### LIP registry as generated artifact
 
 **Track:** `none`
