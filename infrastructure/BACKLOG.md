@@ -538,6 +538,20 @@ These contradict. Line 10 is correct; line 30 either points at a stale plan or a
 
 ---
 
+### LIP registry as generated artifact
+
+**Track:** `none`
+
+**Status:** Not started. Surfaced 2026-05-06 by the LIP-3 frontmatter-vs-registry drift incident (PR #33 → PR #34, recorded in `infrastructure/LESSONS.md`).
+
+**Estimate:** 2-4 hours.
+
+**Why:** Eliminates a whole class of registry-vs-frontmatter drift that's currently honor-system. `static/spec/lips/index.json` mirrors state that is authoritative in `content/spec/lips/lip-NNNN.md` frontmatter; two surfaces, manual sync, predictable drift. The validate-lip-registry CI catches the drift but only after it has landed, and the freshness check is structurally circular (a registry-only commit shifts its own expected `generated` date forward). Generating the registry from frontmatter on demand makes the drift mechanically impossible.
+
+**Scope:** A script (or Hugo template, or pre-commit hook) reads each `content/spec/lips/lip-NNNN.md` frontmatter and builds `static/spec/lips/index.json`. Decision required: regenerate-on-build (file is gitignored, produced by Hugo on every build) vs regenerate-and-commit (file is checked in, mechanically refreshed by a script that's the only sanctioned way to modify it). External consumers (validators, downstream tooling) reference the published URL, so the file must exist at build output regardless. Once landed, the validate-lip-registry workflow's role narrows to checking semantic invariants, not freshness; the freshness check (currently circular for registry-only commits) can be retired or replaced with a content-hash check.
+
+---
+
 ### Carry-over from pre-handoff BACKLOG (2026-04-20 origin)
 
 These items were captured in the original repo-root `BACKLOG.md` on 2026-04-20 and predate the comprehensive handoff structure above. Preserved here verbatim. Most are low-to-medium priority; surface during post-conference cleanup or when a related task naturally touches them.

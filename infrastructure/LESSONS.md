@@ -35,3 +35,21 @@ Format: dated heading per entry, three subheadings (What / Why / Different). Mos
 **Why:** The kid (key identifier `diverse-2026-01`) is the cryptographic identifier and must stay stable across ceremonies. The on-disk filename, however, is local-only and can be anything the scripts agree on. Conflating the kid with the filename pushed kid-length pain into every command line.
 
 **Different:** Use short filenames inside date-versioned ceremony directories. The directory carries the date context (`~/llmo-key-ceremony-2026-MM-DD-vN/`); the filename inside it can be terse (`key.json`, `payload.json`, `signed.json`). Update `infrastructure/SIGNING-CEREMONY.md` to specify the short-filename convention and reserve the long, kid-bearing names for in-document fields where stability across ceremonies actually matters.
+
+---
+
+## 2026-05-06: Enforced CI catches drift on first contact
+
+**What:** The first PR under enforced branch protection (PR #33, branch protection docs) failed the `validate` required check due to LIP-3 registry/frontmatter drift that had been silently present since 2026-05-05. The LIP-3 status was transitioned `Draft → Final` in `content/spec/lips/lip-0003.md` frontmatter (and recorded in the transitions array), but the parallel mirror at `static/spec/lips/index.json` was never updated. The registry's `generated` field was also stale (2026-04-26 vs. an actual most-recent LIP commit on 2026-05-05). PR #33 had to wait while the drift was reconciled in PR #34.
+
+**Why:** Honor-system maintenance had been the convention. The LIP-3 transition updated the frontmatter but never propagated to the registry, and there was no mechanical check fail-loud about it until enforced CI made the validator's failure consequential. Without `enforce_admins: true` and required status checks, the validator was a workflow that ran but did not block; with both flipped on, latent drift surfaced immediately.
+
+A second-order observation: the validator's freshness check (`generated` must equal the most recent commit date for LIP files) is structurally circular for registry-only commits. Updating the registry to fix freshness shifts the latest-commit date forward to the registry-update commit itself, requiring the `generated` field to equal its own commit date. PR #34 needed two commits to thread through this (set to 2026-05-05, fail, bump to 2026-05-06 to match the new latest-commit-date, pass).
+
+**Different:** Two paths, additive:
+
+1. The registry should be regenerated from frontmatter rather than maintained as a parallel surface. A script or Hugo template builds `static/spec/lips/index.json` from each LIP file's frontmatter on demand, eliminating the manual-sync surface entirely. Tracked as a new BACKLOG item ("LIP registry as generated artifact"). Until that lands, the manual discipline of updating both surfaces in the same commit must hold, which the validate-registry CI enforces post-merge.
+
+2. The validator's freshness check should be reworked so that it does not require the file to know its own commit date. Options: drop the `generated` field check entirely (semantic equivalence is what matters, and the regenerate-from-frontmatter path makes mechanical drift impossible); or replace the date with a content hash of the LIP corpus (changes when LIPs change, computable without circular reference to the registry's own commit). Defer the rework decision until the regenerate-from-frontmatter direction is settled, since regeneration may obviate the freshness check entirely.
+
+The lesson behind both: enforced CI doesn't introduce drift, it surfaces it. The drift was already there, working as intended. The system did its job.
