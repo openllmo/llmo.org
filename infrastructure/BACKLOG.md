@@ -452,18 +452,6 @@ These contradict. Line 10 is correct; line 30 either points at a stale plan or a
 
 ---
 
-### GitHub branch protection on main
-
-**Track:** `none`
-
-**Status:** Unknown. Verify state on both `openllmo/llmo.org` and `openllmo/cli`.
-
-**Estimate:** 30 minutes once verified.
-
-**Scope:** Require PRs, require status checks, no force-push. Currently mostly enforced by convention; the rule should be mechanical, not honor-system.
-
----
-
 ### Defensive domain registrations
 
 **Track:** `none`
@@ -653,6 +641,10 @@ Concept: a cryptographic proof (zero-knowledge or equivalent) that a real transa
 ## COMPLETED (chronological, most recent first)
 
 This section grows over time. Move items here when done.
+
+### 2026-05-06
+
+- ✅ Branch protection on `main` for `openllmo/llmo.org` (applied via `gh api`; ruleset documented in `infrastructure/branch-protection.json` and `infrastructure/branch-protection.md`). Required checks: `check`, `validate`. `enforce_admins: true`. `openllmo/cli` protection still pending; tracked separately if not already covered.
 
 ### 2026-04-26 to 2026-04-27
 
