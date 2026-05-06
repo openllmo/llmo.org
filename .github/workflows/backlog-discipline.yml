@@ -1,0 +1,121 @@
+name: Backlog Discipline
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine commit range
+        id: range
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BASE_SHA=$(git merge-base "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}")
+            echo "base=$BASE_SHA" >> "$GITHUB_OUTPUT"
+            echo "head=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "base=${{ github.event.before }}" >> "$GITHUB_OUTPUT"
+            echo "head=${{ github.event.after }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check commits for backlog tie
+        env:
+          BASE: ${{ steps.range.outputs.base }}
+          HEAD: ${{ steps.range.outputs.head }}
+        run: |
+          set -euo pipefail
+
+          # Initial-push case: GitHub sends all-zeroes "before" SHA when a branch
+          # is first created. Nothing to check.
+          if [[ "$BASE" == "0000000000000000000000000000000000000000" ]]; then
+            echo "Initial push to branch; no commit range to check."
+            exit 0
+          fi
+
+          COMMITS=$(git log --format='%H' "$BASE..$HEAD" 2>/dev/null || true)
+          if [[ -z "$COMMITS" ]]; then
+            echo "No commits in range $BASE..$HEAD."
+            exit 0
+          fi
+
+          FAIL=0
+
+          for SHA in $COMMITS; do
+            TRIGGERS=()
+
+            # New ADR or LIP file (status A only). ADR-0000 is allowlisted as
+            # bootstrap registry maintenance per ADR-0000's own carve-out.
+            while IFS=$'\t' read -r status file _; do
+              [[ -z "${status:-}" ]] && continue
+              if [[ "$status" == "A" ]]; then
+                if [[ "$file" =~ ^content/adr/[0-9]{4}-.+\.md$ ]] && [[ "$file" != "content/adr/0000-record-architecture-decisions.md" ]]; then
+                  TRIGGERS+=("new ADR: $file")
+                fi
+                if [[ "$file" =~ ^content/spec/lips/lip-[0-9]{4}\.md$ ]]; then
+                  TRIGGERS+=("new LIP: $file")
+                fi
+              fi
+            done < <(git show --name-status --pretty=format: "$SHA")
+
+            # New changelog version section (a "## [X.Y.Z]" header added in the
+            # diff). Modifications to existing sections, additions to the
+            # [Unreleased] block, or cross-reference backfills do not trigger;
+            # the cut-to-version commit fires the rule and ties to backlog.
+            if git show --pretty=format: "$SHA" -- content/spec/changelog.md 2>/dev/null \
+              | grep -E '^\+## \[' \
+              | grep -vE '^\+## \[Unreleased\]' > /dev/null 2>&1; then
+              TRIGGERS+=("new changelog version section in content/spec/changelog.md")
+            fi
+
+            if [[ ${#TRIGGERS[@]} -eq 0 ]]; then
+              continue
+            fi
+
+            # Triggered. Commit must satisfy one of:
+            # (a) message contains a line matching ^Resolves: BACKLOG (case-insensitive on Resolves)
+            # (b) commit also touches infrastructure/BACKLOG.md
+            MSG=$(git log -1 --format=%B "$SHA")
+
+            HAS_RESOLVES=0
+            if echo "$MSG" | grep -iE '^Resolves: BACKLOG' > /dev/null 2>&1; then
+              HAS_RESOLVES=1
+            fi
+
+            HAS_BACKLOG_MOD=0
+            if git show --name-only --pretty=format: "$SHA" | grep -Fxq 'infrastructure/BACKLOG.md'; then
+              HAS_BACKLOG_MOD=1
+            fi
+
+            TRIGGER_LIST=$(IFS='; '; echo "${TRIGGERS[*]}")
+
+            if [[ $HAS_RESOLVES -eq 0 ]] && [[ $HAS_BACKLOG_MOD -eq 0 ]]; then
+              echo "::error::Commit $SHA produces an artifact ($TRIGGER_LIST) but has no 'Resolves: BACKLOG...' line in its message and does not modify infrastructure/BACKLOG.md. Artifact-producing commits must back-link to a BACKLOG item or move it to COMPLETED in the same commit. See infrastructure/BACKLOG.md Track conventions and content/adr/0000-record-architecture-decisions.md cross-linking discipline."
+              FAIL=1
+            else
+              echo "OK: $SHA produces $TRIGGER_LIST; backlog tie satisfied"
+            fi
+          done
+
+          if [[ $FAIL -ne 0 ]]; then
+            echo ""
+            echo "One or more commits failed the backlog discipline check."
+            echo "Fix: amend the offending commits with a 'Resolves: BACKLOG#<item>' line in the message,"
+            echo "or move the corresponding backlog item to the COMPLETED section of infrastructure/BACKLOG.md in the same commit."
+            exit 1
+          fi
+
+          echo "All commits in range satisfy the backlog discipline."
