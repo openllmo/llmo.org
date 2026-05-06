@@ -75,15 +75,15 @@ Standard JWS clarification, RFC 7797 prohibition, and editorial cleanup folded f
 
 ### Added
 - §4.3.1 (JWS payload encoding) specifying standard attached JWS per RFC 7515 as the required signing mode.
-- §8.11 covering post-quantum cryptographic readiness as an open question for future versions.
+- §8.11 covering post-quantum cryptographic readiness as an open question for future versions. (#24)
 
 ### Changed
 - §4.3 clarified to require standard attached JWS per RFC 7515.
 - Prior §4.3.1 (Canonicalization) renumbered to §4.3.2.
 - Prior §4.3.2 (Publisher guidance) renumbered to §4.3.3.
-- §8 renamed from "Open Questions for v0.2" to "Open Questions for Future Versions"; version-specific commitments throughout the section retired.
-- Em-dashes removed from specification text per authoring conventions in LIP-3.
-- Adjacent anchor reference update in `claims.mdx`.
+- §8 renamed from "Open Questions for v0.2" to "Open Questions for Future Versions"; version-specific commitments throughout the section retired. (#24)
+- Em-dashes removed from specification text per authoring conventions in LIP-3. (#24)
+- Adjacent anchor reference update in `claims.mdx`. (#24)
 - `static/spec/v0.1/schema.json`: `signature.protected` description carries the `b64`/`crit` prohibition. `signature.protected` and `signature.signature` gain a `minLength: 16` floor.
 
 ### Security
