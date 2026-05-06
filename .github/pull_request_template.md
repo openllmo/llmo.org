@@ -20,7 +20,7 @@ _Link to the issue this PR addresses, if applicable._
 - [ ] Commit messages follow conventional commit style
 - [ ] No em dashes in new or modified content
 - [ ] No marketing language
-- [ ] Mintlify build passes locally (`mintlify dev`)
+- [ ] Hugo build passes locally (`hugo --minify`)
 - [ ] Internal links resolve
 - [ ] If modifying normative spec text, the 14-day discussion period has started or completed
 - [ ] If adding an extension registration, the extension proposal issue has been accepted

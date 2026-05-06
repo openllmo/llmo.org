@@ -65,7 +65,7 @@ The exact UTF-8 bytes of the JCS-canonicalized payload that was signed (that is,
 
 Raw: [`/spec/v0.1/test-vectors/signed-strict-payload.json`](/spec/v0.1/test-vectors/signed-strict-payload.json)
 
-> **Note:** The file is served with a `.json` extension because Mintlify's default static-asset handler serves `.json` but not `.txt`. The content is a valid canonical JSON object by construction (that is what JCS produces), so the `.json` extension is accurate. Implementers compare the file byte-for-byte; the extension does not change the comparison.
+> **Note:** The file is served with a `.json` extension. The content is a valid canonical JSON object by construction (that is what JCS produces), so the `.json` extension is accurate. Implementers compare the file byte-for-byte; the extension does not change the comparison.
 
 ## Verifying the signed vector
 
