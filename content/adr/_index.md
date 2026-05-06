@@ -14,6 +14,7 @@ ADRs differ from LIPs in scope. [LIPs](/spec/lips/) propose changes to the LLMO 
 | Number | Title | Author | Status | Date |
 | --- | --- | --- | --- | --- |
 | [ADR-0000](/adr/0000-record-architecture-decisions/) | Record architecture decisions | Nic Chavez | Accepted | 2026-05-06 |
+| [ADR-0001](/adr/0001-two-entity-firewall/) | Two-entity firewall between protocol stewardship and commercial activity | Nic Chavez | Accepted | 2026-05-06 |
 
 ## Format
 
