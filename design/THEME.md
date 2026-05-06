@@ -4,8 +4,9 @@ Internal working notes for site aesthetic. Not published to the site.
 
 ## Status
 
-Pass 1 (content and structure) is the current pass. No theme work in this pass.
-Pass 2 (aesthetic) will implement the target properties below via Mintlify Global CSS.
+**SUPERSEDED.** This Pass 2 plan was authored against Mintlify's templating constraints (Mintlify Global CSS, `docs.json` schema limits on color keys). The project migrated to Hugo + Cloudflare Pages on 2026-04-26, and the Mintlify-specific implementation notes below are no longer applicable.
+
+The remaining content is preserved as a historical record of what was once contemplated. When Pass 2 (aesthetic) actually starts, a new design document will be written from current ground truth: Hugo's templating, the `static/css/` structure, and any design intent that survives a fresh review. Do not implement Pass 2 from this document.
 
 ## Colors
 
