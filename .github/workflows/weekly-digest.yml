@@ -1,0 +1,76 @@
+name: Weekly Digest
+
+on:
+  schedule:
+    # Mondays 13:00 UTC = 09:00 US/Eastern (EDT). In EST this becomes 08:00.
+    # The choice of fixed-UTC over fixed-Eastern is intentional: cron has no
+    # DST awareness, and UTC is the project's reference time zone.
+    - cron: '0 13 * * 1'
+  workflow_dispatch:
+    inputs:
+      start_date:
+        description: 'Start date (YYYY-MM-DD, inclusive). Leave blank for previous ISO week.'
+        required: false
+      end_date:
+        description: 'End date (YYYY-MM-DD, inclusive). Leave blank for previous ISO week.'
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    name: generate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Generate digest
+        id: gen
+        env:
+          START_DATE: ${{ inputs.start_date }}
+          END_DATE: ${{ inputs.end_date }}
+        run: |
+          set -euo pipefail
+          if [[ -n "${START_DATE:-}" && -n "${END_DATE:-}" ]]; then
+            python3 scripts/weekly-digest.py "$START_DATE" "$END_DATE"
+          elif [[ -n "${START_DATE:-}" || -n "${END_DATE:-}" ]]; then
+            echo "::error::Provide both start_date and end_date, or neither."
+            exit 1
+          else
+            python3 scripts/weekly-digest.py
+          fi
+
+      - name: Commit and push if changed
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          git add infrastructure/weekly-digest/
+          if git diff --cached --quiet; then
+            echo "No digest changes to commit."
+            exit 0
+          fi
+
+          # Identify the digest file that changed for the commit message.
+          CHANGED=$(git diff --cached --name-only -- 'infrastructure/weekly-digest/*.md' | head -n1)
+          if [[ -n "$CHANGED" ]]; then
+            BASENAME=$(basename "$CHANGED" .md)
+            YEAR="${BASENAME%-W*}"
+            WEEK="${BASENAME#*-W}"
+            MSG="digest: week ${WEEK} of ${YEAR}"
+          else
+            MSG="digest: weekly digest update"
+          fi
+
+          git commit -m "$MSG"
+          git push
