@@ -38,6 +38,8 @@ The ADR directory is append-only. Numbers, once committed, are never reused. A d
 
 LIP-vs-ADR scope rule: a decision that changes `content/spec/` is a LIP candidate. A decision that changes `infrastructure/` or operational practice is an ADR candidate. When a single decision touches both, the LIP is authoritative and the ADR (if needed for operational context) cross-references it.
 
+Cross-linking discipline: from ADR-0001 onward, operational ADRs include a `## References` section listing relevant pull requests and changelog versions where the decision is load-bearing or visible. Cross-references use immutable identifiers (PR numbers, changelog version anchors) so they remain valid as the project evolves. ADRs with no applicable cross-references omit the section rather than pad it with tenuous links. ADR-0000 is exempt as bootstrap: it establishes the practice rather than demonstrating it.
+
 ## Consequences
 
 **Positive.**
