@@ -78,18 +78,6 @@ Items in this section gate the v0.1 public-launch announcement. The conference (
 
 **Scope:** Vectors covering Strict-pass, Strict-invalid-claim-signature, Strict-invalid-both-signatures, Standard-pass, Standard-failed-tier (one per S1-S6), schema-only failures, malformed-input failures. Use a published test JWKS distinct from production keys (the existing `signed-strict-key.json` is already labeled test-only).
 
-### Self-host AJV, ajv-formats, and canonicalize in validator
-
-**Track:** `none`
-
-**Status:** Not started. The validator at `static/js/validator.js` currently dynamic-imports `ajv@8/dist/2020.js`, `ajv-formats@3`, and `canonicalize@2.0.0` from `https://esm.sh/...` at runtime (verified at lines 157-160).
-
-**Estimate:** 1-2 hours, up to 3 if a build step is introduced.
-
-**Why blocker:** esm.sh is a runtime SPOF. If esm.sh is down, every validator load fails. For a tool whose product thesis is "publishers control their own identity," depending on a third-party CDN to verify their own conformance is structurally backwards. Bundle locally as static assets under `static/js/vendor/`.
-
-**Scope:** Download the three modules (correct ESM builds), place under `static/js/vendor/`, update `validator.js` to import via relative paths. Verify each tier vector still passes after the change. Supersedes the carry-over "Self-hosted AJV for the validator" item, with broader scope (all three packages, not just AJV).
-
 ### CLI v0.1.5 npm release
 
 **Track:** `none`
@@ -669,6 +657,10 @@ Concept: a cryptographic proof (zero-knowledge or equivalent) that a real transa
 ## COMPLETED (chronological, most recent first)
 
 This section grows over time. Move items here when done.
+
+### 2026-05-07
+
+- ✅ Validator self-hosts `ajv@8.20.0/dist/2020`, `ajv-formats@3.0.1`, and `canonicalize@2.0.0` (plus the three transitive deps `fast-deep-equal`, `fast-uri`, `json-schema-traverse` and the `ajv` main + `codegen` subpaths) under `static/js/vendor/`. Eliminates esm.sh as a runtime SPOF. All three v0.1 test vectors produce identical results before and after (verified by playwright harness against hugo serve, both branches).
 
 ### 2026-05-06
 
