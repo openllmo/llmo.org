@@ -154,9 +154,9 @@
 
   function loadAjvDynamic() {
     return Promise.all([
-      import("https://esm.sh/ajv@8/dist/2020.js"),
-      import("https://esm.sh/ajv-formats@3"),
-      import("https://esm.sh/canonicalize@2.0.0")
+      import("/js/vendor/ajv/ajv2020.mjs"),
+      import("/js/vendor/ajv-formats/ajv-formats.mjs"),
+      import("/js/vendor/canonicalize/canonicalize.mjs")
     ]).then(function (mods) { return { ajvMod: mods[0], formatsMod: mods[1], canonMod: mods[2] }; });
   }
 
@@ -170,9 +170,9 @@
         "(async () => {\n" +
         "  try {\n" +
         "    const [ajvMod, formatsMod, canonMod] = await Promise.all([\n" +
-        "      import('https://esm.sh/ajv@8/dist/2020.js'),\n" +
-        "      import('https://esm.sh/ajv-formats@3'),\n" +
-        "      import('https://esm.sh/canonicalize@2.0.0')\n" +
+        "      import('/js/vendor/ajv/ajv2020.mjs'),\n" +
+        "      import('/js/vendor/ajv-formats/ajv-formats.mjs'),\n" +
+        "      import('/js/vendor/canonicalize/canonicalize.mjs')\n" +
         "    ]);\n" +
         "    window.__llmo_validator_ajv = { ajvMod, formatsMod, canonMod };\n" +
         "    window.dispatchEvent(new CustomEvent('__llmo_validator_ajv_ready'));\n" +
