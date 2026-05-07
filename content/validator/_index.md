@@ -23,3 +23,5 @@ That last check is what makes the protocol useful. A signed `llmo.json` proves t
 It does not prove the publisher's claims are *true* (see [§4.6 What trust does not mean](/spec/v0.1#46-what-trust-does-not-mean)). The validator gives you cryptographic confirmation of authorship, not adjudication of accuracy.
 
 The validator runs in your browser. The publisher's public key file (JWKS) is fetched server-side via a Cloudflare Pages Function on llmo.org to bypass cross-origin restrictions; no document content is uploaded to llmo.org.
+
+Browser support note: EdDSA (Ed25519) signature verification requires WebCrypto Ed25519 support, available in Chrome 113+, Firefox 130+, and Safari 17+. Older browsers can still validate ES256-signed and ES384-signed documents normally; EdDSA-signed documents on unsupporting browsers report "browser limitation" rather than a signature failure, since the document itself isn't broken. If you hit that case, try a current browser or use the [LLMO CLI](https://www.npmjs.com/package/llmo) for verification.
