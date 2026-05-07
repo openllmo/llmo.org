@@ -15,7 +15,7 @@ Applied 2026-05-06. Verified by `gh api repos/openllmo/llmo.org/branches/main/pr
 | Field | Value |
 |---|---|
 | `required_status_checks.strict` | `true` |
-| `required_status_checks.contexts` | `["check", "validate"]` |
+| `required_status_checks.contexts` | `["check", "validate", "check-urls"]` |
 | `enforce_admins` | `true` |
 | `required_pull_request_reviews` | `null` |
 | `required_signatures` | `false` |
@@ -30,12 +30,13 @@ Applied 2026-05-06. Verified by `gh api repos/openllmo/llmo.org/branches/main/pr
 
 ## Why each rule
 
-### `required_status_checks.contexts: ["check", "validate"]`
+### `required_status_checks.contexts: ["check", "validate", "check-urls"]`
 
 These are the exact check names reported by the GitHub Actions API on `pull_request` runs:
 
 - `check`: the job in `.github/workflows/backlog-discipline.yml`. Enforces that artifact-producing commits include a `Resolves: BACKLOG#item-id` line or modify `infrastructure/BACKLOG.md` in the same commit.
 - `validate`: the job in `.github/workflows/validate-lip-registry.yml`. Validates the LIP registry's six invariants (generated freshness, file/registry agreement, frontmatter agreement, etc.).
+- `check-urls`: the job in `.github/workflows/check-doc-urls.yml`. Verifies that every external URL referenced in scoped documents (currently `SECURITY.md`) resolves: for `llmo.org`-hosted URLs, the corresponding path must exist in the locally-built Hugo output (catches publishing-path drift on the PR itself); for external URLs, an HTTP HEAD or GET must return 2xx. The script is `scripts/check-doc-urls.sh`. The check was added 2026-05-07 after a Hugo-migration-era directory mismatch silently broke the SECURITY.md PGP key URL for 11 days; mechanically gating documented URLs makes that class of bug impossible to reach `main`.
 
 These are the names as reported by GitHub, not the workflow filenames. GitHub matches required-checks against the check name from the workflow run, not the workflow file. Mismatched names silently fail to enforce.
 

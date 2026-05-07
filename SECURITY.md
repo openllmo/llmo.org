@@ -27,7 +27,8 @@ Please use one of the following channels, in order of preference:
 The fastest path. Navigate to the Security tab of the affected repository and click "Report a vulnerability":
 
 - [openllmo/llmo.org](https://github.com/openllmo/llmo.org/security/advisories/new)
-- [openllmo/llmo-validator](https://github.com/openllmo/llmo-validator/security/advisories/new)
+
+The validator was originally developed in `openllmo/llmo-validator` and hosted at validate.llmo.org. That repository is preserved as a historical reference but is no longer maintained: the validator was consolidated into this repository on 2026-04-26 (see `static/js/validator.js` and `layouts/validator/`). Vulnerability reports for the validator should be filed against `openllmo/llmo.org`.
 
 This creates a private report visible only to repository maintainers. No account linking or email setup is required beyond a standard GitHub account.
 
