@@ -501,6 +501,63 @@ Items in this section materially weaken external credibility if absent at announ
 
 ---
 
+### Org-level workflow permissions for PR-creating workflows
+
+**Track:** `none` (operator-action documentation, not pending engineering work)
+
+**Status:** Enabled 2026-05-07 on both `openllmo/llmo.org` and `openllmo/cli`. Both repos are explicitly at `default_workflow_permissions: write` and `can_approve_pull_request_reviews: true`. Verifiable via `gh api repos/<owner>/<repo>/actions/permissions/workflow`.
+
+**Why:** The `weekly-digest.yml` and `sunday-audit.yml` workflows create PRs from `github-actions[bot]` to comply with the enforced branch protection on `main`. PR creation by GitHub Actions requires two settings under `https://github.com/organizations/openllmo/settings/actions` (org level) AND the corresponding repo-level fields:
+
+1. Workflow permissions: "Read and write permissions"
+2. "Allow GitHub Actions to create and approve pull requests": checked
+
+The org-level setting unlocks the repo-level setting; the repo-level setting must also be flipped explicitly (the org toggle does not auto-propagate to repos). If the openllmo org is migrated, restructured, has its security defaults reset, or is recreated, both levels must be re-enabled or both scheduled workflows will silently fail at the PR-creation step.
+
+**Detection signal:** A scheduled run of either workflow that completes without committing its output file, or a workflow run log containing `pull request create failed: GitHub Actions is not permitted to create or approve pull requests`.
+
+**Recovery action:** Re-enable both org-level settings per the URL above. Then for each affected repo: `gh api -X PUT repos/<owner>/<repo>/actions/permissions/workflow -F can_approve_pull_request_reviews=true -f default_workflow_permissions=write`.
+
+**Why this is BACKLOG and not LESSONS:** Forward-looking operational dependency, not a past failure. LESSONS captures what went wrong; BACKLOG captures what needs to remain true.
+
+---
+
+### GitHub App for workflow PR creation
+
+**Track:** `none` (operational tooling)
+
+**Status:** Not started. Surfaced 2026-05-07 during PR #48 verification: PRs created via `GITHUB_TOKEN` do not trigger `pull_request`-event workflows (GitHub's anti-recursion safeguard). The `weekly-digest.yml` and `sunday-audit.yml` workflows currently create PRs that sit open with no required-check status; auto-merge is queued but never fires because the checks do not run. Until this BACKLOG item lands, scheduled runs require ~30 seconds of operator close-reopen-merge intervention to land the PR (close the PR via UI or `gh api PATCH`, reopen it, the close-reopen counts as a user action and triggers the required checks, then manually merge after they pass).
+
+**Estimate:** 2-3 hours.
+
+**Why this fix and not the alternatives:** A Personal Access Token works mechanically (PAT-authenticated PRs trigger workflows) but ties auth to the operator's identity, requires rotation, and does not survive steward transitions. A `pull_request_target` trigger swap on the required-check workflows works mechanically but creates a wrong security posture for a project designed to accept external contributions via LIP-1's discussion window (`pull_request_target` runs in base-repo context with secrets available; appropriate for trusted internal flows but inappropriate as the default trigger for checks that gate untrusted contributor PRs). A GitHub App owned by the openllmo organization is the durable institutional solution: App identity is fungible across stewards, no token rotation, App-created PRs do trigger workflows.
+
+**Scope:**
+
+1. Register a GitHub App at `https://github.com/organizations/openllmo/settings/apps/new`. Name: `llmo-workflow-bot` or similar. Owned by the `openllmo` organization, not by any individual user.
+
+2. Permissions: contents (write), pull-requests (write), issues (write), metadata (read). No webhook, no organization permissions, no user permissions.
+
+3. Install the App on `openllmo/llmo.org` and `openllmo/cli`.
+
+4. Generate a private key. Store the App ID and private key as repository secrets in `openllmo/llmo.org`:
+   - `LLMO_WORKFLOW_BOT_APP_ID` (numeric)
+   - `LLMO_WORKFLOW_BOT_PRIVATE_KEY` (PEM contents)
+
+   Same secrets in `openllmo/cli` if its workflows ever need the same App.
+
+5. Update `.github/workflows/weekly-digest.yml` and `.github/workflows/sunday-audit.yml` to mint an installation token via `actions/create-github-app-token@v1` and use that token as `GH_TOKEN` for the `gh pr create` step (only that step; branch creation, commit, and push continue using `GITHUB_TOKEN`).
+
+6. Verify both workflows by manual `workflow_dispatch`. Expected: PR creates, required checks fire, checks pass, auto-merge fires, PR merges.
+
+**Stop conditions:** GitHub App registration UI changes from what the prompt assumes (halt and re-prompt). `actions/create-github-app-token@v1` deprecated or breaking-changed (halt and confirm major version). App-token-authenticated PR still doesn't trigger required checks (deeper auth issue, halt). App permissions insufficient (halt for operator action since changing App permissions requires re-installation). Auto-merge still doesn't fire even with required checks passing (separate issue, halt).
+
+**Detection signal that this regresses later:** Workflow PR created but required checks do not run (same symptom as the 2026-05-07 failure).
+
+**Recovery action:** Verify the App is still installed on the repo (`gh api repos/<owner>/<repo>/installation`). Regenerate the App private key if expired or revoked, refresh the repo secrets.
+
+---
+
 ### Carry-over from pre-handoff BACKLOG (2026-04-20 origin)
 
 These items were captured in the original repo-root `BACKLOG.md` on 2026-04-20 and predate the comprehensive handoff structure above. Preserved here verbatim. Most are low-to-medium priority; surface during post-conference cleanup or when a related task naturally touches them.
