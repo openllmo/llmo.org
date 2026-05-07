@@ -16,6 +16,30 @@
   var ajvValidate = null;
   var canonicalizeFn = null;
 
+  // WebCrypto Ed25519 support landed in Chrome 113, Firefox 130, Safari 17.
+  // Older browsers throw at importKey when handed an Ed25519 JWK. We probe
+  // once at validator init using a real public-key x value taken from the
+  // signed-strict-eddsa test vector (any real Ed25519 public key works for
+  // the probe; we use a known-good one so the call is realistic).
+  // The result is cached and consulted by the alg dispatch so EdDSA-signed
+  // documents on unsupporting browsers surface a clear "browser limitation"
+  // rather than a cryptic key_import_failed.
+  var ed25519Supported = null;
+  var ED25519_PROBE_JWK = { kty: "OKP", crv: "Ed25519", x: "Kb76hE4jcM-lJeAUR7LMD9_FHBNcRIpQ5p6yWfKGGXw", ext: true };
+
+  async function detectEd25519Support() {
+    // Test override hook for harness-driven simulation of old browsers.
+    if (typeof window !== "undefined" && window.__llmo_force_ed25519_unsupported === true) {
+      return false;
+    }
+    try {
+      await crypto.subtle.importKey("jwk", ED25519_PROBE_JWK, { name: "Ed25519" }, false, ["verify"]);
+      return true;
+    } catch (_e) {
+      return false;
+    }
+  }
+
   var jwksCache = {};
 
   function resetJwksCache() {
@@ -227,6 +251,10 @@
       addFormats(ajv);
       ajvValidate = ajv.compile(schema);
       canonicalizeFn = canon;
+    }).then(function () {
+      return detectEd25519Support().then(function (supported) {
+        ed25519Supported = supported;
+      });
     });
   }
 
@@ -659,6 +687,12 @@
     if (!params) {
       return { applicable: true, verified: false, error: "unsupported_alg", alg: header.alg };
     }
+    // Browser-side limitation: Ed25519 needs WebCrypto support that older
+    // browsers lack. Surface as a distinct error so the result handling
+    // treats it as "we can't tell" rather than "signature is bad."
+    if (header.alg === "EdDSA" && ed25519Supported === false) {
+      return { applicable: true, verified: false, error: "eddsa_unsupported_by_browser", alg: header.alg };
+    }
 
     var jwksResult = await fetchJwksOnce(urlContext);
     if (jwksResult.error) {
@@ -732,6 +766,9 @@
       } else if (sigResult.error === "jwks_unreachable" || sigResult.error === "jwks_fetch_failed") {
         x5Status = "SKIP";
         x5Note = "could not fetch JWKS for verification: " + (sigResult.detail || sigResult.error);
+      } else if (sigResult.error === "eddsa_unsupported_by_browser") {
+        x5Status = "SKIP";
+        x5Note = "this browser does not support EdDSA verification (requires Chrome 113+, Firefox 130+, or Safari 17+); signature could not be verified, but this is a browser limitation, not a document defect";
       } else {
         x5Status = "FAIL";
         x5Note = "signature verification failed: " + sigResult.error + (sigResult.detail ? " (" + sigResult.detail + ")" : "");
@@ -760,7 +797,11 @@
           if (cResult.applicable) {
             if (cResult.verified) {
               // verified
-            } else if (cResult.error === "jwks_unreachable" || cResult.error === "jwks_fetch_failed") {
+            } else if (
+              cResult.error === "jwks_unreachable" ||
+              cResult.error === "jwks_fetch_failed" ||
+              cResult.error === "eddsa_unsupported_by_browser"
+            ) {
               anySkip = true;
             } else {
               anyFail = true;
@@ -777,7 +818,11 @@
             if (match.result.applicable && match.result.verified) {
               pc.verification = "verified";
             } else if (match.result.applicable && !match.result.verified) {
-              if (match.result.error === "jwks_unreachable" || match.result.error === "jwks_fetch_failed") {
+              if (
+                match.result.error === "jwks_unreachable" ||
+                match.result.error === "jwks_fetch_failed" ||
+                match.result.error === "eddsa_unsupported_by_browser"
+              ) {
                 pc.verification = "unverified";
               } else {
                 pc.verification = "failed";
@@ -795,12 +840,18 @@
         x6Status = "FAIL";
         var failed = claimResults.filter(function (r) {
           return r.result.applicable && !r.result.verified
-            && r.result.error !== "jwks_unreachable" && r.result.error !== "jwks_fetch_failed";
+            && r.result.error !== "jwks_unreachable" && r.result.error !== "jwks_fetch_failed"
+            && r.result.error !== "eddsa_unsupported_by_browser";
         });
         x6Note = failed.length + " per-claim signature(s) failed verification";
       } else if (anySkip) {
         x6Status = "SKIP";
-        x6Note = "could not verify one or more per-claim signatures (JWKS issue)";
+        var anyEddsaUnsupported = claimResults.some(function (r) {
+          return r.result.applicable && r.result.error === "eddsa_unsupported_by_browser";
+        });
+        x6Note = anyEddsaUnsupported
+          ? "one or more per-claim signatures use EdDSA, which this browser does not support (requires Chrome 113+, Firefox 130+, or Safari 17+); signatures could not be verified"
+          : "could not verify one or more per-claim signatures (JWKS issue)";
       } else {
         x6Status = "PASS";
         x6Note = claimResults.length + " per-claim signature(s) cryptographically verified";
