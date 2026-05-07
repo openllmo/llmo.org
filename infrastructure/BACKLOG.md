@@ -96,34 +96,6 @@ Items in this section materially weaken external credibility if absent at announ
 
 Low priority. Becomes real if EdDSA uptake on signed `llmo.json` documents grows enough that older browsers hit it in practice; currently most publishers use ES256.
 
-### Sunday audit cron
-
-**Track:** `none`
-
-**Status:** Not started. Surfaced 2026-05-07 by the SECURITY.md PGP key 404 finding (LESSONS 2026-05-07). PR #41 added a URL-resolution check scoped to SECURITY.md only; this BACKLOG item generalizes the mechanism across the repo as a weekly audit.
-
-**Estimate:** 4-6 hours for the initial implementation. Less if scoped to URL resolution at first and extended over time.
-
-**Why:** The discipline pass enforces workflow at commit time. It does not audit static state for pre-existing drift or for drift introduced by changes that don't touch the affected files (e.g., a Hugo config change breaks links in SECURITY.md without modifying SECURITY.md). A weekly audit closes that gap. The URL-resolution check on SECURITY.md catches commit-time drift on that one file; the Sunday audit catches background drift across the whole repo.
-
-**Scope:** A scheduled GitHub Action runs every Sunday at 18:00 UTC, ahead of the Monday digest. Audits the repo for six classes of static-state drift:
-
-1. URL resolution across all committed Markdown and HTML files. Every `https://` link is verified against the locally-built Hugo output for `llmo.org`-hosted URLs and against the live network for external URLs.
-2. LIP registry consistency against frontmatter. Every LIP file has a registry entry; every entry points at a real file; statuses and dates match.
-3. ADR registry consistency against ADR files. Same shape as LIP check.
-4. Spec section anchor resolution. Internal links to spec sections (`#section-3-5`) resolve to actual headings.
-5. Cross-document reference integrity. ADR-NNNN, LIP-N, and changelog-version references point at things that exist.
-6. JWKS publication freshness. The `kid` in the live `llmo.json` matches a key present in the published JWKS.
-
-Findings produce two outputs:
-
-- A dated file at `infrastructure/audit-findings/YYYY-WNN.md`, parallel to the weekly digest. Empty audit weeks produce a "all clear" file with the same structure as empty digest weeks.
-- A GitHub issue per finding, labeled `audit/sunday`. Issues remain open until a steward resolves them.
-
-The audit is informational, not gating. Findings don't block engineering work. The audit doesn't auto-fix anything; the script ends at "here's what I found." Resolution decisions belong to whoever is sitting in the steward role at the time.
-
-The Monday weekly digest references the prior Sunday's audit file in its summary section, so a steward reading the digest sees both the week's commits and the audit findings in one place.
-
 ### Threat model document
 
 **Track:** `adr`
@@ -649,6 +621,7 @@ This section grows over time. Move items here when done.
 
 ### 2026-05-07
 
+- ✅ Sunday audit cron implemented at `scripts/sunday-audit.py` and `.github/workflows/sunday-audit.yml`. Runs every Sunday at 18:00 UTC, ahead of the Monday weekly digest. Six audit classes: URL resolution (skips RFC 2606 reserved domains and template-placeholder URLs), LIP registry consistency, ADR registry consistency, spec section anchor resolution against rendered Hugo output, cross-document reference integrity (ADR-NNNN / LIP-N / version refs), and JWKS publication freshness against the live llmo.json. Findings written to `infrastructure/audit-findings/YYYY-WNN.md` plus one GitHub issue per finding (label `audit/sunday`, idempotent against open issues). Workflow uses a PR-based commit pattern with auto-merge so it works under the enforced branch protection on `main`. Repo-level `allow_auto_merge` flipped to `true` to enable that flow. Dry-run produced 13 findings on first contact (10 pre-deployment diverse.org URLs, 1 parked llmo.com, 1 broken `#origin` anchor, 1 v0.1.6 future-version warning), all surfaced in the PR description for triage in a follow-up rather than fixed in this PR.
 - ✅ CLI v0.1.5 published to npm via OIDC trusted publishing. Reaches end users running `npm install -g llmo`. Includes per-claim signature verification (rule X6 per §5.3) and alg dispatch covering ES256, ES384, and EdDSA. Tag `v0.1.5` on `openllmo/cli`; release workflow run published to `https://registry.npmjs.org/llmo` with SLSA v1 provenance attestation (`dist.attestations.provenance.predicateType: https://slsa.dev/provenance/v1`); maintainer remains `nicchavez`, publisher is `GitHub Actions <npm-oidc-no-reply@github.com>`. Smoke-tested end-to-end: `npm install -g llmo@0.1.5` then sign a per-claim signature with `llmo sign --claim` then verify with `llmo verify --json` returns `perClaimSignatures[0].verification: "verified"`. Resolves `npm provenance via GitHub Actions` simultaneously: provenance was already wired into the cli's release workflow (commit `8cc3d95`, 2026-04-29) and is now confirmed live on the published 0.1.5 tarball.
 - ✅ Branch protection on `main` for `openllmo/cli` (sibling repo to this one). Required checks: `test (node 20 / macos-latest)`, `test (node 20 / ubuntu-latest)`, `test (node 22 / macos-latest)`, `test (node 22 / ubuntu-latest)`, `vendor drift check`. `enforce_admins: true`. Sequencing: `vendor drift check` had been failing on cli's `main` since 2026-05-01 because of legitimate upstream schema refinements (claim `type` becoming a `oneOf`, `identity.founded` gaining a date pattern); cli PR #1 cleared the drift via `scripts/vendor.sh` before cli PR #2 added the rule as required, so the gate did not block all merges from day one. Documentation parallel to this repo's `infrastructure/branch-protection.{json,md}` now lives at the same path in cli. Both sibling repos now share the same protection shape; the only divergences are repo-specific (cli has a five-context CI matrix; this repo has two single-job contexts plus `check-urls`).
 - ✅ SECURITY.md reconciliation. Three findings in one fix: (1) the stale `openllmo/llmo-validator` PVR URL at line 30 was removed (validator was consolidated into this repo on 2026-04-26 commit `4d1e6d0`; the separate repo is preserved as historical reference but unmaintained, and reports there would land in dead air); (2) `security/llmo-security.asc` was at the repo root and therefore not served by Hugo (which serves only `static/`), causing the PGP key link to silently 404 since the Hugo migration; the file moved to `static/security/llmo-security.asc` and is now served correctly; (3) a new `check-doc-urls` CI workflow (script: `scripts/check-doc-urls.sh`) verifies every documented URL in scoped files (currently `SECURITY.md`) resolves: `llmo.org`-hosted URLs are checked against the locally-built Hugo output (catches publishing-path drift on the PR), external URLs are HTTP-checked. Added to `required_status_checks.contexts` so the class of "documented URL silently 404s on main" is mechanically impossible going forward.

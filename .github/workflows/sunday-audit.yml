@@ -1,0 +1,173 @@
+name: Sunday Audit
+
+on:
+  schedule:
+    # Sunday 18:00 UTC, ahead of the Monday weekly digest at 13:00 UTC.
+    # Choice of fixed-UTC over fixed-Eastern is intentional: cron has no
+    # DST awareness, and UTC is the project's reference time zone.
+    - cron: '0 18 * * 0'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run: produce the findings file but do not open a PR or create issues.'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  audit:
+    name: audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: 'latest'
+          extended: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Build site
+        run: hugo --minify
+
+      - name: Run audit
+        id: audit
+        run: |
+          set -euo pipefail
+          python3 scripts/sunday-audit.py
+          # Capture the dated filenames for downstream steps.
+          ISO=$(python3 -c "from datetime import datetime, timezone; y, w, _ = datetime.now(timezone.utc).isocalendar(); print(f'{y}-W{w:02d}')")
+          MD="infrastructure/audit-findings/${ISO}.md"
+          JSON="infrastructure/audit-findings/${ISO}.findings.json"
+          echo "iso=${ISO}" >> "$GITHUB_OUTPUT"
+          echo "md=${MD}" >> "$GITHUB_OUTPUT"
+          echo "json=${JSON}" >> "$GITHUB_OUTPUT"
+          # Count findings.
+          COUNT=$(python3 -c "import json; print(len(json.load(open('${JSON}'))))")
+          echo "count=${COUNT}" >> "$GITHUB_OUTPUT"
+          echo "Audit produced ${COUNT} findings."
+
+      - name: Skip remaining steps if dry run
+        if: ${{ inputs.dry_run == 'true' }}
+        run: |
+          echo "Dry run requested; not opening PR or creating issues."
+          echo "Findings file: ${{ steps.audit.outputs.md }}"
+          echo "Findings count: ${{ steps.audit.outputs.count }}"
+          # Print the findings file to the workflow log so dry-run users can inspect.
+          cat "${{ steps.audit.outputs.md }}"
+
+      - name: Open PR for findings file
+        if: ${{ inputs.dry_run != 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          ISO="${{ steps.audit.outputs.iso }}"
+          MD="${{ steps.audit.outputs.md }}"
+          JSON="${{ steps.audit.outputs.json }}"
+          COUNT="${{ steps.audit.outputs.count }}"
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          BRANCH="audit/sunday-${ISO}-$(date -u +%Y%m%d%H%M%S)"
+          git checkout -b "$BRANCH"
+          git add "$MD" "$JSON"
+
+          if git diff --cached --quiet; then
+            echo "No changes to audit-findings/; nothing to commit. Audit completed cleanly."
+            exit 0
+          fi
+
+          git commit -m "audit: sunday $ISO ($COUNT findings)"
+          git push -u origin "$BRANCH"
+
+          # Build PR body with the findings markdown inline so reviewers can
+          # see the report directly in the PR.
+          BODY_FILE=$(mktemp)
+          {
+            echo "Automated weekly Sunday audit run."
+            echo
+            echo "Findings: $COUNT total."
+            echo
+            echo "<details><summary>Full findings report</summary>"
+            echo
+            cat "$MD"
+            echo
+            echo "</details>"
+            echo
+            echo "_Audit script: \`scripts/sunday-audit.py\`. Workflow: \`.github/workflows/sunday-audit.yml\`. Triggered: \`schedule\` (Sunday 18:00 UTC)._"
+          } > "$BODY_FILE"
+
+          PR_URL=$(gh pr create \
+            --title "audit: sunday $ISO ($COUNT findings)" \
+            --body-file "$BODY_FILE" \
+            --label "audit/sunday")
+
+          echo "Opened $PR_URL"
+          # Try to enable auto-merge so the PR self-merges once required checks pass.
+          # If auto-merge isn't enabled at the repo level, this command fails;
+          # the PR stays open for manual merge in that case.
+          gh pr merge --squash --auto "$PR_URL" || echo "Auto-merge not available; PR left open for manual merge."
+
+      - name: Open issues for findings (idempotent)
+        if: ${{ inputs.dry_run != 'true' && steps.audit.outputs.count != '0' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          JSON="${{ steps.audit.outputs.json }}"
+          MD="${{ steps.audit.outputs.md }}"
+          ISO="${{ steps.audit.outputs.iso }}"
+
+          # Existing open issues with audit/sunday label, by title.
+          mapfile -t EXISTING < <(gh issue list --label "audit/sunday" --state open --limit 200 --json title --jq '.[].title')
+
+          # Helper: emit a slug for a finding to use as a deterministic issue key.
+          # The script's title() method already produces a stable string.
+          python3 -c "
+          import json, sys
+          findings = json.load(open('${JSON}'))
+          for f in findings:
+              loc = ''
+              if f.get('file'):
+                  loc = f' in ' + f['file']
+                  if f.get('line'):
+                      loc += ':' + str(f['line'])
+              title = f'[audit/sunday] {f[\"cls\"]}: {f[\"message\"][:80]}{loc}'
+              print(title)
+          " > /tmp/finding-titles.txt
+
+          while IFS= read -r TITLE; do
+            already=0
+            for E in "${EXISTING[@]:-}"; do
+              if [[ "$E" == "$TITLE" ]]; then already=1; break; fi
+            done
+            if [[ $already -eq 1 ]]; then
+              echo "Skipping (already open): $TITLE"
+              continue
+            fi
+            BODY="Detected by Sunday audit run **$ISO**.
+
+          See the full findings report in \`$MD\` on \`main\`.
+
+          To resolve: investigate the underlying drift, fix it, and close this issue. The next Sunday audit run will reopen the issue if the drift remains. To suppress a known false positive, update \`scripts/sunday-audit.py\`'s skip lists or extraction logic.
+          "
+            gh issue create \
+              --title "$TITLE" \
+              --body "$BODY" \
+              --label "audit/sunday" \
+              || echo "Failed to create issue for: $TITLE"
+          done < /tmp/finding-titles.txt
