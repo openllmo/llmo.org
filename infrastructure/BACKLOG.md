@@ -78,18 +78,6 @@ Items in this section gate the v0.1 public-launch announcement. The conference (
 
 **Scope:** Vectors covering Strict-pass, Strict-invalid-claim-signature, Strict-invalid-both-signatures, Standard-pass, Standard-failed-tier (one per S1-S6), schema-only failures, malformed-input failures. Use a published test JWKS distinct from production keys (the existing `signed-strict-key.json` is already labeled test-only).
 
-### CLI v0.1.5 npm release
-
-**Track:** `none`
-
-**Status:** Shipped to GitHub `main` as commit `c880fd0` in the llmo-cli repo (separate from this repo). Not yet published to the npm registry.
-
-**Estimate:** 1-2 hours, up to 4 if combined with npm provenance setup (see post-conference parallel-clock work).
-
-**Why blocker:** End users running `npm install -g llmo` get an older version. Closes the v0.1.5 user-facing story (per-claim signature verification, alg dispatch in the CLI).
-
----
-
 ## ANNOUNCEMENT CREDIBILITY (soft, not strict gating)
 
 Items in this section materially weaken external credibility if absent at announcement time, but do not strictly gate the announcement. A security-minded reviewer (including IETF Internet-Draft reviewers) hits these first when LLMO gets external attention.
@@ -441,18 +429,6 @@ The Monday weekly digest references the prior Sunday's audit file in its summary
 
 ---
 
-### npm provenance via GitHub Actions
-
-**Track:** `none`
-
-**Status:** Not configured.
-
-**Estimate:** 2-3 hours.
-
-**Scope:** Sign npm packages from CI, attaching SLSA provenance attestations. Improves supply-chain credibility. May naturally bundle with the CLI v0.1.5 npm release work.
-
----
-
 ### Defensive domain registrations
 
 **Track:** `none`
@@ -673,6 +649,7 @@ This section grows over time. Move items here when done.
 
 ### 2026-05-07
 
+- ✅ CLI v0.1.5 published to npm via OIDC trusted publishing. Reaches end users running `npm install -g llmo`. Includes per-claim signature verification (rule X6 per §5.3) and alg dispatch covering ES256, ES384, and EdDSA. Tag `v0.1.5` on `openllmo/cli`; release workflow run published to `https://registry.npmjs.org/llmo` with SLSA v1 provenance attestation (`dist.attestations.provenance.predicateType: https://slsa.dev/provenance/v1`); maintainer remains `nicchavez`, publisher is `GitHub Actions <npm-oidc-no-reply@github.com>`. Smoke-tested end-to-end: `npm install -g llmo@0.1.5` then sign a per-claim signature with `llmo sign --claim` then verify with `llmo verify --json` returns `perClaimSignatures[0].verification: "verified"`. Resolves `npm provenance via GitHub Actions` simultaneously: provenance was already wired into the cli's release workflow (commit `8cc3d95`, 2026-04-29) and is now confirmed live on the published 0.1.5 tarball.
 - ✅ Branch protection on `main` for `openllmo/cli` (sibling repo to this one). Required checks: `test (node 20 / macos-latest)`, `test (node 20 / ubuntu-latest)`, `test (node 22 / macos-latest)`, `test (node 22 / ubuntu-latest)`, `vendor drift check`. `enforce_admins: true`. Sequencing: `vendor drift check` had been failing on cli's `main` since 2026-05-01 because of legitimate upstream schema refinements (claim `type` becoming a `oneOf`, `identity.founded` gaining a date pattern); cli PR #1 cleared the drift via `scripts/vendor.sh` before cli PR #2 added the rule as required, so the gate did not block all merges from day one. Documentation parallel to this repo's `infrastructure/branch-protection.{json,md}` now lives at the same path in cli. Both sibling repos now share the same protection shape; the only divergences are repo-specific (cli has a five-context CI matrix; this repo has two single-job contexts plus `check-urls`).
 - ✅ SECURITY.md reconciliation. Three findings in one fix: (1) the stale `openllmo/llmo-validator` PVR URL at line 30 was removed (validator was consolidated into this repo on 2026-04-26 commit `4d1e6d0`; the separate repo is preserved as historical reference but unmaintained, and reports there would land in dead air); (2) `security/llmo-security.asc` was at the repo root and therefore not served by Hugo (which serves only `static/`), causing the PGP key link to silently 404 since the Hugo migration; the file moved to `static/security/llmo-security.asc` and is now served correctly; (3) a new `check-doc-urls` CI workflow (script: `scripts/check-doc-urls.sh`) verifies every documented URL in scoped files (currently `SECURITY.md`) resolves: `llmo.org`-hosted URLs are checked against the locally-built Hugo output (catches publishing-path drift on the PR), external URLs are HTTP-checked. Added to `required_status_checks.contexts` so the class of "documented URL silently 404s on main" is mechanically impossible going forward.
 - ✅ Validator supports ES384 and EdDSA per spec §4.2 (alongside the existing ES256 path). `verifyAttachedSignature` reads `alg` from the protected header and dispatches via an `ALG_PARAMS` table to the appropriate WebCrypto import/verify call and JWK key-type check. Two new strict-tier test vectors landed under `static/spec/v0.1/test-vectors/` (`signed-strict-es384.*`, `signed-strict-eddsa.*`). Verified end-to-end via playwright harness in URL mode with mocked JWKS; all three algorithms reach Strict tier with document-level signature `verified`. RS256 and other unsupported `alg` values are rejected at the X1 structural check (predates this change) with a clear note naming the three permitted algorithms.
