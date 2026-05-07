@@ -108,6 +108,34 @@ Items in this section materially weaken external credibility if absent at announ
 
 Low priority. Becomes real if EdDSA uptake on signed `llmo.json` documents grows enough that older browsers hit it in practice; currently most publishers use ES256.
 
+### Sunday audit cron
+
+**Track:** `none`
+
+**Status:** Not started. Surfaced 2026-05-07 by the SECURITY.md PGP key 404 finding (LESSONS 2026-05-07). PR #41 added a URL-resolution check scoped to SECURITY.md only; this BACKLOG item generalizes the mechanism across the repo as a weekly audit.
+
+**Estimate:** 4-6 hours for the initial implementation. Less if scoped to URL resolution at first and extended over time.
+
+**Why:** The discipline pass enforces workflow at commit time. It does not audit static state for pre-existing drift or for drift introduced by changes that don't touch the affected files (e.g., a Hugo config change breaks links in SECURITY.md without modifying SECURITY.md). A weekly audit closes that gap. The URL-resolution check on SECURITY.md catches commit-time drift on that one file; the Sunday audit catches background drift across the whole repo.
+
+**Scope:** A scheduled GitHub Action runs every Sunday at 18:00 UTC, ahead of the Monday digest. Audits the repo for six classes of static-state drift:
+
+1. URL resolution across all committed Markdown and HTML files. Every `https://` link is verified against the locally-built Hugo output for `llmo.org`-hosted URLs and against the live network for external URLs.
+2. LIP registry consistency against frontmatter. Every LIP file has a registry entry; every entry points at a real file; statuses and dates match.
+3. ADR registry consistency against ADR files. Same shape as LIP check.
+4. Spec section anchor resolution. Internal links to spec sections (`#section-3-5`) resolve to actual headings.
+5. Cross-document reference integrity. ADR-NNNN, LIP-N, and changelog-version references point at things that exist.
+6. JWKS publication freshness. The `kid` in the live `llmo.json` matches a key present in the published JWKS.
+
+Findings produce two outputs:
+
+- A dated file at `infrastructure/audit-findings/YYYY-WNN.md`, parallel to the weekly digest. Empty audit weeks produce a "all clear" file with the same structure as empty digest weeks.
+- A GitHub issue per finding, labeled `audit/sunday`. Issues remain open until a steward resolves them.
+
+The audit is informational, not gating. Findings don't block engineering work. The audit doesn't auto-fix anything; the script ends at "here's what I found." Resolution decisions belong to whoever is sitting in the steward role at the time.
+
+The Monday weekly digest references the prior Sunday's audit file in its summary section, so a steward reading the digest sees both the week's commits and the audit findings in one place.
+
 ### Threat model document
 
 **Track:** `adr`
