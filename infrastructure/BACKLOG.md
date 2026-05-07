@@ -94,7 +94,19 @@ Items in this section gate the v0.1 public-launch announcement. The conference (
 
 Items in this section materially weaken external credibility if absent at announcement time, but do not strictly gate the announcement. A security-minded reviewer (including IETF Internet-Draft reviewers) hits these first when LLMO gets external attention.
 
-### SECURITY.md reconciliation
+### Validator graceful degradation when WebCrypto Ed25519 unavailable
+
+**Track:** `none`
+
+**Status:** Not started. Surfaced 2026-05-07 alongside the ES384/EdDSA dispatch landed in PR #38.
+
+**Estimate:** 1-2 hours.
+
+**Why:** Browser WebCrypto support for Ed25519 landed in Chrome 113 (May 2023), Firefox 130 (September 2024), and Safari 17 (September 2023). Older browsers will fail `crypto.subtle.importKey` for an Ed25519 JWK with a generic error. The validator currently surfaces this as `key_import_failed`, which is technically correct but doesn't tell the user *why*: their browser is too old. A user with an EdDSA-signed document and an older browser sees a confusing failure on a document that any modern verifier would accept.
+
+**Scope:** Detect Ed25519 support at validator init (try `crypto.subtle.generateKey({name:"Ed25519"}, ...)` once and remember the result, or feature-detect against `crypto.subtle` capabilities). When verifying an EdDSA-signed document on a runtime that lacks support, fail with a clear message: "This browser does not support Ed25519 verification. Try Chrome 113+, Firefox 130+, or Safari 17+." Same message in the X5/X6 result note. Do not attempt to polyfill.
+
+Low priority. Becomes real if EdDSA uptake on signed `llmo.json` documents grows enough that older browsers hit it in practice; currently most publishers use ES256.
 
 **Track:** `none` (reclassified from notepad's `adr` proposal: this is operational reconciliation, not an architectural decision; channels and timelines are already committed)
 
