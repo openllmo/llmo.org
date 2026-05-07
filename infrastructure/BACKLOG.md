@@ -94,18 +94,6 @@ Items in this section gate the v0.1 public-launch announcement. The conference (
 
 Items in this section materially weaken external credibility if absent at announcement time, but do not strictly gate the announcement. A security-minded reviewer (including IETF Internet-Draft reviewers) hits these first when LLMO gets external attention.
 
-### ES384 and EdDSA support in validator
-
-**Track:** `none`
-
-**Status:** Spec §4.2 permits ES256, ES384, and EdDSA. Validator hardcodes ES256 in the X5 (per-claim) and X6 (document-level) signature paths. CLI already handles all three.
-
-**Estimate:** 3-5 hours, up to 7 if a library swap is needed.
-
-**Why credibility:** A reviewer who reads §4.2 and then runs an ES384-signed document through the validator gets a misleading failure. Reference implementation narrower than the spec is a soft credibility hit.
-
-**Scope:** Extend `verifyClaimSignature` and `verifyAndApplyX5X6` to read `alg` from the protected header and dispatch to the appropriate verification routine. Handle JWKS key-type matching (EC P-256, EC P-384, OKP Ed25519). Port the CLI's TypeScript verification logic into `validator.js` with WebCrypto-API adaptations.
-
 ### SECURITY.md reconciliation
 
 **Track:** `none` (reclassified from notepad's `adr` proposal: this is operational reconciliation, not an architectural decision; channels and timelines are already committed)
@@ -660,6 +648,7 @@ This section grows over time. Move items here when done.
 
 ### 2026-05-07
 
+- ✅ Validator supports ES384 and EdDSA per spec §4.2 (alongside the existing ES256 path). `verifyAttachedSignature` reads `alg` from the protected header and dispatches via an `ALG_PARAMS` table to the appropriate WebCrypto import/verify call and JWK key-type check. Two new strict-tier test vectors landed under `static/spec/v0.1/test-vectors/` (`signed-strict-es384.*`, `signed-strict-eddsa.*`). Verified end-to-end via playwright harness in URL mode with mocked JWKS; all three algorithms reach Strict tier with document-level signature `verified`. RS256 and other unsupported `alg` values are rejected at the X1 structural check (predates this change) with a clear note naming the three permitted algorithms.
 - ✅ Validator self-hosts `ajv@8.20.0/dist/2020`, `ajv-formats@3.0.1`, and `canonicalize@2.0.0` (plus the three transitive deps `fast-deep-equal`, `fast-uri`, `json-schema-traverse` and the `ajv` main + `codegen` subpaths) under `static/js/vendor/`. Eliminates esm.sh as a runtime SPOF. All three v0.1 test vectors produce identical results before and after (verified by playwright harness against hugo serve, both branches).
 
 ### 2026-05-06

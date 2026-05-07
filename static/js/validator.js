@@ -599,10 +599,46 @@
     return ev;
   }
 
-  // ---- X5: cryptographic signature verification ------------------------
+  // ---- X5/X6: cryptographic signature verification ---------------------
+  //
+  // Per spec §4.2, three signature algorithms are permitted:
+  //   - ES256 (ECDSA over P-256, SHA-256)
+  //   - ES384 (ECDSA over P-384, SHA-384)
+  //   - EdDSA (Ed25519)
+  // Each row below maps the JOSE alg label to the JWK key-type/curve it must
+  // pair with and the WebCrypto SubtleCrypto parameters used for import and
+  // verify. sigLength is the JOSE-compact signature length: r||s for ECDSA
+  // (64 for P-256, 96 for P-384), raw 64 bytes for Ed25519.
 
-  async function verifyDocumentSignature(doc, urlContext) {
-    if (!doc || !doc.signature || !doc.signature.protected || !doc.signature.signature) {
+  var ALG_PARAMS = {
+    ES256: {
+      kty: "EC",
+      crv: "P-256",
+      importParams: { name: "ECDSA", namedCurve: "P-256" },
+      verifyParams: { name: "ECDSA", hash: "SHA-256" },
+      sigLength: 64,
+      jwk: function (k) { return { kty: "EC", crv: "P-256", x: k.x, y: k.y, ext: true }; }
+    },
+    ES384: {
+      kty: "EC",
+      crv: "P-384",
+      importParams: { name: "ECDSA", namedCurve: "P-384" },
+      verifyParams: { name: "ECDSA", hash: "SHA-384" },
+      sigLength: 96,
+      jwk: function (k) { return { kty: "EC", crv: "P-384", x: k.x, y: k.y, ext: true }; }
+    },
+    EdDSA: {
+      kty: "OKP",
+      crv: "Ed25519",
+      importParams: { name: "Ed25519" },
+      verifyParams: { name: "Ed25519" },
+      sigLength: 64,
+      jwk: function (k) { return { kty: "OKP", crv: "Ed25519", x: k.x, ext: true }; }
+    }
+  };
+
+  async function verifyAttachedSignature(payload, urlContext) {
+    if (!payload || !payload.signature || !payload.signature.protected || !payload.signature.signature) {
       return { applicable: false, reason: "no_signature" };
     }
     if (!urlContext || !urlContext.hostname) {
@@ -611,8 +647,7 @@
 
     var header;
     try {
-      var protectedJson = base64UrlDecodeToString(doc.signature.protected);
-      header = JSON.parse(protectedJson);
+      header = JSON.parse(base64UrlDecodeToString(payload.signature.protected));
     } catch (err) {
       return { applicable: true, verified: false, error: "protected_header_decode_failed" };
     }
@@ -620,7 +655,8 @@
     if (!header.alg || !header.kid) {
       return { applicable: true, verified: false, error: "protected_header_missing_alg_or_kid" };
     }
-    if (header.alg !== "ES256") {
+    var params = ALG_PARAMS[header.alg];
+    if (!params) {
       return { applicable: true, verified: false, error: "unsupported_alg", alg: header.alg };
     }
 
@@ -628,152 +664,55 @@
     if (jwksResult.error) {
       return { applicable: true, verified: false, error: jwksResult.error, detail: jwksResult.detail };
     }
-    var jwks = jwksResult.jwks;
 
-    var key = jwks.keys.find(function (k) { return k.kid === header.kid; });
+    var key = jwksResult.jwks.keys.find(function (k) { return k.kid === header.kid; });
     if (!key) {
       return { applicable: true, verified: false, error: "kid_not_in_jwks", kid: header.kid };
     }
-    if (key.kty !== "EC" || key.crv !== "P-256") {
-      return { applicable: true, verified: false, error: "key_type_mismatch_for_es256" };
+    if (key.kty !== params.kty || key.crv !== params.crv) {
+      return { applicable: true, verified: false, error: "key_type_mismatch_for_alg", alg: header.alg, expected: params.kty + "/" + params.crv, got: key.kty + "/" + key.crv };
     }
 
     var publicKey;
     try {
-      publicKey = await crypto.subtle.importKey(
-        "jwk",
-        { kty: "EC", crv: "P-256", x: key.x, y: key.y, ext: true },
-        { name: "ECDSA", namedCurve: "P-256" },
-        false,
-        ["verify"]
-      );
+      publicKey = await crypto.subtle.importKey("jwk", params.jwk(key), params.importParams, false, ["verify"]);
     } catch (err) {
-      return { applicable: true, verified: false, error: "key_import_failed" };
+      return { applicable: true, verified: false, error: "key_import_failed", detail: (err && err.message) ? err.message : String(err) };
     }
 
     var payloadCanonical;
     try {
-      var canonicalString = canonicalizeWithoutSignature(doc);
-      payloadCanonical = new TextEncoder().encode(canonicalString);
+      payloadCanonical = new TextEncoder().encode(canonicalizeWithoutSignature(payload));
     } catch (err) {
       return { applicable: true, verified: false, error: "canonicalization_failed" };
     }
 
-    var protectedB64 = doc.signature.protected;
-    var payloadB64 = base64UrlEncode(payloadCanonical);
-    var signingInput = new TextEncoder().encode(protectedB64 + "." + payloadB64);
+    var signingInput = new TextEncoder().encode(payload.signature.protected + "." + base64UrlEncode(payloadCanonical));
 
     var signatureBytes;
     try {
-      signatureBytes = base64UrlDecodeToBytes(doc.signature.signature);
+      signatureBytes = base64UrlDecodeToBytes(payload.signature.signature);
     } catch (err) {
       return { applicable: true, verified: false, error: "signature_decode_failed" };
     }
-    if (signatureBytes.length !== 64) {
-      return { applicable: true, verified: false, error: "signature_wrong_length", length: signatureBytes.length };
+    if (signatureBytes.length !== params.sigLength) {
+      return { applicable: true, verified: false, error: "signature_wrong_length", expected: params.sigLength, got: signatureBytes.length };
     }
 
     var verified;
     try {
-      verified = await crypto.subtle.verify(
-        { name: "ECDSA", hash: "SHA-256" },
-        publicKey,
-        signatureBytes,
-        signingInput
-      );
+      verified = await crypto.subtle.verify(params.verifyParams, publicKey, signatureBytes, signingInput);
     } catch (err) {
-      return { applicable: true, verified: false, error: "verify_threw" };
+      return { applicable: true, verified: false, error: "verify_threw", detail: (err && err.message) ? err.message : String(err) };
     }
 
     return { applicable: true, verified: verified, kid: header.kid, alg: header.alg };
   }
 
-  async function verifyClaimSignature(claim, urlContext) {
-    if (!claim || !claim.signature || !claim.signature.protected || !claim.signature.signature) {
-      return { applicable: false, reason: "no_signature" };
-    }
-    if (!urlContext || !urlContext.hostname) {
-      return { applicable: false, reason: "paste_mode_no_origin" };
-    }
-
-    var header;
-    try {
-      var protectedJson = base64UrlDecodeToString(claim.signature.protected);
-      header = JSON.parse(protectedJson);
-    } catch (err) {
-      return { applicable: true, verified: false, error: "protected_header_decode_failed" };
-    }
-
-    if (!header.alg || !header.kid) {
-      return { applicable: true, verified: false, error: "protected_header_missing_alg_or_kid" };
-    }
-    if (header.alg !== "ES256") {
-      return { applicable: true, verified: false, error: "unsupported_alg", alg: header.alg };
-    }
-
-    var jwksResult = await fetchJwksOnce(urlContext);
-    if (jwksResult.error) {
-      return { applicable: true, verified: false, error: jwksResult.error, detail: jwksResult.detail };
-    }
-    var jwks = jwksResult.jwks;
-
-    var key = jwks.keys.find(function (k) { return k.kid === header.kid; });
-    if (!key) {
-      return { applicable: true, verified: false, error: "kid_not_in_jwks", kid: header.kid };
-    }
-    if (key.kty !== "EC" || key.crv !== "P-256") {
-      return { applicable: true, verified: false, error: "key_type_mismatch_for_es256" };
-    }
-
-    var publicKey;
-    try {
-      publicKey = await crypto.subtle.importKey(
-        "jwk",
-        { kty: "EC", crv: "P-256", x: key.x, y: key.y, ext: true },
-        { name: "ECDSA", namedCurve: "P-256" },
-        false,
-        ["verify"]
-      );
-    } catch (err) {
-      return { applicable: true, verified: false, error: "key_import_failed" };
-    }
-
-    var payloadCanonical;
-    try {
-      var canonicalString = canonicalizeWithoutSignature(claim);
-      payloadCanonical = new TextEncoder().encode(canonicalString);
-    } catch (err) {
-      return { applicable: true, verified: false, error: "canonicalization_failed" };
-    }
-
-    var protectedB64 = claim.signature.protected;
-    var payloadB64 = base64UrlEncode(payloadCanonical);
-    var signingInput = new TextEncoder().encode(protectedB64 + "." + payloadB64);
-
-    var signatureBytes;
-    try {
-      signatureBytes = base64UrlDecodeToBytes(claim.signature.signature);
-    } catch (err) {
-      return { applicable: true, verified: false, error: "signature_decode_failed" };
-    }
-    if (signatureBytes.length !== 64) {
-      return { applicable: true, verified: false, error: "signature_wrong_length", length: signatureBytes.length };
-    }
-
-    var verified;
-    try {
-      verified = await crypto.subtle.verify(
-        { name: "ECDSA", hash: "SHA-256" },
-        publicKey,
-        signatureBytes,
-        signingInput
-      );
-    } catch (err) {
-      return { applicable: true, verified: false, error: "verify_threw" };
-    }
-
-    return { applicable: true, verified: verified, kid: header.kid, alg: header.alg };
-  }
+  // Document-level (X5) and claim-level (X6) signatures share the same
+  // attached-JWS framing, so both paths funnel through verifyAttachedSignature.
+  function verifyDocumentSignature(doc, urlContext) { return verifyAttachedSignature(doc, urlContext); }
+  function verifyClaimSignature(claim, urlContext) { return verifyAttachedSignature(claim, urlContext); }
 
   async function verifyAndApplyX5X6(ev, doc, urlContext) {
     var x5Current = ev.strict.find(function (c) { return c.id === "X5"; });

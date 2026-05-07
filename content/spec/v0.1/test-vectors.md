@@ -67,6 +67,18 @@ Raw: [`/spec/v0.1/test-vectors/signed-strict-payload.json`](/spec/v0.1/test-vect
 
 > **Note:** The file is served with a `.json` extension. The content is a valid canonical JSON object by construction (that is what JCS produces), so the `.json` extension is accurate. Implementers compare the file byte-for-byte; the extension does not change the comparison.
 
+### `signed-strict-es384.json`, `signed-strict-es384-key.json`, `signed-strict-es384-payload.json`
+
+A second strict-tier vector signed with ES384 (ECDSA over P-384, SHA-384) instead of ES256. Exercises the same strict-tier rules as `signed-strict.json` but with the second algorithm permitted by [§4.2](/spec/v0.1#4-2-signature-algorithms). `document_id` is `test-vector-v0.1-strict-002`. The JWKS, payload, and verification procedure follow the same conventions as the ES256 vector. Test-only key, MUST NOT be used in production.
+
+Raw: [`signed-strict-es384.json`](/spec/v0.1/test-vectors/signed-strict-es384.json), [`signed-strict-es384-key.json`](/spec/v0.1/test-vectors/signed-strict-es384-key.json), [`signed-strict-es384-payload.json`](/spec/v0.1/test-vectors/signed-strict-es384-payload.json)
+
+### `signed-strict-eddsa.json`, `signed-strict-eddsa-key.json`, `signed-strict-eddsa-payload.json`
+
+A third strict-tier vector signed with EdDSA (Ed25519). Exercises the third algorithm permitted by [§4.2](/spec/v0.1#4-2-signature-algorithms). `document_id` is `test-vector-v0.1-strict-003`. The JWK uses `kty: "OKP"` and `crv: "Ed25519"` (no `y` field, unlike the EC P-256 / P-384 vectors). Signature length is 64 bytes (raw Ed25519, not r||s). Test-only key, MUST NOT be used in production.
+
+Raw: [`signed-strict-eddsa.json`](/spec/v0.1/test-vectors/signed-strict-eddsa.json), [`signed-strict-eddsa-key.json`](/spec/v0.1/test-vectors/signed-strict-eddsa-key.json), [`signed-strict-eddsa-payload.json`](/spec/v0.1/test-vectors/signed-strict-eddsa-payload.json)
+
 ## Verifying the signed vector
 
 1. Fetch the JWKS: `signed-strict-key.json`.
