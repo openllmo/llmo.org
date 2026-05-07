@@ -1,0 +1,132 @@
+[
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 0: https://llmo.com",
+    "file": "content/about/governance.md",
+    "line": 19,
+    "machine_data": {
+      "url": "https://llmo.com",
+      "status": 0
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 404: https://diverse.org/.well-known/llmo.json",
+    "file": "content/spec/v0.1/_index.md",
+    "line": 600,
+    "machine_data": {
+      "url": "https://diverse.org/.well-known/llmo.json",
+      "status": 404
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 404: https://diverse.org/.well-known/llmo.json",
+    "file": "content/spec/v0.1/_index.md",
+    "line": 715,
+    "machine_data": {
+      "url": "https://diverse.org/.well-known/llmo.json",
+      "status": 404
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 404: https://diverse.org/.well-known/llmo.json",
+    "file": "content/spec/v0.1/_index.md",
+    "line": 726,
+    "machine_data": {
+      "url": "https://diverse.org/.well-known/llmo.json",
+      "status": 404
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 404: https://diverse.org/.well-known/llmo.json",
+    "file": "infrastructure/BACKLOG.md",
+    "line": 176,
+    "machine_data": {
+      "url": "https://diverse.org/.well-known/llmo.json",
+      "status": 404
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 404: https://diverse.org/.well-known/security.txt",
+    "file": "infrastructure/BACKLOG.md",
+    "line": 190,
+    "machine_data": {
+      "url": "https://diverse.org/.well-known/security.txt",
+      "status": 404
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 404: https://diverse.org/.well-known/llmo.json",
+    "file": "infrastructure/BACKLOG.md",
+    "line": 202,
+    "machine_data": {
+      "url": "https://diverse.org/.well-known/llmo.json",
+      "status": 404
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 404: https://diverse.org/.well-known/llmo.json",
+    "file": "infrastructure/BACKLOG.md",
+    "line": 202,
+    "machine_data": {
+      "url": "https://diverse.org/.well-known/llmo.json",
+      "status": 404
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 404: https://diverse.org/about/leadership",
+    "file": "infrastructure/SIGNING-CEREMONY.md",
+    "line": 88,
+    "machine_data": {
+      "url": "https://diverse.org/about/leadership",
+      "status": 404
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #origin not found at /about/",
+    "file": "content/about/announcement-2025-11/_index.md",
+    "line": 46,
+    "machine_data": {
+      "target_page": "/about/",
+      "anchor": "origin"
+    }
+  },
+  {
+    "cls": "cross-refs",
+    "severity": "warning",
+    "message": "Spec version v0.1.6 referenced but not in changelog.md",
+    "file": "infrastructure/BACKLOG.md",
+    "line": 71,
+    "machine_data": {
+      "reference": "v0.1.6"
+    }
+  },
+  {
+    "cls": "cross-refs",
+    "severity": "warning",
+    "message": "Spec version v0.1.6 referenced but not in changelog.md",
+    "file": "infrastructure/BACKLOG.md",
+    "line": 611,
+    "machine_data": {
+      "reference": "v0.1.6"
+    }
+  }
+]
