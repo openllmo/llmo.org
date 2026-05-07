@@ -17,6 +17,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   generate:
@@ -48,29 +49,73 @@ jobs:
           else
             python3 scripts/weekly-digest.py
           fi
+          # Identify the digest file the script wrote so downstream steps can act on it.
+          CHANGED=$(git status --porcelain infrastructure/weekly-digest/ | awk '{print $2}' | head -n 1)
+          if [[ -z "$CHANGED" ]]; then
+            # Possibly an idempotent regeneration of an already-committed file.
+            # Find the latest *.md under the digest dir and use that.
+            CHANGED=$(ls -1 infrastructure/weekly-digest/*.md 2>/dev/null | sort | tail -n 1 || true)
+          fi
+          if [[ -z "$CHANGED" ]]; then
+            echo "::error::weekly-digest.py produced no file under infrastructure/weekly-digest/"
+            exit 1
+          fi
+          BASENAME=$(basename "$CHANGED" .md)
+          # ISO designator like 2026-W19. Split into year/week for the commit message.
+          YEAR="${BASENAME%-W*}"
+          WEEK="${BASENAME#*-W}"
+          echo "file=${CHANGED}" >> "$GITHUB_OUTPUT"
+          echo "iso=${BASENAME}" >> "$GITHUB_OUTPUT"
+          echo "year=${YEAR}" >> "$GITHUB_OUTPUT"
+          echo "week=${WEEK}" >> "$GITHUB_OUTPUT"
+          echo "msg=digest: week ${WEEK} of ${YEAR}" >> "$GITHUB_OUTPUT"
 
-      - name: Commit and push if changed
+      - name: Open PR for digest file (auto-merge)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
+          FILE="${{ steps.gen.outputs.file }}"
+          ISO="${{ steps.gen.outputs.iso }}"
+          MSG="${{ steps.gen.outputs.msg }}"
+
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 
-          git add infrastructure/weekly-digest/
+          git add "$FILE"
           if git diff --cached --quiet; then
-            echo "No digest changes to commit."
+            echo "Digest unchanged from what is already on main; nothing to commit."
             exit 0
           fi
 
-          # Identify the digest file that changed for the commit message.
-          CHANGED=$(git diff --cached --name-only -- 'infrastructure/weekly-digest/*.md' | head -n1)
-          if [[ -n "$CHANGED" ]]; then
-            BASENAME=$(basename "$CHANGED" .md)
-            YEAR="${BASENAME%-W*}"
-            WEEK="${BASENAME#*-W}"
-            MSG="digest: week ${WEEK} of ${YEAR}"
-          else
-            MSG="digest: weekly digest update"
-          fi
-
+          BRANCH="digest/${ISO}-$(date -u +%Y%m%d%H%M%S)"
+          git checkout -b "$BRANCH"
           git commit -m "$MSG"
-          git push
+          git push -u origin "$BRANCH"
+
+          # PR body summarizes the digest and notes the auto-merge intent.
+          BODY_FILE=$(mktemp)
+          {
+            echo "Automated weekly digest run."
+            echo
+            echo "Period: ISO week ${ISO}."
+            echo
+            echo "<details><summary>Digest preview</summary>"
+            echo
+            cat "$FILE"
+            echo
+            echo "</details>"
+            echo
+            echo "_Workflow: \`.github/workflows/weekly-digest.yml\`. Triggered: \`schedule\` (Monday 13:00 UTC) or manual dispatch._"
+          } > "$BODY_FILE"
+
+          PR_URL=$(gh pr create \
+            --title "$MSG" \
+            --body-file "$BODY_FILE" \
+            --label "digest")
+
+          echo "Opened $PR_URL"
+          # Queue auto-merge so the PR self-merges once required checks pass.
+          # If auto-merge is not enabled at the repo level, this command fails
+          # and the PR stays open for manual merge.
+          gh pr merge --squash --auto "$PR_URL" || echo "Auto-merge not available; PR left open for manual merge."
