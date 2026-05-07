@@ -69,3 +69,19 @@ A second-order finding: ajv ships multiple entry points (`ajv@8` for draft-07, `
 A more durable fix: introduce a build pipeline (esbuild or equivalent) that emits one self-contained bundle per validator module. Defer until the import graph grows beyond what manual rewriting can handle; the current 8-file graph is small enough that a build step would add more complexity than it removes.
 
 A separate observation worth noting alongside this lesson, not as its own entry: Ed25519 support in browser WebCrypto landed in Chrome 113 (May 2023), Firefox 130 (September 2024), and Safari 17 (September 2023). Older browsers will fail `key_import_failed` when verifying an EdDSA-signed document. The validator handles this gracefully (the signature check fails with a clear error), but if EdDSA usage in the wild gets significant, the validator may need a polyfill or feature-detection branch. Not urgent today; flag if it becomes a real failure mode.
+
+---
+
+## 2026-05-07: Publishing-path migration silently broke a documented URL
+
+**What:** SECURITY.md's PGP key URL (`https://llmo.org/security/llmo-security.asc`) returned 404 on the live site for 11 days without anyone noticing. The key file was tracked in the repo at `security/llmo-security.asc` (repo root) and had served correctly under Mintlify. The 2026-04-26 Mintlify-to-Hugo migration changed the publishing rules: Hugo serves files only from `static/`, not from arbitrary repo-root directories. The file was never moved into `static/`, so post-migration it stopped being served. SECURITY.md still pointed at the URL. Visual review during and after the migration didn't catch the drift; the failure surfaced only when a CI check explicitly verified the URL resolved, on the SECURITY.md reconciliation PR (#41) that landed 11 days after the migration.
+
+**Why:** Hugo's static-only serving rule is a structural convention, not enforced by any check. The migration PR had its own scope (move site infrastructure from Mintlify to Hugo, get the build green, switch DNS), and verifying that every external reference in every committed doc still resolved was not in that scope and not on any checklist. It was nobody's job. The PGP key URL is also low-traffic: most readers of SECURITY.md never click the public-key link unless they're filing an encrypted vulnerability report. So the failure was both invisible to passive review and rare-to-trigger in actual use, which is exactly the profile of a bug that sits unnoticed for a long time.
+
+**Different:** Two changes, additive.
+
+1. Mechanical URL-resolution CI now exists. PR #41 added `.github/workflows/check-doc-urls.yml` and `scripts/check-doc-urls.sh`, scoped initially to SECURITY.md and added to `required_status_checks.contexts` on `main`. Any future PR that breaks (or fails to fix) a documented URL is blocked from merging. The script verifies `llmo.org`-hosted URLs against the locally-built Hugo output, so drift is caught on the PR itself, before the deploy.
+
+2. Migration checklists should include "verify all external references in committed docs still resolve." Hugo, Mintlify, Cloudflare Pages, and any future publishing-platform change can quietly invalidate paths that worked under the previous regime. The general principle: when you change publishing rules, every URL that points at content you publish becomes a candidate for breakage. Run the URL check (or whatever scope is relevant for the migration) as the last step before merging the migration.
+
+The lesson behind both: visual review catches what reviewers see; mechanical checks catch what reviewers don't see. Disclosure-flow URLs and other low-traffic load-bearing references are precisely the things visual review misses, because nobody's clicking them in the normal flow. They need their own gate.
