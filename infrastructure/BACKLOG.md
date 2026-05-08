@@ -487,6 +487,59 @@ Items in this section materially weaken external credibility if absent at announ
 
 ---
 
+### Document per-commit semantics of the BACKLOG-discipline rule
+
+**Track:** `none` (contributor-facing documentation)
+
+**Status:** Not started. Surfaced 2026-05-08 during the public-discoverability push: PR #70 (predecessor of PR #71) hit a noisy-recovery loop because the discipline rule fires per-commit, not per-PR. The first commit added three new ADR files; the BACKLOG-update fix was in a follow-up commit on the same branch. The rule rejected the first commit despite the second commit modifying BACKLOG.md. Recovery required a local squash-and-force-push, plus an extra round of branch deletion and recreation that closed and reopened the PR.
+
+**Estimate:** 30 minutes.
+
+**Why this is BACKLOG and not LESSONS:** The rule itself is correct. The gap is contributor-facing documentation of how to work with it cleanly. Forward-looking discipline documentation, not a retrospective on a failure.
+
+**Scope:** Document the per-commit (not per-PR) semantics of the BACKLOG-discipline rule in `CONTRIBUTING.md` (or whichever contributor-facing workflow docs the project maintains). Include a recommended workflow: when a commit changes operational state that warrants a BACKLOG update, include the BACKLOG update in the same commit, not a follow-up commit. Reference `.github/workflows/backlog-discipline.yml` and add a comment header in that workflow file pointing back at the contributor doc.
+
+**Detection signal:** A future contributor (or a future Code session) hits the same squash-and-force-push recovery loop after a BACKLOG-rule rejection.
+
+**Recovery action:** Add the doc; reference it from `CONTRIBUTING.md` and from a new comment header on the workflow file.
+
+---
+
+### Single-source-of-truth pattern for "current state" surfaces
+
+**Track:** `none` (operational discipline)
+
+**Status:** Not started. Surfaced 2026-05-08 during verification of the public-discoverability push: the homepage Status section was stale (still claiming v0.1.1) while the changelog and the press kit were current (v0.1.5). At least three "current state" surfaces (homepage, press kit, and the validator's footer build-stamp) reference version-specific or release-count values that need to stay in sync with the changelog's most recent entry.
+
+**Estimate:** 2-4 hours.
+
+**Why this is BACKLOG and not LESSONS:** Forward-looking automation work, not a retrospective on the staleness incident itself. The fix is a substrate-level pattern that prevents recurrence.
+
+**Scope:** Identify all "current state" surfaces on llmo.org that reference a specific version number, release date, or release count. Implement a single-source-of-truth pattern. Three viable approaches:
+
+1. **Hugo data file driven by the changelog.** A small build-time script reads the changelog's most recent versioned entry and writes the version, date, and release count to `data/current.toml` (or equivalent). Templates pull from `.Site.Data.current`. Update happens once per release, in the changelog commit.
+
+2. **Build-time injection via a script.** Same effect via a pre-build step that derives the values and rewrites a single source-of-truth file. More explicit, more code.
+
+3. **Frontmatter convention plus CI cross-check.** Each "current state" page declares the version it references in frontmatter. A CI check fails the build if any declared version is older than the changelog's most recent entry. Catches drift but does not auto-fix.
+
+Pick the approach that fits the existing site architecture; (1) is probably cleanest for Hugo. As a minimum-viable fix until the SSOT pattern lands: list the surfaces in this BACKLOG entry so future updates touch all of them deliberately.
+
+**Surfaces currently identified:**
+
+- Homepage Status section (`content/_index.md`, the "version **0.1.5**" line). Updated 2026-05-08.
+- Press kit Current Status section (`content/about/press.md`). Already current as of 2026-05-08.
+- Validator footer build-stamp at `/validator/` (auto-derived from git SHA via `enableGitInfo`; no manual maintenance).
+- Changelog's [Unreleased] header (`content/spec/changelog.md`, implicitly the source of truth).
+
+Add to this list as additional surfaces are surfaced.
+
+**Detection signal:** A new specification version ships and a "current state" surface (homepage status, press kit, etc.) is not updated within the same PR, falling out of sync with the changelog.
+
+**Recovery action:** Manual sync until the SSOT pattern is in place; afterward, the SSOT update is the only required edit per release.
+
+---
+
 ### Route weekly-digest output to /updates/ automatically
 
 **Track:** `none`
