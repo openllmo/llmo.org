@@ -8,3 +8,8 @@ defaultContentLanguage = "en"
 enableGitInfo = true
 
 ignoreFiles = ['^README\.md$', '^CONTRIBUTING\.md$', '^SECURITY\.md$', '^CLAUDE\.md$', '^infrastructure/', '^scripts/', '^design/', '^\.github/', '^\.claude/']
+
+# Suppress empty taxonomy and term pages. The site does not use categories
+# or tags, but Hugo emits empty list pages for them by default and includes
+# them in the sitemap. disableKinds removes those pages from output.
+disableKinds = ['taxonomy', 'term']

@@ -34,6 +34,8 @@ This guide assumes you control a domain and can put files at /.well-known/ on it
 npm install -g llmo
 ```
 
+Package on npm: [llmo](https://www.npmjs.com/package/llmo).
+
 Verify:
 
 ```bash

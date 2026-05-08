@@ -90,8 +90,9 @@ Until that transition, Diverse.org stewards the specification and Nic Chavez ser
 
 ## Where to read more
 
-- [Specification](/spec)
-- [Governance](/about/governance)
-- [Contact](/about/contact)
-- [License](/about/license)
-- [Improvement proposals](/spec/lips)
+- [Specification](/spec): the protocol document, schema, conformance tiers, and worked example.
+- [Improvement proposals](/spec/lips): the LIP process and registry of accepted, draft, and withdrawn proposals.
+- [Governance](/about/governance): how decisions are made during pre-release, the planned transition to broader stewardship, and the current decision process.
+- [Contact](/about/contact): general inquiries, security disclosures, and LIP submissions.
+- [License](/about/license): licensing terms covering the specification, schema, and reference implementations.
+- [Press](/about/press): press kit, project status, and contacts for journalists.
