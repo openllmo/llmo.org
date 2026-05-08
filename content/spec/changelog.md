@@ -12,30 +12,36 @@ During v0.1 pre-release, changes are author-decided and no governance window app
 
 ## [Unreleased]
 
-### Added
-- Strict-tier test vectors for ES384 (`signed-strict-es384.json` and key/payload counterparts) and EdDSA (`signed-strict-eddsa.json` and key/payload counterparts) under `/spec/v0.1/test-vectors/`. The §4.2 algorithm registry permits ES256, ES384, and EdDSA; the test vector set previously covered only ES256. The new vectors complete coverage. `content/spec/v0.1/test-vectors.md` gains entries describing them.
-- Comprehensive test-vector expansion under `/spec/v0.1/test-vectors/` covering every conformance rule v0.1 defines. New negative vectors for S1, S2, S4 (three failure modes), S5, S6, X1 (alg, kid, malformed protected header, b64:false, crit non-empty), X4, X5 (corrupted document signature), and X6 (corrupted per-claim signature); schema and minimal-tier negatives for malformed `claim.type`, malformed `founded` field, bad `llmo_version`, and over-365-day windows; warning vectors for W1 and W2; edge-case vectors at 365-day and 366-day window boundaries, namespaced extension claim types, the impersonation-defense disavowal scope, and spokesperson verification URLs. `content/spec/v0.1/test-vectors.md` gains a coverage matrix table mapping each rule to its enforcing implementations and exercising vectors, organized vector-file subsections (positive, negative-by-rule, warning, edge), and a Drift findings section documenting where validator.js and CLI behavior diverge from spec text. Two harnesses landed at `scripts/test-vectors/`: `verify-vectors.mjs` runs CLI verify against every vector and asserts expected tier and rule outcomes (31/31 passing); `verify-schema.mjs` validates each vector against the canonical `/spec/v0.1/schema.json` (31/31 passing). The expansion surfaced four drift findings, each filed as a separate BACKLOG item: §5.2 S6 unimplemented in both reference implementations, §4.3.1 b64/crit rejection unimplemented in both, CLI does not enforce S4 or X4, and the CLI vendored schema lags canonical.
+## [0.1.6] - 2026-05-08
+
+S6 deferral patch. The §5.2 S6 conformance rule (disavowal and supersedes claim scope) was promoted to Standard tier in v0.1.5 ahead of the schema substrate that would let reference validators enforce it cleanly. v0.1.6 documents the deferral in §5.4 without removing S6 from §5.2; the rule remains normative as a publisher requirement, with binding validator enforcement deferred pending a LIP-process schema discriminator for disavowal categories.
 
 ### Changed
-- Appendix B of the v0.1 specification document replaced with a pointer to this changelog. The standalone changelog at `/spec/changelog/` is the single source of truth for version history; the in-spec mirror was removed to eliminate drift.
+- §5.4 gains a paragraph documenting that v0.1.5 reference validators report S6 informationally rather than as binding tier failure. Disavowal-half ambiguity (the §3.5 disavowal categories lack a schema discriminator) means binding enforcement is deferred to a future LIP-process clarification. The supersedes half is machine-checkable and may be enforced earlier in a future patch.
 
-### Fixed
-- Reference validator at /validator/ now enforces §4.3.1 prohibitions on detached-payload JWS (`b64: false` in protected header) and non-empty `crit` parameter. Previously the validator silently accepted these constructions; the CLI already rejected them. Two reference implementations now agree on §4.3.1-malformed input.
+### Notes
+- This is not a substantive normative change to S6 itself. Publishers remain subject to S6 as written in §5.2; consumers remain entitled to treat S6 violations as out-of-conformance. Reference validator behavior is the only thing changing: from "unimplemented" (the v0.1.5 reality) to "explicitly informational pending schema discriminator" (v0.1.6).
 
-## [0.1.5] - 2026-05-05
+## [0.1.5] - 2026-05-08
 
-Per-claim signature verification and rule labeling pass. Documents conforming to v0.1.4 with document-level signatures only continue to conform under v0.1.5; X6 evaluates as PASS trivially for documents with no per-claim signatures. The live `llmo.json` at `/.well-known/llmo.json` was re-signed in a parallel ceremony to gain a per-claim signature on its disavowal claim, exercising the new rule end-to-end.
+Per-claim signature verification, rule labeling, and end-of-line stabilization. The release introduced X6 (per-claim signature verification), labeled S1 through S6 and X1 through X6 to match validator emission, and (in a tail commit on 2026-05-08) closed the §4.3.1 detached-payload-JWS gap in the reference validator. A comprehensive test-vector expansion landed alongside, exercising every v0.1 conformance rule and surfacing the drift findings that v0.1.6 then addresses for S6. Documents conforming to v0.1.4 with document-level signatures only continue to conform under v0.1.5; X6 evaluates as PASS trivially for documents with no per-claim signatures. The live `llmo.json` at `/.well-known/llmo.json` was re-signed in a parallel ceremony to gain a per-claim signature on its disavowal claim, exercising the new rule end-to-end.
 
 ### Added
 - §5.3 X6 rule requiring all present per-claim signatures to cryptographically verify against keys in the publisher's JWKS. Per-claim signatures MAY use a different `kid` than the document-level signature, provided the `kid` resolves to a key in the same publisher JWKS.
 - §5.4 W1 (validity window 181 to 365 days) and W2 (`personnel.spokespeople` entry without a `verification` URL) warning codes defined explicitly to match validator emission.
 - §4.4 consumer verification algorithm gains a clarifying note on per-claim `kid` resolution.
+- Strict-tier test vectors for ES384 (`signed-strict-es384.json` and key/payload counterparts) and EdDSA (`signed-strict-eddsa.json` and key/payload counterparts) under `/spec/v0.1/test-vectors/`. The §4.2 algorithm registry permits ES256, ES384, and EdDSA; the test vector set previously covered only ES256. The new vectors complete coverage. `content/spec/v0.1/test-vectors.md` gains entries describing them.
+- Comprehensive test-vector expansion under `/spec/v0.1/test-vectors/` covering every conformance rule v0.1 defines. New negative vectors for S1, S2, S4 (three failure modes), S5, S6, X1 (alg, kid, malformed protected header, b64:false, crit non-empty), X4, X5 (corrupted document signature), and X6 (corrupted per-claim signature); schema and minimal-tier negatives for malformed `claim.type`, malformed `founded` field, bad `llmo_version`, and over-365-day windows; warning vectors for W1 and W2; edge-case vectors at 365-day and 366-day window boundaries, namespaced extension claim types, the impersonation-defense disavowal scope, and spokesperson verification URLs. `content/spec/v0.1/test-vectors.md` gains a coverage matrix table mapping each rule to its enforcing implementations and exercising vectors, organized vector-file subsections (positive, negative-by-rule, warning, edge), and a Drift findings section documenting where validator.js and CLI behavior diverge from spec text. Two harnesses landed at `scripts/test-vectors/`: `verify-vectors.mjs` runs CLI verify against every vector and asserts expected tier and rule outcomes (31/31 passing); `verify-schema.mjs` validates each vector against the canonical `/spec/v0.1/schema.json` (31/31 passing). The expansion surfaced four drift findings, each filed as a separate BACKLOG item: §5.2 S6 unimplemented in both reference implementations, §4.3.1 b64/crit rejection unimplemented in both, CLI does not enforce S4 or X4, and the CLI vendored schema lags canonical.
 
 ### Changed
 - §5.2 Standard tier bullets gain explicit S1 through S6 labels matching what conforming validators emit. Prior unlabeled bullets created cross-reference drift between spec text and validator output.
 - §5.3 Strict tier bullets gain explicit X1 through X6 labels for the same reason.
 - §5.3's prior single "valid document-level signature" bullet split into X1 (structural validity of the signature field including protected header decoding and `alg`/`kid` presence) and X5 (cryptographic verification of the signature against the publisher's JWKS).
 - §7 worked example updated to show a per-claim signature on the disavowal claim, with corresponding annotation.
+- Appendix B of the v0.1 specification document replaced with a pointer to this changelog. The standalone changelog at `/spec/changelog/` is the single source of truth for version history; the in-spec mirror was removed to eliminate drift.
+
+### Fixed
+- Reference validator at `/validator/` now enforces §4.3.1 prohibitions on detached-payload JWS (`b64: false` in protected header) and non-empty `crit` parameter. Previously the validator silently accepted these constructions; the CLI already rejected them. Two reference implementations now agree on §4.3.1-malformed input.
 
 ## [0.1.4] - 2026-05-01
 

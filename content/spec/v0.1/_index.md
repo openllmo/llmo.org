@@ -554,6 +554,8 @@ A reference validator at `llmo.org/validate` will check these tiers. It will rep
   - **W1.** Validity window exceeds 180 days but does not exceed 365 days. Standard-tier conformance requires `valid_until` no more than 180 days after `valid_from` (§5.2 S5); windows between 181 and 365 days remain Minimal-tier conforming but are flagged as discouraged.
   - **W2.** A `personnel.spokespeople` entry omits the `verification` URL. The claim remains conforming but consumers have no corroborating reference for the named individual; the §3.5 worked example shows the recommended pattern.
 
+v0.1.5 reference validators report S6 informationally rather than as a binding tier failure. The disavowal half of S6 requires a discriminator in the §3.5 disavowal categories that v0.1's schema does not currently carry; binding S6 enforcement against publisher-asserted prose risks reference implementations diverging on interpretation. Binding S6 enforcement is deferred pending a schema discriminator added through the LIP process. The supersedes half of S6 is machine-checkable (publisher-controlled URLs versus third-party URLs) and may be enforced earlier in a v0.1 patch release once the disavowal half has a discriminator. S6 remains a normative publisher requirement under §5.2; consumers remain entitled to treat S6 violations as out-of-conformance.
+
 ---
 
 ## 6. Relationship to Adjacent Standards

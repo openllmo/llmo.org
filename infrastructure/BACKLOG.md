@@ -86,13 +86,29 @@ Items in this section materially weaken external credibility if absent at announ
 
 **Track:** `changelog`
 
-**Status:** Surfaced 2026-05-08 by the test-vector expansion harness. Spec rule S6 (disavowal scope: publisher self-statements or impersonation defense; supersedes scope: publisher-controlled URLs) landed in v0.1.2 but neither reference implementation was updated. Vectors `negative-s6-disavowal-third-party.json` and `edge-disavowal-impersonation-defense.json` document the gap.
+**Status:** Surfaced 2026-05-08 by the test-vector expansion harness. Spec rule S6 (disavowal scope: publisher self-statements or impersonation defense; supersedes scope: publisher-controlled URLs) landed in v0.1.2 but neither reference implementation was updated. Vectors `negative-s6-disavowal-third-party.json` and `edge-disavowal-impersonation-defense.json` document the gap. v0.1.6 (2026-05-08) documented the deferral in §5.4 explicitly; implementing S6 binding now requires the disavowal-discriminator LIP below to land first.
 
 **Estimate:** 2-4 hours per implementation.
 
 **Why credibility:** A spec rule with no enforcement is a claim with no verification. Anyone running an implementation today is told "Standard tier" for documents that fail S6.
 
-**Scope:** Add S6 check in `static/js/validator.js` (claim by claim, distinguishing disavowal from supersedes) and in `cli/src/lib/tier.ts`. The disavowal "what" field is the discriminator: values implying impersonation defense (`unaffiliated_domain`, etc.) are in scope; values implying third-party assertions (competitor product quality, third-party content) are out. Keep the discriminator list in spec text rather than hard-coded; v0.1.6 spec patch may need to enumerate. Update `negative-s6-disavowal-third-party.json` expectation in the harness when implementations land.
+**Scope:** Add S6 check in `static/js/validator.js` (claim by claim, distinguishing disavowal from supersedes) and in `cli/src/lib/tier.ts`. The disavowal "what" field is the discriminator: values implying impersonation defense (`unaffiliated_domain`, etc.) are in scope; values implying third-party assertions (competitor product quality, third-party content) are out. Once the disavowal-discriminator LIP lands, the discriminator can be a schema field rather than a hard-coded enum. The supersedes half is already machine-checkable (publisher-controlled URLs vs third-party URLs) and may be enforced earlier in a v0.1 patch. Update `negative-s6-disavowal-third-party.json` expectation in the harness when implementations land.
+
+### LIP: schema discriminator for disavowal categories
+
+**Track:** `lip`
+
+**Status:** LIP candidate. Surfaced 2026-05-08 by PR #74's drift investigation; documented in v0.1.6 §5.4 as the substrate that binding S6 enforcement is waiting on.
+
+**Estimate:** 2-4 hours drafting, plus the LIP-1 7-day public discussion window.
+
+**Scope:** Add a discriminator field to `disavowal.disavowed[]` in the schema (e.g., `category: "self_statement" | "impersonation_defense"` or equivalent) so reference validators can machine-check S6's disavowal half without interpreting publisher-asserted prose. Spec text in §3.5 updates to reference the discriminator as the normative authority for which scope a disavowal entry claims; §5.2 S6 updates to enforce against the discriminator field. The supersedes half is already machine-checkable from the URL set and can be enforced in the same release once the disavowal half has substrate.
+
+**Why:** v0.1.5 promoted S6 to Standard tier; v0.1.6 documents the binding-enforcement deferral in §5.4. Binding S6 requires a schema substrate the spec doesn't currently carry. Without this LIP, S6 stays informational indefinitely, and the §5.4 deferral note becomes load-bearing rather than transitional.
+
+**Detection signal:** S6 still informational after v0.2 publication.
+
+**Recovery action:** Land the LIP through the normal LIP-1 process; close out v0.1.6's §5.4 deferral note in the v0.1.7 (or v0.2) changelog when binding enforcement returns.
 
 ### Implement §4.3.1 b64:false and crit rejection
 
@@ -563,8 +579,9 @@ Pick the approach that fits the existing site architecture; (1) is probably clea
 
 **Surfaces currently identified:**
 
-- Homepage Status section (`content/_index.md`, the "version **0.1.5**" line). Updated 2026-05-08.
-- Press kit Current Status section (`content/about/press.md`). Already current as of 2026-05-08.
+- Homepage Status section (`content/_index.md`, the "version **0.1.6**" line). Updated 2026-05-08 (v0.1.6 release).
+- Press kit Current Status section (`content/about/press.md`, the release-count line). Updated 2026-05-08 (v0.1.6 release).
+- Updates entry for the release week (`content/updates/2026-05-08.md`). Closing paragraph appended 2026-05-08 to mark v0.1.6.
 - Validator footer build-stamp at `/validator/` (auto-derived from git SHA via `enableGitInfo`; no manual maintenance).
 - Changelog's [Unreleased] header (`content/spec/changelog.md`, implicitly the source of truth).
 

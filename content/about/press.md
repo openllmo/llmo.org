@@ -21,7 +21,7 @@ LLMO does not solve the trust problem. It gives organizations a sovereign channe
 ## Current status
 
 - Specification v0.1 published 2026-04-17.
-- Six versioned releases through 2026-05-05 (v0.1.0 through v0.1.5).
+- Seven versioned releases through 2026-05-08 (v0.1.0 through v0.1.6).
 - Reference command-line tool published on npm: [llmo](https://www.npmjs.com/package/llmo).
 - Web validator runs at [validate.llmo.org](https://validate.llmo.org), redirected to [/validator/](/validator/).
 - Improvement Proposal process active: see [LIPs](/spec/lips/).
