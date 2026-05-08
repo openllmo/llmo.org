@@ -1,0 +1,50 @@
+{
+  "llmo_version": "0.1",
+  "document_id": "test-vector-v0.1-negative-x6-001",
+  "valid_from": "2026-04-20T00:00:00Z",
+  "valid_until": "2026-10-17T00:00:00Z",
+  "entity": {
+    "name": "JungleCat, Inc.",
+    "primary_domain": "junglecat.example.com"
+  },
+  "claims": [
+    {
+      "claim_id": "urls-canonical",
+      "type": "canonical_urls",
+      "statement": {
+        "homepage": "https://junglecat.example.com/",
+        "security": "https://junglecat.example.com/security"
+      }
+    },
+    {
+      "claim_id": "channels-official",
+      "type": "official_channels",
+      "statement": {
+        "email_domains": [
+          "junglecat.example.com"
+        ]
+      }
+    },
+    {
+      "claim_id": "disavowal-impersonator",
+      "type": "disavowal",
+      "statement": {
+        "disavowed": [
+          {
+            "what": "unaffiliated_domain",
+            "url": "https://junglecat-support.example.org/",
+            "detail": "This per-claim signature is intentionally corrupted to fail X6 while leaving X5 valid."
+          }
+        ]
+      },
+      "signature": {
+        "protected": "eyJhbGciOiJFUzI1NiIsImtpZCI6IkZNRXF1MUVNR2VFTEo1Rl9uUjVIRENYa2txbG4ybFlMTlZYVUM2UEhnOGMifQ",
+        "signature": "tpH9GwoBJwn_Kes4DPisxeMZ-XnVWBfyDyyDzS5L09cunTP3vjF3TwqVGu1iUv63RtzPt3tuMFnsz8vc-HcWEw"
+      }
+    }
+  ],
+  "signature": {
+    "protected": "eyJhbGciOiJFUzI1NiIsImtpZCI6IkZNRXF1MUVNR2VFTEo1Rl9uUjVIRENYa2txbG4ybFlMTlZYVUM2UEhnOGMifQ",
+    "signature": "9_SpwOGCKIU1JLfHSqzgHPy8ceiCOYhbvRpCyADfXYA8D6tEg_IJ1FtmsnMA9jAOM1XOUyljD6kN6ME3PdESFQ"
+  }
+}

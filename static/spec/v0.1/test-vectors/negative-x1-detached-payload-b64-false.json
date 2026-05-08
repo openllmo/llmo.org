@@ -1,0 +1,33 @@
+{
+  "llmo_version": "0.1",
+  "document_id": "test-vector-v0.1-negative-x1-004",
+  "valid_from": "2026-04-20T00:00:00Z",
+  "valid_until": "2026-10-17T00:00:00Z",
+  "entity": {
+    "name": "JungleCat, Inc.",
+    "primary_domain": "junglecat.example.com"
+  },
+  "claims": [
+    {
+      "claim_id": "urls-canonical",
+      "type": "canonical_urls",
+      "statement": {
+        "homepage": "https://junglecat.example.com/",
+        "security": "https://junglecat.example.com/security"
+      }
+    },
+    {
+      "claim_id": "channels-official",
+      "type": "official_channels",
+      "statement": {
+        "email_domains": [
+          "junglecat.example.com"
+        ]
+      }
+    }
+  ],
+  "signature": {
+    "protected": "eyJhbGciOiJFUzI1NiIsImtpZCI6Imp1bmdsZWNhdC10ZXN0LTIwMjYiLCJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdfQ",
+    "signature": "jnTRhvzJq2KHJl7iTtACDUKjYTPTLQXztpPfwPAGGltaiXX3pNq8CkEUVccs1dUBrPjUYFsv7kJaB05zmxykww"
+  }
+}
