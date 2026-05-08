@@ -1,7 +1,7 @@
 ---
 title: Changelog
 description: Version history for the LLMO specification.
-date: 2026-04-26
+use_lastmod: true
 ---
 
 ## About this changelog
@@ -11,6 +11,9 @@ This changelog records substantive and editorial changes to the LLMO specificati
 During v0.1 pre-release, changes are author-decided and no governance window applies. From v0.2 forward, changes follow the LIP process and the editor applies editorial revisions per the [governance page](/about/governance).
 
 ## [Unreleased]
+
+### Added
+- Strict-tier test vectors for ES384 (`signed-strict-es384.json` and key/payload counterparts) and EdDSA (`signed-strict-eddsa.json` and key/payload counterparts) under `/spec/v0.1/test-vectors/`. The §4.2 algorithm registry permits ES256, ES384, and EdDSA; the test vector set previously covered only ES256. The new vectors complete coverage. `content/spec/v0.1/test-vectors.md` gains entries describing them.
 
 ### Changed
 - Appendix B of the v0.1 specification document replaced with a pointer to this changelog. The standalone changelog at `/spec/changelog/` is the single source of truth for version history; the in-spec mirror was removed to eliminate drift.
