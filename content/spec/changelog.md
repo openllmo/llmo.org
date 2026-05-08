@@ -19,8 +19,15 @@ During v0.1 pre-release, changes are author-decided and no governance window app
 ### Changed
 - Appendix B of the v0.1 specification document replaced with a pointer to this changelog. The standalone changelog at `/spec/changelog/` is the single source of truth for version history; the in-spec mirror was removed to eliminate drift.
 
+## [0.1.6] - 2026-05-08
+
+v0.1.6 bundles two changes surfaced by PR #74's test-vector expansion. The reference validator at /validator/ now enforces §4.3.1's prohibitions on detached-payload JWS (`b64: false` in the protected header) and non-empty `crit`; the CLI already enforced these, so v0.1.6 brings the two reference implementations into agreement on §4.3.1-malformed input. §5.4 gains a paragraph documenting that S6 (introduced in v0.1.5) is reported informationally by reference validators pending a schema discriminator for §3.5 disavowal categories. This is not a normative change to S6 itself: publishers remain subject to S6 as written in §5.2, and consumers remain entitled to treat S6 violations as out-of-conformance. Reference validator behavior is the only thing changing for S6, from "unimplemented" to "explicitly informational pending schema discriminator."
+
 ### Fixed
 - Reference validator at /validator/ now enforces §4.3.1 prohibitions on detached-payload JWS (`b64: false` in protected header) and non-empty `crit` parameter. Previously the validator silently accepted these constructions; the CLI already rejected them. Two reference implementations now agree on §4.3.1-malformed input.
+
+### Changed
+- §5.4 gains a paragraph documenting that v0.1.5 reference validators report S6 informationally rather than as binding tier failure. Disavowal-half ambiguity (the §3.5 disavowal categories lack a schema discriminator) means binding enforcement is deferred to a future LIP-process clarification. The supersedes half is machine-checkable and may be enforced earlier in a future patch.
 
 ## [0.1.5] - 2026-05-05
 
