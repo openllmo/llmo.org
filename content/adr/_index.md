@@ -15,6 +15,9 @@ ADRs differ from LIPs in scope. [LIPs](/spec/lips/) propose changes to the LLMO 
 | --- | --- | --- | --- | --- |
 | [ADR-0000](/adr/0000-record-architecture-decisions/) | Record architecture decisions | Nic Chavez | Accepted | 2026-05-06 |
 | [ADR-0001](/adr/0001-two-entity-firewall/) | Two-entity firewall between protocol stewardship and commercial activity | Nic Chavez | Accepted | 2026-05-06 |
+| [ADR-0002](/adr/0002-branch-protection-on-main/) | Branch protection on main | Nic Chavez | Accepted | 2026-05-06 |
+| [ADR-0003](/adr/0003-backlog-discipline-track-conventions/) | BACKLOG discipline and Track conventions | Nic Chavez | Accepted | 2026-05-06 |
+| [ADR-0004](/adr/0004-github-app-workflow-auth/) | GitHub App for workflow PR creation | Nic Chavez | Accepted | 2026-05-07 |
 
 ## Format
 
