@@ -3,6 +3,7 @@ title: Anchoring LIP Documents
 linkTitle: Anchoring
 description: "How LLMO anchors LIP documents to Bitcoin via OpenTimestamps."
 date: 2026-04-26
+use_lastmod: true
 ---
 
 ## Purpose
