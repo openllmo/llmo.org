@@ -19,6 +19,9 @@ During v0.1 pre-release, changes are author-decided and no governance window app
 ### Changed
 - Appendix B of the v0.1 specification document replaced with a pointer to this changelog. The standalone changelog at `/spec/changelog/` is the single source of truth for version history; the in-spec mirror was removed to eliminate drift.
 
+### Fixed
+- Reference validator at /validator/ now enforces §4.3.1 prohibitions on detached-payload JWS (`b64: false` in protected header) and non-empty `crit` parameter. Previously the validator silently accepted these constructions; the CLI already rejected them. Two reference implementations now agree on §4.3.1-malformed input.
+
 ## [0.1.5] - 2026-05-05
 
 Per-claim signature verification and rule labeling pass. Documents conforming to v0.1.4 with document-level signatures only continue to conform under v0.1.5; X6 evaluates as PASS trivially for documents with no per-claim signatures. The live `llmo.json` at `/.well-known/llmo.json` was re-signed in a parallel ceremony to gain a per-claim signature on its disavowal claim, exercising the new rule end-to-end.

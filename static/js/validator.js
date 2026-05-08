@@ -444,7 +444,11 @@
         } else {
           try {
             var header = JSON.parse(b64urlDecode(sig.protected));
-            if (ALLOWED_ALGS.indexOf(header.alg) < 0) {
+            if (header.b64 === false) {
+              x1note = "JWS protected header has b64:false; v0.1 prohibits detached-payload mode (RFC 7797) per §4.3.1";
+            } else if (Array.isArray(header.crit) && header.crit.length > 0) {
+              x1note = "JWS protected header has non-empty crit parameter; v0.1 verifiers MUST reject per §4.3.1";
+            } else if (ALLOWED_ALGS.indexOf(header.alg) < 0) {
               x1note = "JWS protected header alg is " + JSON.stringify(header.alg) + ", must be ES256, ES384, or EdDSA";
             } else if (!header.kid) {
               x1note = "JWS protected header is missing kid";

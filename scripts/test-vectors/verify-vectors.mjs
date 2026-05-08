@@ -58,11 +58,12 @@ const VECTORS = [
   { file: 'negative-x1-missing-kid.json', expect: { tier: 'standard', tierFailureRule: 'signature valid' }, drift: 'Same X1/X5 collapse.' },
   { file: 'negative-x1-malformed-protected.json', expect: { tier: 'standard', tierFailureRule: 'signature valid' }, drift: 'Same X1/X5 collapse.' },
 
-  // X1 detail rules from §4.3.1: b64:false and crit non-empty. Neither CLI
-  // nor validator.js enforces these; both pass at strict if the alg/kid
-  // are otherwise valid. Drift documented for §4.3.1.
-  { file: 'negative-x1-detached-payload-b64-false.json', expect: { tier: 'standard', tierFailureRule: 'signature valid' }, drift: 'Spec §4.3.1 rejects b64:false; CLI and validator.js do not check, but signature is unverifiable so vector still drops to standard via crypto failure.' },
-  { file: 'negative-x1-crit-non-empty.json', expect: { tier: 'standard', tierFailureRule: 'signature valid' }, drift: 'Spec §4.3.1 rejects non-empty crit; same situation as b64:false.' },
+  // X1 detail rules from §4.3.1: b64:false and crit non-empty. CLI rejects
+  // both in lib/jws.ts; validator.js rejects both at the X1 structural check
+  // (added in PR fix/validator-jws-rfc7797). CLI surfaces the failure as a
+  // generic "signature valid" rule because it collapses X1 and X5.
+  { file: 'negative-x1-detached-payload-b64-false.json', expect: { tier: 'standard', tierFailureRule: 'signature valid' } },
+  { file: 'negative-x1-crit-non-empty.json', expect: { tier: 'standard', tierFailureRule: 'signature valid' } },
 
   // X4 - CLI does NOT enforce; validator.js does.
   { file: 'negative-x4-no-owned-canonical-url.json', expect: { tier: 'standard', tierFailureRule: 'signature valid' }, drift: 'CLI does not enforce X4; vector still fails because placeholder sig is uncryptographic. Validator.js fails X4 directly.' },

@@ -44,7 +44,7 @@ The vector set targets every spec rule v0.1 defines. Two reference implementatio
 | S5 window <= 180 days | §5.2 | yes | yes | `unsigned-standard.json` | `negative-s5-window-181-days.json` |
 | S6 disavowal/supersedes scope | §5.2 | no | no | `edge-disavowal-impersonation-defense.json` | `negative-s6-disavowal-third-party.json` |
 | X1 signature structurally valid | §5.3, §4.3 | yes | collapsed into "signature valid" | `signed-strict.json`, `signed-strict-es384.json`, `signed-strict-eddsa.json` | `negative-x1-bad-alg.json`, `negative-x1-missing-kid.json`, `negative-x1-malformed-protected.json` |
-| X1 §4.3.1 detail (b64:false, crit) | §4.3.1 | no | no | n/a | `negative-x1-detached-payload-b64-false.json`, `negative-x1-crit-non-empty.json` |
+| X1 §4.3.1 detail (b64:false, crit) | §4.3.1 | yes | yes | n/a | `negative-x1-detached-payload-b64-false.json`, `negative-x1-crit-non-empty.json` |
 | X2 JWKS retrievable | §5.3 | URL mode only | URL mode only | (live deploy) | (live deploy) |
 | X3 JWKS Cache-Control <= 86400 | §5.3 | URL mode only | URL mode only | (live deploy) | (live deploy) |
 | X4 canonical_urls reference | §5.3 | yes | informational only | `signed-strict.json` | `negative-x4-no-owned-canonical-url.json` |
@@ -159,11 +159,11 @@ JWS protected header decodes to `{"alg":"ES256"}` with no `kid`. Validator repor
 
 ##### `negative-x1-detached-payload-b64-false.json`
 
-JWS protected header includes `b64: false` and `crit: ["b64"]`, the RFC 7797 detached-payload mode that [§4.3.1](/spec/v0.1#4-3-1-jws-payload-encoding) explicitly prohibits for v0.1. Neither validator nor CLI enforces this rule; both pass X1 structural validity. The vector documents the spec text and is filed as drift; the signature also fails to verify cryptographically because the placeholder bytes are not a real JWS over this payload.
+JWS protected header includes `b64: false` and `crit: ["b64"]`, the RFC 7797 detached-payload mode that [§4.3.1](/spec/v0.1#4-3-1-jws-payload-encoding) explicitly prohibits for v0.1. Validator reports X1 FAIL with the b64:false-specific message; CLI rejects via `lib/jws.ts` and reports `signature valid` failure with tier `standard`.
 
 ##### `negative-x1-crit-non-empty.json`
 
-JWS protected header includes a non-empty `crit` array (`crit: ["unknown-ext"]`). [§4.3.1](/spec/v0.1#4-3-1-jws-payload-encoding) requires verifiers to reject any JWS whose `crit` parameter is non-empty for v0.1. Same drift as the b64:false case: neither validator nor CLI enforces.
+JWS protected header includes a non-empty `crit` array (`crit: ["unknown-ext"]`). [§4.3.1](/spec/v0.1#4-3-1-jws-payload-encoding) requires verifiers to reject any JWS whose `crit` parameter is non-empty for v0.1. Validator reports X1 FAIL with the crit-non-empty message; CLI rejects via `lib/jws.ts` and reports `signature valid` failure with tier `standard`.
 
 ##### `negative-x4-no-owned-canonical-url.json`
 
@@ -237,7 +237,7 @@ The vector set surfaced four classes of drift between spec text and reference im
 
 1. **S6 (disavowal/supersedes scope) is unimplemented in both validator.js and the CLI.** Vectors: `negative-s6-disavowal-third-party.json`, and `edge-disavowal-impersonation-defense.json` as a positive control. Spec rule landed in v0.1.2; reference implementations were not updated.
 
-2. **§4.3.1 `b64:false` and non-empty `crit` are unimplemented in both implementations.** Vectors: `negative-x1-detached-payload-b64-false.json`, `negative-x1-crit-non-empty.json`. Spec text under [§4.3.1](/spec/v0.1#4-3-1-jws-payload-encoding) is normative; the structural-X1 check in both implementations only checks `alg` and `kid`.
+2. **§4.3.1 `b64:false` and non-empty `crit` (resolved).** Vectors: `negative-x1-detached-payload-b64-false.json`, `negative-x1-crit-non-empty.json`. Spec text under [§4.3.1](/spec/v0.1#4-3-1-jws-payload-encoding) is normative. The CLI enforces this in `src/lib/jws.ts`; the validator now enforces it in the X1 structural check (PR `fix/validator-jws-rfc7797`). Vectors retained so the harness can detect any future regression.
 
 3. **CLI does not enforce S4 (URL ownership) or X4 (canonical_urls reference).** Both rules are noted as "informational" in `src/lib/tier.ts` of the CLI. Validator.js does enforce them. Vectors: the three `negative-s4-*.json` and `negative-x4-no-owned-canonical-url.json`.
 
