@@ -487,6 +487,48 @@ Items in this section materially weaken external credibility if absent at announ
 
 ---
 
+### Route weekly-digest output to /updates/ automatically
+
+**Track:** `none`
+
+**Status:** Not started. Surfaced 2026-05-08 by PR 3 of the public-discoverability push, which created the `/updates/` content section and backfilled three weekly entries by hand.
+
+**Estimate:** 3-6 hours, depending on whether a transform step is included.
+
+**Why:** The weekly-digest workflow already produces a per-week markdown narrative at `infrastructure/weekly-digest/YYYY-WNN.md`. That output is technical (commit-message-derived, organized by file-path category) and lives in a directory Hugo's `ignoreFiles` excludes from build output. The polished journalist-readable counterpart at `/updates/` is currently hand-written or hand-polished. Routing the digest output (or a transformed version of it) into `content/updates/` automatically would close the manual-writing gap that exists between cadence-driven internal record and cadence-driven public surface.
+
+**Scope:** Two parts, separable:
+
+1. **Direct route.** Modify the digest workflow (or add a downstream step) to copy the generated markdown into `content/updates/` with appropriate frontmatter (title, linkTitle, description, date) and commit the public version alongside the technical version. The two files have the same content; the technical one stays as the build artifact, the public one becomes the rendered page. Lowest effort; produces public content that reads as commit-summary-prose.
+
+2. **Polished transform.** Add an LLM-call or rules-based transform step that converts the technical digest into a journalist-register summary (active voice, plain-language framing, named shipped surfaces with links). The transform's output goes into `content/updates/`. Higher effort, more useful for non-developer readers. Defer until 4-6 weekly updates have been hand-written so the polished-register target is well-defined.
+
+**Detection signal that this is needed:** weekly-digest run produces a useful technical narrative, but the corresponding `/updates/` page is missing or out of date because no human wrote it that week.
+
+---
+
+### Long-form blog at blog.llmo.org
+
+**Track:** `none`
+
+**Status:** Not started. Surfaced 2026-05-08 by PR 3 of the public-discoverability push.
+
+**Estimate:** 6-12 hours for substrate (subdomain, build pipeline, signing convention); ongoing for content.
+
+**Why:** `/updates/` is cadence-driven (weekly summaries of project activity). A long-form blog covers a different register: protocol-design narrative, decisions explained at essay length, replies to external reviewers, engagement with the broader trust-layer conversation. The blog and the updates page are complementary, not redundant.
+
+**Scope:**
+
+1. Subdomain `blog.llmo.org` provisioned and pointed at a Hugo build (or alternative if a different generator fits better). Cloudflare Pages can host both `llmo.org` and `blog.llmo.org` from separate projects if the operational separation is worth the complexity, or from the same project with a subdomain-aware build if not.
+
+2. Posts dogfood the protocol: each blog post is signed against the project's signing key. The post's signed metadata is published alongside the post itself, demonstrating the protocol against a real text artifact rather than only against `llmo.json`. This is content choice plus a small build-pipeline change.
+
+3. Cross-linking from `/updates/` to relevant blog posts and vice versa. Updates point at long-form essays when those exist; blog posts reference the cadence-driven updates as the project-state record they contextualize.
+
+**Detection signal that this is needed:** essays written in personal notes or scratch documents that should be public but have nowhere to live; protocol-design rationale that requires more than an ADR can carry.
+
+---
+
 ### LIP registry as generated artifact
 
 **Track:** `none`
