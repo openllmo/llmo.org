@@ -70,9 +70,24 @@ jobs:
           echo "week=${WEEK}" >> "$GITHUB_OUTPUT"
           echo "msg=digest: week ${WEEK} of ${YEAR}" >> "$GITHUB_OUTPUT"
 
+      # Mint an installation token from the llmo-workflow-bot GitHub App.
+      # PRs created via GITHUB_TOKEN do not trigger pull_request-event
+      # workflows (anti-recursion safeguard), so required checks never run
+      # and auto-merge never fires. PRs created via an App-installation
+      # token do trigger workflows, so this is the path that lets the
+      # weekly digest land unattended under enforced branch protection.
+      # Branch creation, commit, and push above continue to use
+      # GITHUB_TOKEN; only PR creation and merge-queue need the App token.
+      - name: Generate App token
+        id: app-token
+        uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
+        with:
+          app-id: ${{ secrets.LLMO_WORKFLOW_BOT_APP_ID }}
+          private-key: ${{ secrets.LLMO_WORKFLOW_BOT_PRIVATE_KEY }}
+
       - name: Open PR for digest file (auto-merge)
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           set -euo pipefail
           FILE="${{ steps.gen.outputs.file }}"
