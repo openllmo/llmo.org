@@ -2,6 +2,7 @@
 title: Contact
 description: "How to reach the LLMO project for different kinds of matters."
 date: 2026-04-26
+use_lastmod: true
 ---
 
 This page routes contact to the right channel for the right kind of matter.

@@ -2,6 +2,7 @@
 title: License
 description: Licensing terms for the LLMO specification, documentation, code, and schemas.
 date: 2026-04-17
+use_lastmod: true
 ---
 
 The LLMO project is published under two licenses, applied by material type.
