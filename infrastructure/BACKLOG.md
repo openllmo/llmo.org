@@ -86,13 +86,17 @@ Items in this section materially weaken external credibility if absent at announ
 
 **Track:** `changelog`
 
-**Status:** Surfaced 2026-05-08 by the test-vector expansion harness. Spec rule S6 (disavowal scope: publisher self-statements or impersonation defense; supersedes scope: publisher-controlled URLs) landed in v0.1.2 but neither reference implementation was updated. Vectors `negative-s6-disavowal-third-party.json` and `edge-disavowal-impersonation-defense.json` document the gap. v0.1.5 (2026-05-05) labeled the rule as S6 in §5.2 Standard tier without binding validator enforcement; v0.1.6 (2026-05-08) documented the deferral in §5.4 explicitly. Implementing S6 binding now requires the disavowal-discriminator LIP below to land first.
+**[Deferred to v0.2 / LIP-candidate; partial documentation in v0.1.6]** §5.2 S6 binding enforcement.
 
-**Estimate:** 2-4 hours per implementation.
+Filed 2026-05-08. Investigation surfaced material spec ambiguity: the disavowal half of S6 lacks a schema discriminator that would let reference validators machine-check the rule. The supersedes half is cleaner but shipping half of S6 is worse than shipping none.
+
+v0.1.5 (2026-05-05) labeled the rule as S6 in §5.2 Standard tier without binding validator enforcement. v0.1.6 (released 2026-05-08, llmo.org PR #79, SHA 6c2de9fcd75aadec5a2a430602cf71625a4a3470) documents the deferral in §5.4: reference validators report S6 informationally pending the schema discriminator. Filed LIP candidate (see "LIP: schema discriminator for disavowal categories" entry below) for the schema addition. Binding S6 enforcement can return in a v0.1.7 patch or v0.2 once the LIP lands.
+
+**Estimate:** 2-4 hours per implementation once the disavowal-discriminator LIP lands.
 
 **Why credibility:** A spec rule with no enforcement is a claim with no verification. Anyone running an implementation today is told "Standard tier" for documents that fail S6.
 
-**Scope:** Add S6 check in `static/js/validator.js` (claim by claim, distinguishing disavowal from supersedes) and in `cli/src/lib/tier.ts`. The disavowal "what" field is the discriminator: values implying impersonation defense (`unaffiliated_domain`, etc.) are in scope; values implying third-party assertions (competitor product quality, third-party content) are out. Once the disavowal-discriminator LIP lands, the discriminator can be a schema field rather than a hard-coded enum. The supersedes half is already machine-checkable (publisher-controlled URLs vs third-party URLs) and may be enforced earlier in a v0.1 patch. Update `negative-s6-disavowal-third-party.json` expectation in the harness when implementations land.
+**Scope:** Add S6 check in `static/js/validator.js` (claim by claim, distinguishing disavowal from supersedes) and in `cli/src/lib/tier.ts`. The disavowal "what" field is the discriminator: values implying impersonation defense (`unaffiliated_domain`, etc.) are in scope; values implying third-party assertions (competitor product quality, third-party content) are out. Once the disavowal-discriminator LIP lands, the discriminator becomes a schema field rather than a hard-coded enum. The supersedes half is already machine-checkable (publisher-controlled URLs vs third-party URLs) and may be enforced earlier in a v0.1 patch. Update `negative-s6-disavowal-third-party.json` expectation in the harness when implementations land. Vectors `negative-s6-disavowal-third-party.json` and `edge-disavowal-impersonation-defense.json` document the gap.
 
 ### LIP: schema discriminator for disavowal categories
 
@@ -114,37 +118,27 @@ Items in this section materially weaken external credibility if absent at announ
 
 **Track:** `changelog`
 
-**Status:** Surfaced 2026-05-08 by the test-vector expansion harness. Spec §4.3.1 explicitly prohibits `b64: false` and non-empty `crit` in JWS protected headers; neither validator.js nor CLI checks. Vectors `negative-x1-detached-payload-b64-false.json` and `negative-x1-crit-non-empty.json` document the gap.
+**[Resolved 2026-05-08 by llmo.org PR #78, SHA d7d2bcdb18d559dabb0b098c6a7c5ab98ff34706]** Validator b64/crit enforcement (§4.3.1).
 
-**Estimate:** 1-2 hours per implementation.
-
-**Why credibility:** RFC 7797 (detached-payload JWS) is a frequent source of interop failure precisely because verifiers mishandle the `crit` parameter. Spec §4.3.1 picked the conservative default (reject any `crit` for v0.1) specifically to avoid this; the implementations failing to enforce it defeats that choice.
-
-**Scope:** Extend the X1 structural check in both implementations to reject any JWS protected header with `b64: false` or with a non-empty `crit` array. Validator.js: add to the existing X1 alg/kid check at validator.js line ~447. CLI: extend the structural-validity portion of `verify-jws` or split into a dedicated X1 check separate from X5. Update vector harness expectations after.
+Originally filed 2026-05-08 as "Spec §4.3.1 explicitly prohibits b64: false and non-empty crit in JWS protected headers; neither validator.js nor CLI checks." Investigation 2026-05-08 (post-filing) corrected the state: CLI implements the check in `src/lib/jws.ts`; validator did not. Resolved by validator-side enforcement in PR #78; both reference implementations now agree on §4.3.1-malformed input.
 
 ### Implement S4 and X4 in CLI
 
 **Track:** `changelog`
 
-**Status:** Surfaced 2026-05-08. CLI's `cli/src/lib/tier.ts` lines 130 and 162 mark S4 (URL ownership) and X4 (canonical_urls reference) as informational, not enforced. Validator.js does enforce both. Vectors `negative-s4-third-party-canonical-url.json`, `negative-s4-third-party-product-url.json`, `negative-s4-third-party-supersedes-url.json`, and `negative-x4-no-owned-canonical-url.json` document the gap.
+**[Resolved 2026-05-08 by cli PR #5, SHA b407061fad9af9533bda0a917b27a8906c6cf0da]** CLI does not enforce S4/X4.
 
-**Estimate:** 3-5 hours.
-
-**Why credibility:** Cross-implementation drift on enforced rules is worse than having a rule unimplemented uniformly. Implementers running CLI in CI pipelines will pass documents that the public validator at /validator/ rejects.
-
-**Scope:** Port the validator.js S4 and X4 logic into CLI tier.ts. Reuse the entity owned-domain set logic. Implement the S4 third-party-allowed list (`pointer.url`, `disavowal.disavowed[].url`, `official_channels.community[].url`, `personnel.spokespeople[].verification`) verbatim. Cover with new CLI unit tests. After landing, update vector harness expectations.
+Originally filed 2026-05-08. CLI tier.ts ports validator.js's S4 and X4 implementations; informational notes dropped; vector harness now produces identical CLI-vs-validator outcomes. Resolved by cli PR #5. Coordination harness expectation update on llmo.org landed 2026-05-08 in PR #80, SHA c8a4ab788ca941e07bb93e94a1d8231b35c3b552.
 
 ### Re-vendor canonical schema into CLI
 
 **Track:** `none`
 
-**Status:** Surfaced 2026-05-08. CLI's `src/schema/v0.1.json` lags the canonical `static/spec/v0.1/schema.json` from this repo. Missing: the v0.1.4 `claim.type` `oneOf` (core enum or namespaced pattern), the `statement_identity.founded` pattern. Vector `negative-schema-malformed-founded.json` reproduces the gap.
+**[Resolved 2026-05-07 by cli PR #1, SHA 151acf6]** CLI vendored schema lags canonical.
 
-**Estimate:** 30 minutes plus CI verification.
+Filed 2026-05-08 from a snapshot that predated cli PR #1's re-vendor (2026-05-07). Investigation 2026-05-08 confirmed the CLI's `src/schema/v0.1.json` is byte-identical to canonical except for the deliberate `$comment` provenance line inserted by `scripts/vendor.sh`. No further action; the v0.1.4 schema completeness changes (claim.type oneOf, statement_identity.founded pattern) are present in the CLI.
 
-**Why credibility:** A vendored schema that does not match the published canonical schema means CLI consumers run against silently outdated rules. The vendor script and a vendor-drift CI check already exist (per CLI `scripts/vendor.sh` and the cli repo's vendor-drift required check); they just need to run.
-
-**Scope:** Run `scripts/vendor.sh` in `openllmo/cli` to refresh `src/schema/v0.1.json`, regenerate the dist build, ship as a CLI patch (v0.1.6 or later). The vendor-drift CI check on cli's `main` should already gate this; if it has been failing without resolution, investigate why.
+Vendor-drift CI guard added 2026-05-08 in cli PR #4, SHA f3b41aed377aede1d79f3b3c4e293ea6002d6edd, to prevent re-occurrence of the snapshot-vs-reality drift pattern.
 
 ---
 
@@ -590,6 +584,26 @@ Add to this list as additional surfaces are surfaced.
 **Detection signal:** A new specification version ships and a "current state" surface (homepage status, press kit, etc.) is not updated within the same PR, falling out of sync with the changelog.
 
 **Recovery action:** Manual sync until the SSOT pattern is in place; afterward, the SSOT update is the only required edit per release.
+
+---
+
+### BACKLOG-vs-reality drift discipline
+
+**Track:** `none` (process discipline)
+
+**[Open]** BACKLOG-vs-reality drift discipline.
+
+Surfaced 2026-05-08 by PR #74 drift investigation. Two of four findings filed on 2026-05-08 turned out to be stale or wrong relative to the actual codebase state: Finding #2 framed both implementations as missing the §4.3.1 check (only validator was missing); Finding #4 referenced a schema-vendor gap already resolved by cli PR #1 the day before.
+
+Second instance of the same pattern fired during the same session: PR D-1's first draft folded the [Unreleased] b64/crit fix into v0.1.5 and bumped v0.1.5's date from 2026-05-05 to 2026-05-08, falsifying the as-published v0.1.5 snapshot. Operator caught on review; correction commit (llmo.org PR #79, SHA 6c2de9fcd75aadec5a2a430602cf71625a4a3470) reverted v0.1.5 to its as-published state and moved the b64/crit fix into v0.1.6 alongside the §5.4 S6 deferral.
+
+The general pattern: BACKLOG entries (and changelog entries) are snapshots from when written, not current ground truth. Investigation-first prompts that read current state should be the default for non-trivial BACKLOG-driven work, especially for entries crossing repo boundaries, filed days before action, or rewriting historical state.
+
+**Detection signal:** A BACKLOG-driven prompt finds the described state has changed materially since filing; or, an edit to a versioned changelog entry changes that entry's date or substantive content after publication.
+
+**Recovery action:** Investigation report identifies the corrected state; act on the corrected state, not the BACKLOG framing. For changelog: never modify a published version's date or substantive content; new releases get new entries.
+
+This is process discipline rather than codebase work; no PR resolves it. Tracking here so the discipline becomes deliberate going forward.
 
 ---
 
