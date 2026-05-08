@@ -86,7 +86,7 @@ Items in this section materially weaken external credibility if absent at announ
 
 **Track:** `changelog`
 
-**Status:** Surfaced 2026-05-08 by the test-vector expansion harness. Spec rule S6 (disavowal scope: publisher self-statements or impersonation defense; supersedes scope: publisher-controlled URLs) landed in v0.1.2 but neither reference implementation was updated. Vectors `negative-s6-disavowal-third-party.json` and `edge-disavowal-impersonation-defense.json` document the gap. v0.1.6 (2026-05-08) documented the deferral in §5.4 explicitly; implementing S6 binding now requires the disavowal-discriminator LIP below to land first.
+**Status:** Surfaced 2026-05-08 by the test-vector expansion harness. Spec rule S6 (disavowal scope: publisher self-statements or impersonation defense; supersedes scope: publisher-controlled URLs) landed in v0.1.2 but neither reference implementation was updated. Vectors `negative-s6-disavowal-third-party.json` and `edge-disavowal-impersonation-defense.json` document the gap. v0.1.5 (2026-05-05) labeled the rule as S6 in §5.2 Standard tier without binding validator enforcement; v0.1.6 (2026-05-08) documented the deferral in §5.4 explicitly. Implementing S6 binding now requires the disavowal-discriminator LIP below to land first.
 
 **Estimate:** 2-4 hours per implementation.
 
