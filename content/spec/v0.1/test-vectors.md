@@ -35,19 +35,19 @@ The vector set targets every spec rule v0.1 defines. Two reference implementatio
 
 | Rule | Section | validator.js | CLI | Positive vector | Negative vector(s) |
 |---|---|---|---|---|---|
-| M3 schema validity | §3.1 | yes | yes (lagging schema) | all positives | `negative-schema-malformed-claim-type.json`, `negative-schema-malformed-founded.json`, `negative-schema-bad-llmo-version.json` |
+| M3 schema validity | §3.1 | yes | yes | all positives | `negative-schema-malformed-claim-type.json`, `negative-schema-malformed-founded.json`, `negative-schema-bad-llmo-version.json` |
 | M5 window <= 365 days | §5.1 | yes | yes | all positives | `negative-m5-window-over-365.json`, `edge-validity-366-days.json` |
 | S1 has canonical_urls | §5.2 | yes | yes | `unsigned-standard.json` | `negative-s1-missing-canonical-urls.json` |
 | S2 has official_channels | §5.2 | yes | yes | `unsigned-standard.json` | `negative-s2-missing-official-channels.json` |
 | S3 primary_domain matches serving | §5.2 | yes (URL mode) | yes (URL mode) | `unsigned-standard.json` (URL mode) | none (paste-mode-only set) |
-| S4 URL ownership | §5.2 | yes | informational only | `unsigned-standard.json` | `negative-s4-third-party-canonical-url.json`, `negative-s4-third-party-product-url.json`, `negative-s4-third-party-supersedes-url.json` |
+| S4 URL ownership | §5.2 | yes | yes | `unsigned-standard.json` | `negative-s4-third-party-canonical-url.json`, `negative-s4-third-party-product-url.json`, `negative-s4-third-party-supersedes-url.json` |
 | S5 window <= 180 days | §5.2 | yes | yes | `unsigned-standard.json` | `negative-s5-window-181-days.json` |
 | S6 disavowal/supersedes scope | §5.2 | no | no | `edge-disavowal-impersonation-defense.json` | `negative-s6-disavowal-third-party.json` |
 | X1 signature structurally valid | §5.3, §4.3 | yes | collapsed into "signature valid" | `signed-strict.json`, `signed-strict-es384.json`, `signed-strict-eddsa.json` | `negative-x1-bad-alg.json`, `negative-x1-missing-kid.json`, `negative-x1-malformed-protected.json` |
 | X1 §4.3.1 detail (b64:false, crit) | §4.3.1 | yes | yes | n/a | `negative-x1-detached-payload-b64-false.json`, `negative-x1-crit-non-empty.json` |
 | X2 JWKS retrievable | §5.3 | URL mode only | URL mode only | (live deploy) | (live deploy) |
 | X3 JWKS Cache-Control <= 86400 | §5.3 | URL mode only | URL mode only | (live deploy) | (live deploy) |
-| X4 canonical_urls reference | §5.3 | yes | informational only | `signed-strict.json` | `negative-x4-no-owned-canonical-url.json` |
+| X4 canonical_urls reference | §5.3 | yes | yes | `signed-strict.json` | `negative-x4-no-owned-canonical-url.json` |
 | X5 document signature verifies | §5.3, §4.3 | yes (with JWKS) | yes (with JWKS) | `signed-strict.json` | `negative-x5-corrupted-signature.json` |
 | X6 per-claim signatures verify | §5.3 | yes (with JWKS) | yes (with JWKS) | `signed-strict.json` (no per-claim sigs, trivially passes) | `negative-x6-bad-claim-signature.json` |
 | W1 window 181-365 days warning | §5.4 | yes | not emitted | none (warning is conditional) | `warning-w1-200-day-window.json`, `edge-validity-365-days.json` |
@@ -125,15 +125,15 @@ A document with no `official_channels` claim. Validator reports S2 FAIL; CLI rep
 
 ##### `negative-s4-third-party-canonical-url.json`
 
-`canonical_urls.docs` resolves to `https://docs.thirdparty.example.org/junglecat`, off the publisher's owned domain set. `canonical_urls.*` is not in the §5.2 third-party-allowed list. Validator reports S4 FAIL; CLI does not enforce S4 in v0.1.0 and reports tier `standard`. See [Drift findings](#drift-findings).
+`canonical_urls.docs` resolves to `https://docs.thirdparty.example.org/junglecat`, off the publisher's owned domain set. `canonical_urls.*` is not in the §5.2 third-party-allowed list. Validator reports S4 FAIL; CLI reports tier `minimal` with rule `all claim URLs resolve to owned domain or are third-party pointers`.
 
 ##### `negative-s4-third-party-product-url.json`
 
-A `product_facts` claim with `products[0].url = https://marketplace.thirdparty.example.org/...`. Like `canonical_urls.*`, `product_facts.products[].url` is not in the §5.2 third-party-allowed list. Same validator/CLI split as above.
+A `product_facts` claim with `products[0].url = https://marketplace.thirdparty.example.org/...`. Like `canonical_urls.*`, `product_facts.products[].url` is not in the §5.2 third-party-allowed list. Both validator and CLI report S4 FAIL; CLI tier drops to `minimal`.
 
 ##### `negative-s4-third-party-supersedes-url.json`
 
-A `supersedes` claim with `superseded[0].url` on a third-party domain. `supersedes.superseded[].url` is not in the §5.2 third-party-allowed list. Same validator/CLI split.
+A `supersedes` claim with `superseded[0].url` on a third-party domain. `supersedes.superseded[].url` is not in the §5.2 third-party-allowed list. Both validator and CLI report S4 FAIL; CLI tier drops to `minimal`.
 
 ##### `negative-s5-window-181-days.json`
 
@@ -167,7 +167,7 @@ JWS protected header includes a non-empty `crit` array (`crit: ["unknown-ext"]`)
 
 ##### `negative-x4-no-owned-canonical-url.json`
 
-A signed document whose `canonical_urls` claim has an empty `statement` object. The doc passes S1 (claim is present) and S4 (no URLs to validate) but fails X4 (no canonical_urls URL on the owned domain). Validator reports X4 FAIL; CLI does not separately enforce X4 and reports `signature valid` failure for the unverifiable placeholder signature.
+A signed document whose `canonical_urls` claim has an empty `statement` object. The doc passes S1 (claim is present) and S4 (no URLs to validate) but fails X4 (no canonical_urls URL on the owned domain). Validator reports X4 FAIL; CLI reports a strict-tier failure with rule `canonical_urls claim has owned-domain URL` (alongside the `signature valid` failure for the unverifiable placeholder signature). Tier drops to `standard`.
 
 ##### `negative-x5-corrupted-signature.json`
 
@@ -185,7 +185,7 @@ Includes a claim with `type: "noNamespace"`, which matches neither the eight res
 
 ##### `negative-schema-malformed-founded.json`
 
-`statement_identity.founded` is set to `"yesterday"`. The v0.1.4 schema fix added a pattern (`YYYY`, `YYYY-MM`, or `YYYY-MM-DD`); `"yesterday"` violates it. Schema validation against canonical schema fails. The CLI's vendored schema lags behind canonical at the time of writing and does not catch this; the [verify-schema.mjs harness](https://github.com/openllmo/llmo.org/blob/main/scripts/test-vectors/verify-schema.mjs) does. Drift filed.
+`statement_identity.founded` is set to `"yesterday"`. The v0.1.4 schema fix added a pattern (`YYYY`, `YYYY-MM`, or `YYYY-MM-DD`); `"yesterday"` violates it. Both the canonical schema and the CLI's vendored schema reject this vector; the CLI re-vendored in cli PR #1 (2026-05-07) and reports tier `invalid`. The [verify-schema.mjs harness](https://github.com/openllmo/llmo.org/blob/main/scripts/test-vectors/verify-schema.mjs) also fails the vector against the canonical schema.
 
 ##### `negative-schema-bad-llmo-version.json`
 
@@ -239,9 +239,9 @@ The vector set surfaced four classes of drift between spec text and reference im
 
 2. **§4.3.1 `b64:false` and non-empty `crit` (resolved).** Vectors: `negative-x1-detached-payload-b64-false.json`, `negative-x1-crit-non-empty.json`. Spec text under [§4.3.1](/spec/v0.1#4-3-1-jws-payload-encoding) is normative. The CLI enforces this in `src/lib/jws.ts`; the validator now enforces it in the X1 structural check (PR `fix/validator-jws-rfc7797`). Vectors retained so the harness can detect any future regression.
 
-3. **CLI does not enforce S4 (URL ownership) or X4 (canonical_urls reference).** Both rules are noted as "informational" in `src/lib/tier.ts` of the CLI. Validator.js does enforce them. Vectors: the three `negative-s4-*.json` and `negative-x4-no-owned-canonical-url.json`.
+3. **CLI does not enforce S4 (URL ownership) or X4 (canonical_urls reference) (resolved).** Vectors: the three `negative-s4-*.json` and `negative-x4-no-owned-canonical-url.json`. Both rules were noted as "informational" in `src/lib/tier.ts`; validator.js already enforced them. The CLI now ports the validator's S4 (`collectClaimUrls` + third-party-allowed field list + owned-domain check) and X4 (canonical_urls must have at least one owned-domain URL) into `src/lib/tier.ts` (cli PR #5, merge SHA `b407061fad9af9533bda0a917b27a8906c6cf0da`). Vectors retained so the harness can detect any future regression.
 
-4. **CLI vendored schema lags canonical schema.** The v0.1.4 schema additions (`founded` pattern, `claim.type` `oneOf`) are not present in `cli/src/schema/v0.1.json`. Vector `negative-schema-malformed-founded.json` reproduces the gap; canonical-schema validation via `verify-schema.mjs` rejects the vector, CLI accepts it. Resolution: re-vendor by running `scripts/vendor.sh` in the CLI repo.
+4. **CLI vendored schema lags canonical schema (resolved).** Vector: `negative-schema-malformed-founded.json`. The v0.1.4 schema additions (`founded` pattern, `claim.type` `oneOf`) were missing from `cli/src/schema/v0.1.json`; canonical-schema validation via `verify-schema.mjs` rejected the vector while CLI accepted it. The CLI re-vendored the schema in cli PR #1 (2026-05-07); both the canonical schema and the CLI vendored schema now reject `"yesterday"`. Vector retained so the harness can detect any future regression.
 
 
 

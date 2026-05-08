@@ -44,10 +44,12 @@ const VECTORS = [
   { file: 'negative-s1-missing-canonical-urls.json', expect: { tier: 'minimal', tierFailureRule: 'has canonical_urls claim' } },
   { file: 'negative-s2-missing-official-channels.json', expect: { tier: 'minimal', tierFailureRule: 'has official_channels claim' } },
 
-  // S4 - CLI does NOT enforce; validator.js does.
-  { file: 'negative-s4-third-party-canonical-url.json', expect: { tier: 'standard' }, drift: 'CLI tier.ts §5.2 URL-scope rule is informational; validator.js enforces. Vector fails S4 in browser validator.' },
-  { file: 'negative-s4-third-party-product-url.json', expect: { tier: 'standard' }, drift: 'Same S4 drift; validator.js fails this on product_facts URL.' },
-  { file: 'negative-s4-third-party-supersedes-url.json', expect: { tier: 'standard' }, drift: 'Same S4 drift; validator.js fails this on supersedes URL.' },
+  // S4 - both CLI and validator.js enforce as of cli PR #5
+  // (b407061fad9af9533bda0a917b27a8906c6cf0da). Tier drops to minimal
+  // because the standard-tier S4 rule fails.
+  { file: 'negative-s4-third-party-canonical-url.json', expect: { tier: 'minimal', tierFailureRule: 'all claim URLs resolve to owned domain or are third-party pointers' } },
+  { file: 'negative-s4-third-party-product-url.json', expect: { tier: 'minimal', tierFailureRule: 'all claim URLs resolve to owned domain or are third-party pointers' } },
+  { file: 'negative-s4-third-party-supersedes-url.json', expect: { tier: 'minimal', tierFailureRule: 'all claim URLs resolve to owned domain or are third-party pointers' } },
 
   // S5 - paste-mode-testable.
   { file: 'negative-s5-window-181-days.json', expect: { tier: 'minimal', tierFailureRule: 'window <= 180 days' } },
@@ -65,15 +67,18 @@ const VECTORS = [
   { file: 'negative-x1-detached-payload-b64-false.json', expect: { tier: 'standard', tierFailureRule: 'signature valid' } },
   { file: 'negative-x1-crit-non-empty.json', expect: { tier: 'standard', tierFailureRule: 'signature valid' } },
 
-  // X4 - CLI does NOT enforce; validator.js does.
-  { file: 'negative-x4-no-owned-canonical-url.json', expect: { tier: 'standard', tierFailureRule: 'signature valid' }, drift: 'CLI does not enforce X4; vector still fails because placeholder sig is uncryptographic. Validator.js fails X4 directly.' },
+  // X4 - both CLI and validator.js enforce as of cli PR #5
+  // (b407061fad9af9533bda0a917b27a8906c6cf0da). The vector also fails
+  // on the placeholder signature, so multiple strict-tier failures are
+  // expected; we assert the X4-specific rule.
+  { file: 'negative-x4-no-owned-canonical-url.json', expect: { tier: 'standard', tierFailureRule: 'canonical_urls claim has owned-domain URL' } },
 
   // Schema (M3).
   { file: 'negative-schema-malformed-claim-type.json', expect: { tier: 'invalid' } },
   { file: 'negative-schema-bad-llmo-version.json', expect: { tier: 'invalid' } },
-  // founded pattern: canonical schema enforces; CLI's vendored schema (v0.1.0) does not.
-  // CLI returns standard rather than invalid. Drift filed against CLI for re-vendor.
-  { file: 'negative-schema-malformed-founded.json', expect: { tier: 'standard' }, drift: 'Canonical schema (v0.1.4) rejects "yesterday" but CLI vendored schema lags; re-vendor needed. Schema validation against canonical schema.json (verify-schema.mjs) does fail this vector.' },
+  // founded pattern: canonical schema and CLI vendored schema (v0.1.4)
+  // both enforce as of cli PR #1 (2026-05-07). Tier returns invalid.
+  { file: 'negative-schema-malformed-founded.json', expect: { tier: 'invalid' } },
 
   // M5 - CLI catches via tier.ts window > 365.
   { file: 'negative-m5-window-over-365.json', expect: { tier: 'invalid' } },
