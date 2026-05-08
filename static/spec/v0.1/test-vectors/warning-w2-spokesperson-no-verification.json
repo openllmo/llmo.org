@@ -1,0 +1,40 @@
+{
+  "llmo_version": "0.1",
+  "document_id": "test-vector-v0.1-warning-w2-001",
+  "valid_from": "2026-04-20T00:00:00Z",
+  "valid_until": "2026-10-17T00:00:00Z",
+  "entity": {
+    "name": "JungleCat, Inc.",
+    "primary_domain": "junglecat.example.com"
+  },
+  "claims": [
+    {
+      "claim_id": "urls-canonical",
+      "type": "canonical_urls",
+      "statement": {
+        "homepage": "https://junglecat.example.com/"
+      }
+    },
+    {
+      "claim_id": "channels-official",
+      "type": "official_channels",
+      "statement": {
+        "email_domains": [
+          "junglecat.example.com"
+        ]
+      }
+    },
+    {
+      "claim_id": "personnel-leadership",
+      "type": "personnel",
+      "statement": {
+        "spokespeople": [
+          {
+            "role": "ceo",
+            "name": "Jane JungleCat"
+          }
+        ]
+      }
+    }
+  ]
+}

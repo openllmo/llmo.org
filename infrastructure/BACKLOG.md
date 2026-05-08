@@ -66,18 +66,6 @@ Async; they'll reply when they reply. Not blocking anything.
 
 Items in this section gate the v0.1 public-launch announcement. The conference (April 28) has happened; these items separate "we showed it" from "we shipped it." Sequence is not encoded in the order; sequencing is decided at the moment of work against current state.
 
-### Test vectors at /spec/v0.1/test-vectors/
-
-**Track:** `changelog` (resolution likely lands with a v0.1.6 cut bringing the vector set and any associated fixes to a clean closure)
-
-**Status:** Partial. `content/spec/v0.1/test-vectors.md` describes three vectors (unsigned-minimal, unsigned-standard, signed-strict) plus the JWKS and canonical payload. An announcement-grade vector set covers each conformance rule (S1-S6, X5, X6) with both pass and fail cases.
-
-**Estimate:** 6-10 hours, risk-adjusted to 12 if scope expands.
-
-**Why blocker:** Enables third-party self-certification without requiring the validator. Highest single-item leverage on announcement-readiness: implementers who would never run our validator can still verify their implementation against published vectors.
-
-**Scope:** Vectors covering Strict-pass, Strict-invalid-claim-signature, Strict-invalid-both-signatures, Standard-pass, Standard-failed-tier (one per S1-S6), schema-only failures, malformed-input failures. Use a published test JWKS distinct from production keys (the existing `signed-strict-key.json` is already labeled test-only).
-
 ## ANNOUNCEMENT CREDIBILITY (soft, not strict gating)
 
 Items in this section materially weaken external credibility if absent at announcement time, but do not strictly gate the announcement. A security-minded reviewer (including IETF Internet-Draft reviewers) hits these first when LLMO gets external attention.
@@ -93,6 +81,54 @@ Items in this section materially weaken external credibility if absent at announ
 **Why credibility:** IETF reviewers and security-minded readers routinely ask "where's the threat model?" before reading the spec. Having one document the answer raises signal-to-noise on early review passes.
 
 **Scope:** Document attacks LLMO defends against (existing §8.x prose), attacks it explicitly does NOT defend against (consumer-side attacks against publishers, social engineering of publishers, registrar-layer DNS attacks, etc.), and abuse surfaces (publisher reputation laundering, false disavowals, false supersessions, key compromise scenarios). Format as ADR per Nygard structure.
+
+### Implement §5.2 S6 in validator.js and CLI
+
+**Track:** `changelog`
+
+**Status:** Surfaced 2026-05-08 by the test-vector expansion harness. Spec rule S6 (disavowal scope: publisher self-statements or impersonation defense; supersedes scope: publisher-controlled URLs) landed in v0.1.2 but neither reference implementation was updated. Vectors `negative-s6-disavowal-third-party.json` and `edge-disavowal-impersonation-defense.json` document the gap.
+
+**Estimate:** 2-4 hours per implementation.
+
+**Why credibility:** A spec rule with no enforcement is a claim with no verification. Anyone running an implementation today is told "Standard tier" for documents that fail S6.
+
+**Scope:** Add S6 check in `static/js/validator.js` (claim by claim, distinguishing disavowal from supersedes) and in `cli/src/lib/tier.ts`. The disavowal "what" field is the discriminator: values implying impersonation defense (`unaffiliated_domain`, etc.) are in scope; values implying third-party assertions (competitor product quality, third-party content) are out. Keep the discriminator list in spec text rather than hard-coded; v0.1.6 spec patch may need to enumerate. Update `negative-s6-disavowal-third-party.json` expectation in the harness when implementations land.
+
+### Implement §4.3.1 b64:false and crit rejection
+
+**Track:** `changelog`
+
+**Status:** Surfaced 2026-05-08 by the test-vector expansion harness. Spec §4.3.1 explicitly prohibits `b64: false` and non-empty `crit` in JWS protected headers; neither validator.js nor CLI checks. Vectors `negative-x1-detached-payload-b64-false.json` and `negative-x1-crit-non-empty.json` document the gap.
+
+**Estimate:** 1-2 hours per implementation.
+
+**Why credibility:** RFC 7797 (detached-payload JWS) is a frequent source of interop failure precisely because verifiers mishandle the `crit` parameter. Spec §4.3.1 picked the conservative default (reject any `crit` for v0.1) specifically to avoid this; the implementations failing to enforce it defeats that choice.
+
+**Scope:** Extend the X1 structural check in both implementations to reject any JWS protected header with `b64: false` or with a non-empty `crit` array. Validator.js: add to the existing X1 alg/kid check at validator.js line ~447. CLI: extend the structural-validity portion of `verify-jws` or split into a dedicated X1 check separate from X5. Update vector harness expectations after.
+
+### Implement S4 and X4 in CLI
+
+**Track:** `changelog`
+
+**Status:** Surfaced 2026-05-08. CLI's `cli/src/lib/tier.ts` lines 130 and 162 mark S4 (URL ownership) and X4 (canonical_urls reference) as informational, not enforced. Validator.js does enforce both. Vectors `negative-s4-third-party-canonical-url.json`, `negative-s4-third-party-product-url.json`, `negative-s4-third-party-supersedes-url.json`, and `negative-x4-no-owned-canonical-url.json` document the gap.
+
+**Estimate:** 3-5 hours.
+
+**Why credibility:** Cross-implementation drift on enforced rules is worse than having a rule unimplemented uniformly. Implementers running CLI in CI pipelines will pass documents that the public validator at /validator/ rejects.
+
+**Scope:** Port the validator.js S4 and X4 logic into CLI tier.ts. Reuse the entity owned-domain set logic. Implement the S4 third-party-allowed list (`pointer.url`, `disavowal.disavowed[].url`, `official_channels.community[].url`, `personnel.spokespeople[].verification`) verbatim. Cover with new CLI unit tests. After landing, update vector harness expectations.
+
+### Re-vendor canonical schema into CLI
+
+**Track:** `none`
+
+**Status:** Surfaced 2026-05-08. CLI's `src/schema/v0.1.json` lags the canonical `static/spec/v0.1/schema.json` from this repo. Missing: the v0.1.4 `claim.type` `oneOf` (core enum or namespaced pattern), the `statement_identity.founded` pattern. Vector `negative-schema-malformed-founded.json` reproduces the gap.
+
+**Estimate:** 30 minutes plus CI verification.
+
+**Why credibility:** A vendored schema that does not match the published canonical schema means CLI consumers run against silently outdated rules. The vendor script and a vendor-drift CI check already exist (per CLI `scripts/vendor.sh` and the cli repo's vendor-drift required check); they just need to run.
+
+**Scope:** Run `scripts/vendor.sh` in `openllmo/cli` to refresh `src/schema/v0.1.json`, regenerate the dist build, ship as a CLI patch (v0.1.6 or later). The vendor-drift CI check on cli's `main` should already gate this; if it has been failing without resolution, investigate why.
 
 ---
 
@@ -685,6 +721,8 @@ Concept: a cryptographic proof (zero-knowledge or equivalent) that a real transa
 This section grows over time. Move items here when done.
 
 ### 2026-05-08
+
+- ✅ Test vectors at /spec/v0.1/test-vectors/ (announcement blocker). Vector set expanded from 3 positive Strict-tier vectors to a coverage matrix targeting every v0.1 conformance rule. Adds Standard-tier negatives (S1, S2, three S4 cases, S5, S6), Strict-tier negatives (X1 alg, X1 missing kid, X1 malformed protected, X1 §4.3.1 b64 and crit, X4, X5 corrupted document signature, X6 corrupted per-claim signature), schema and minimal-tier negatives (claim type, founded pattern, llmo_version, M5 over-365 window), W1 and W2 warning vectors, and edge cases at validity-window and disavowal/spokesperson boundaries. `content/spec/v0.1/test-vectors.md` extended with a coverage matrix table, per-vector documentation, and a Drift findings section. `scripts/test-vectors/verify-vectors.mjs` runs CLI verify against every vector and asserts expected tier and rule outcomes; `scripts/test-vectors/verify-schema.mjs` validates each vector against the canonical `static/spec/v0.1/schema.json`. Both harnesses exit 0 with 31/31 vectors matching expected behavior. Drift findings: §5.2 S6 unimplemented in both validator.js and CLI, §4.3.1 b64/crit unimplemented in both, CLI does not enforce S4 or X4, CLI vendored schema lags canonical (founded pattern, claim type oneOf). Each drift filed as a separate BACKLOG item below.
 
 - ✅ ADR backfills for branch protection (ADR-0002), BACKLOG discipline and Track conventions (ADR-0003), and GitHub App for workflow PR creation (ADR-0004). Each captures a material operational decision previously recorded only in BACKLOG completed entries and infrastructure files. The three new ADRs land at `content/adr/000{2,3,4}-*.md` with explicit Backfill notes in their Status sections; the ADR index table at `content/adr/_index.md` continues to list ADR-0000 and ADR-0001 only as headline entries, with the auto-rendered child-page list at the bottom of `/adr/` surfacing all five.
 - ✅ GitHub App for workflow PR creation. `llmo-workflow-bot` (App ID `3645059`) registered under the `openllmo` organization, installed on `openllmo/llmo.org`, `openllmo/cli`, and `openllmo/validator`. Permissions: contents/issues/pull-requests write, metadata read; no webhook, no events. Org-level secrets `LLMO_WORKFLOW_BOT_APP_ID` and `LLMO_WORKFLOW_BOT_PRIVATE_KEY` scoped to those three repos. PR #64 (merge SHA `17d397e`) replaces `GITHUB_TOKEN` with an App-installation token in the `gh pr create` and PR-mutation steps of `weekly-digest.yml` and `sunday-audit.yml`. Token minted via `actions/create-github-app-token` pinned to commit `1b10c78` (release v3.1.1, latest at time of merge). End-to-end verification: workflow_dispatch of weekly-digest produced PR #65 authored by `llmo-workflow-bot[bot]`, all three required-check workflows (`check`, `validate`, `check-urls`) fired on the `pull_request` event, all passed, auto-merge fired, PR merged at 2026-05-08T14:15:40Z. workflow_dispatch of sunday-audit produced PR #66, same end-to-end success at 2026-05-08T14:17:24Z, plus the issue-creation step's idempotency check correctly skipped all 11 existing-finding matches without creating duplicates. Filed a small follow-up BACKLOG item to migrate the action's `app-id` input to `client-id` (deprecated at v3.x, currently functional with a warning).

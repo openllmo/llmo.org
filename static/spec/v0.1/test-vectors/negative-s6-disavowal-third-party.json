@@ -1,0 +1,41 @@
+{
+  "llmo_version": "0.1",
+  "document_id": "test-vector-v0.1-negative-s6-001",
+  "valid_from": "2026-04-20T00:00:00Z",
+  "valid_until": "2026-10-17T00:00:00Z",
+  "entity": {
+    "name": "JungleCat, Inc.",
+    "primary_domain": "junglecat.example.com"
+  },
+  "claims": [
+    {
+      "claim_id": "urls-canonical",
+      "type": "canonical_urls",
+      "statement": {
+        "homepage": "https://junglecat.example.com/"
+      }
+    },
+    {
+      "claim_id": "channels-official",
+      "type": "official_channels",
+      "statement": {
+        "email_domains": [
+          "junglecat.example.com"
+        ]
+      }
+    },
+    {
+      "claim_id": "disavowal-out-of-scope",
+      "type": "disavowal",
+      "statement": {
+        "disavowed": [
+          {
+            "what": "competitor_product_quality",
+            "url": "https://competitor.example.org/product",
+            "detail": "JungleCat asserts the competitor product is unreliable. Out of scope per §3.5: this is neither a publisher self-statement nor an impersonation defense, and the publisher is not in a position to adjudicate third-party product claims."
+          }
+        ]
+      }
+    }
+  ]
+}

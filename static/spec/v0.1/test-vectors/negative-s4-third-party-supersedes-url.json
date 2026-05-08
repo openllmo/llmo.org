@@ -1,0 +1,41 @@
+{
+  "llmo_version": "0.1",
+  "document_id": "test-vector-v0.1-negative-s4-003",
+  "valid_from": "2026-04-20T00:00:00Z",
+  "valid_until": "2026-10-17T00:00:00Z",
+  "entity": {
+    "name": "JungleCat, Inc.",
+    "primary_domain": "junglecat.example.com"
+  },
+  "claims": [
+    {
+      "claim_id": "urls-canonical",
+      "type": "canonical_urls",
+      "statement": {
+        "homepage": "https://junglecat.example.com/"
+      }
+    },
+    {
+      "claim_id": "channels-official",
+      "type": "official_channels",
+      "statement": {
+        "email_domains": [
+          "junglecat.example.com"
+        ]
+      }
+    },
+    {
+      "claim_id": "supersedes-old",
+      "type": "supersedes",
+      "statement": {
+        "superseded": [
+          {
+            "what": "old_announcement",
+            "url": "https://news.thirdparty.example.org/junglecat-launch",
+            "reason": "third-party article that we consider stale; supersedes URL is intentionally off-domain to fail S4"
+          }
+        ]
+      }
+    }
+  ]
+}
