@@ -520,41 +520,21 @@ The org-level setting unlocks the repo-level setting; the repo-level setting mus
 
 **Why this is BACKLOG and not LESSONS:** Forward-looking operational dependency, not a past failure. LESSONS captures what went wrong; BACKLOG captures what needs to remain true.
 
+**Relationship to the `llmo-workflow-bot` App:** As of 2026-05-08 (PR #64) the workflows create PRs as the App, not as `github-actions[bot]`. The App is the primary auth path. The org toggle remains required as defense-in-depth: the App cannot create PRs at all if the org toggle is off, regardless of App permissions. Both layers must hold.
+
 ---
 
-### GitHub App for workflow PR creation
+### Migrate `actions/create-github-app-token` from `app-id` input to `client-id`
 
-**Track:** `none` (operational tooling)
+**Track:** `none` (small operational follow-up)
 
-**Status:** Not started. Surfaced 2026-05-07 during PR #48 verification: PRs created via `GITHUB_TOKEN` do not trigger `pull_request`-event workflows (GitHub's anti-recursion safeguard). The `weekly-digest.yml` and `sunday-audit.yml` workflows currently create PRs that sit open with no required-check status; auto-merge is queued but never fires because the checks do not run. Until this BACKLOG item lands, scheduled runs require ~30 seconds of operator close-reopen-merge intervention to land the PR (close the PR via UI or `gh api PATCH`, reopen it, the close-reopen counts as a user action and triggers the required checks, then manually merge after they pass).
+**Status:** Not started. Surfaced 2026-05-08 in PR #64 testing. The action's v3.x deprecates the `app-id` input in favor of `client-id`. Both the `weekly-digest.yml` and `sunday-audit.yml` workflows currently use `app-id` (functional, with a deprecation warning printed in the run log). Migrating to `client-id` removes the warning and aligns with the action's forward-looking contract.
 
-**Estimate:** 2-3 hours.
+**Estimate:** 30 minutes.
 
-**Why this fix and not the alternatives:** A Personal Access Token works mechanically (PAT-authenticated PRs trigger workflows) but ties auth to the operator's identity, requires rotation, and does not survive steward transitions. A `pull_request_target` trigger swap on the required-check workflows works mechanically but creates a wrong security posture for a project designed to accept external contributions via LIP-1's discussion window (`pull_request_target` runs in base-repo context with secrets available; appropriate for trusted internal flows but inappropriate as the default trigger for checks that gate untrusted contributor PRs). A GitHub App owned by the openllmo organization is the durable institutional solution: App identity is fungible across stewards, no token rotation, App-created PRs do trigger workflows.
+**Operator action required:** Surface the App's Client ID from `https://github.com/organizations/openllmo/settings/apps/llmo-workflow-bot` (visible on the App's General settings page, distinct from the numeric App ID). Add it as an org-level secret `LLMO_WORKFLOW_BOT_CLIENT_ID` scoped to the same three repos as the existing secrets.
 
-**Scope:**
-
-1. Register a GitHub App at `https://github.com/organizations/openllmo/settings/apps/new`. Name: `llmo-workflow-bot` or similar. Owned by the `openllmo` organization, not by any individual user.
-
-2. Permissions: contents (write), pull-requests (write), issues (write), metadata (read). No webhook, no organization permissions, no user permissions.
-
-3. Install the App on `openllmo/llmo.org` and `openllmo/cli`.
-
-4. Generate a private key. Store the App ID and private key as repository secrets in `openllmo/llmo.org`:
-   - `LLMO_WORKFLOW_BOT_APP_ID` (numeric)
-   - `LLMO_WORKFLOW_BOT_PRIVATE_KEY` (PEM contents)
-
-   Same secrets in `openllmo/cli` if its workflows ever need the same App.
-
-5. Update `.github/workflows/weekly-digest.yml` and `.github/workflows/sunday-audit.yml` to mint an installation token via `actions/create-github-app-token@v1` and use that token as `GH_TOKEN` for the `gh pr create` step (only that step; branch creation, commit, and push continue using `GITHUB_TOKEN`).
-
-6. Verify both workflows by manual `workflow_dispatch`. Expected: PR creates, required checks fire, checks pass, auto-merge fires, PR merges.
-
-**Stop conditions:** GitHub App registration UI changes from what the prompt assumes (halt and re-prompt). `actions/create-github-app-token@v1` deprecated or breaking-changed (halt and confirm major version). App-token-authenticated PR still doesn't trigger required checks (deeper auth issue, halt). App permissions insufficient (halt for operator action since changing App permissions requires re-installation). Auto-merge still doesn't fire even with required checks passing (separate issue, halt).
-
-**Detection signal that this regresses later:** Workflow PR created but required checks do not run (same symptom as the 2026-05-07 failure).
-
-**Recovery action:** Verify the App is still installed on the repo (`gh api repos/<owner>/<repo>/installation`). Regenerate the App private key if expired or revoked, refresh the repo secrets.
+**Code action:** Replace `app-id: ${{ secrets.LLMO_WORKFLOW_BOT_APP_ID }}` with `client-id: ${{ secrets.LLMO_WORKFLOW_BOT_CLIENT_ID }}` in both workflows. Verify via `workflow_dispatch` that PR creation still works under the App identity. Optionally retire the `LLMO_WORKFLOW_BOT_APP_ID` secret once the workflows no longer reference it.
 
 ---
 
@@ -661,6 +641,10 @@ Concept: a cryptographic proof (zero-knowledge or equivalent) that a real transa
 ## COMPLETED (chronological, most recent first)
 
 This section grows over time. Move items here when done.
+
+### 2026-05-08
+
+- ✅ GitHub App for workflow PR creation. `llmo-workflow-bot` (App ID `3645059`) registered under the `openllmo` organization, installed on `openllmo/llmo.org`, `openllmo/cli`, and `openllmo/validator`. Permissions: contents/issues/pull-requests write, metadata read; no webhook, no events. Org-level secrets `LLMO_WORKFLOW_BOT_APP_ID` and `LLMO_WORKFLOW_BOT_PRIVATE_KEY` scoped to those three repos. PR #64 (merge SHA `17d397e`) replaces `GITHUB_TOKEN` with an App-installation token in the `gh pr create` and PR-mutation steps of `weekly-digest.yml` and `sunday-audit.yml`. Token minted via `actions/create-github-app-token` pinned to commit `1b10c78` (release v3.1.1, latest at time of merge). End-to-end verification: workflow_dispatch of weekly-digest produced PR #65 authored by `llmo-workflow-bot[bot]`, all three required-check workflows (`check`, `validate`, `check-urls`) fired on the `pull_request` event, all passed, auto-merge fired, PR merged at 2026-05-08T14:15:40Z. workflow_dispatch of sunday-audit produced PR #66, same end-to-end success at 2026-05-08T14:17:24Z, plus the issue-creation step's idempotency check correctly skipped all 11 existing-finding matches without creating duplicates. Filed a small follow-up BACKLOG item to migrate the action's `app-id` input to `client-id` (deprecated at v3.x, currently functional with a warning).
 
 ### 2026-05-07
 
