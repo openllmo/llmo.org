@@ -124,7 +124,7 @@
     "severity": "warning",
     "message": "Spec version v0.1.6 referenced but not in changelog.md",
     "file": "infrastructure/BACKLOG.md",
-    "line": 611,
+    "line": 668,
     "machine_data": {
       "reference": "v0.1.6"
     }
