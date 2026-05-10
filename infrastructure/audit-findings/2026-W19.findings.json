@@ -4,7 +4,7 @@
     "severity": "error",
     "message": "External URL returned HTTP 0: https://llmo.com",
     "file": "content/about/governance.md",
-    "line": 19,
+    "line": 20,
     "machine_data": {
       "url": "https://llmo.com",
       "status": 0
@@ -13,9 +13,42 @@
   {
     "cls": "url-resolution",
     "severity": "error",
+    "message": "External URL returned HTTP 0: https://acme.com/.well-known/llmo.json",
+    "file": "content/adr/0005-publisher-domain-proof-via-well-known.md",
+    "line": 16,
+    "machine_data": {
+      "url": "https://acme.com/.well-known/llmo.json",
+      "status": 0
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 0: https://acme.com/.well-known/security.txt",
+    "file": "content/adr/0005-publisher-domain-proof-via-well-known.md",
+    "line": 26,
+    "machine_data": {
+      "url": "https://acme.com/.well-known/security.txt",
+      "status": 0
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 0: https://acme.com/.well-known/llmo.json",
+    "file": "content/adr/0005-publisher-domain-proof-via-well-known.md",
+    "line": 28,
+    "machine_data": {
+      "url": "https://acme.com/.well-known/llmo.json",
+      "status": 0
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
     "message": "External URL returned HTTP 404: https://diverse.org/.well-known/llmo.json",
     "file": "content/spec/v0.1/_index.md",
-    "line": 600,
+    "line": 603,
     "machine_data": {
       "url": "https://diverse.org/.well-known/llmo.json",
       "status": 404
@@ -26,7 +59,7 @@
     "severity": "error",
     "message": "External URL returned HTTP 404: https://diverse.org/.well-known/llmo.json",
     "file": "content/spec/v0.1/_index.md",
-    "line": 715,
+    "line": 718,
     "machine_data": {
       "url": "https://diverse.org/.well-known/llmo.json",
       "status": 404
@@ -37,10 +70,32 @@
     "severity": "error",
     "message": "External URL returned HTTP 404: https://diverse.org/.well-known/llmo.json",
     "file": "content/spec/v0.1/_index.md",
-    "line": 726,
+    "line": 729,
     "machine_data": {
       "url": "https://diverse.org/.well-known/llmo.json",
       "status": 404
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 404: https://github.com/junglecat-ceo",
+    "file": "content/spec/v0.1/test-vectors.md",
+    "line": 232,
+    "machine_data": {
+      "url": "https://github.com/junglecat-ceo",
+      "status": 404
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "Local URL has no corresponding file in Hugo output: https://llmo.org/spec/changelog/#016---2026-05-08",
+    "file": "content/updates/2026-05-08.md",
+    "line": 50,
+    "machine_data": {
+      "url": "https://llmo.org/spec/changelog/#016---2026-05-08",
+      "expected_path": "public/spec/changelog/#016---2026-05-08/index.html"
     }
   },
   {
@@ -48,7 +103,7 @@
     "severity": "error",
     "message": "External URL returned HTTP 404: https://diverse.org/.well-known/llmo.json",
     "file": "infrastructure/BACKLOG.md",
-    "line": 176,
+    "line": 222,
     "machine_data": {
       "url": "https://diverse.org/.well-known/llmo.json",
       "status": 404
@@ -59,7 +114,7 @@
     "severity": "error",
     "message": "External URL returned HTTP 404: https://diverse.org/.well-known/security.txt",
     "file": "infrastructure/BACKLOG.md",
-    "line": 190,
+    "line": 236,
     "machine_data": {
       "url": "https://diverse.org/.well-known/security.txt",
       "status": 404
@@ -70,7 +125,7 @@
     "severity": "error",
     "message": "External URL returned HTTP 404: https://diverse.org/.well-known/llmo.json",
     "file": "infrastructure/BACKLOG.md",
-    "line": 202,
+    "line": 248,
     "machine_data": {
       "url": "https://diverse.org/.well-known/llmo.json",
       "status": 404
@@ -81,7 +136,7 @@
     "severity": "error",
     "message": "External URL returned HTTP 404: https://diverse.org/.well-known/llmo.json",
     "file": "infrastructure/BACKLOG.md",
-    "line": 202,
+    "line": 248,
     "machine_data": {
       "url": "https://diverse.org/.well-known/llmo.json",
       "status": 404
@@ -99,6 +154,66 @@
     }
   },
   {
+    "cls": "adr-registry",
+    "severity": "error",
+    "message": "ADR-0000 file exists but is not in the _index.md table",
+    "file": "content/adr/0000-record-architecture-decisions.md",
+    "line": null,
+    "machine_data": {
+      "adr_number": 0
+    }
+  },
+  {
+    "cls": "adr-registry",
+    "severity": "error",
+    "message": "ADR-0001 file exists but is not in the _index.md table",
+    "file": "content/adr/0001-two-entity-firewall.md",
+    "line": null,
+    "machine_data": {
+      "adr_number": 1
+    }
+  },
+  {
+    "cls": "adr-registry",
+    "severity": "error",
+    "message": "ADR-0002 file exists but is not in the _index.md table",
+    "file": "content/adr/0002-branch-protection-on-main.md",
+    "line": null,
+    "machine_data": {
+      "adr_number": 2
+    }
+  },
+  {
+    "cls": "adr-registry",
+    "severity": "error",
+    "message": "ADR-0003 file exists but is not in the _index.md table",
+    "file": "content/adr/0003-backlog-discipline-track-conventions.md",
+    "line": null,
+    "machine_data": {
+      "adr_number": 3
+    }
+  },
+  {
+    "cls": "adr-registry",
+    "severity": "error",
+    "message": "ADR-0004 file exists but is not in the _index.md table",
+    "file": "content/adr/0004-github-app-workflow-auth.md",
+    "line": null,
+    "machine_data": {
+      "adr_number": 4
+    }
+  },
+  {
+    "cls": "adr-registry",
+    "severity": "error",
+    "message": "ADR-0005 file exists but is not in the _index.md table",
+    "file": "content/adr/0005-publisher-domain-proof-via-well-known.md",
+    "line": null,
+    "machine_data": {
+      "adr_number": 5
+    }
+  },
+  {
     "cls": "spec-anchors",
     "severity": "error",
     "message": "Anchor #origin not found at /about/",
@@ -110,23 +225,133 @@
     }
   },
   {
-    "cls": "cross-refs",
-    "severity": "warning",
-    "message": "Spec version v0.1.6 referenced but not in changelog.md",
-    "file": "infrastructure/BACKLOG.md",
-    "line": 71,
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #2-publication-and-discovery not found at /spec/v0.1/",
+    "file": "content/about/press.md",
+    "line": 42,
     "machine_data": {
-      "reference": "v0.1.6"
+      "target_page": "/spec/v0.1/",
+      "anchor": "2-publication-and-discovery"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #4-2-signature-algorithms not found at /spec/v0.1/",
+    "file": "content/about/press.md",
+    "line": 43,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "4-2-signature-algorithms"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #5-conformance not found at /spec/v0.1/",
+    "file": "content/about/press.md",
+    "line": 44,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "5-conformance"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #4-6-jwks-trust-anchor not found at /spec/v0.1/",
+    "file": "content/about/press.md",
+    "line": 45,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "4-6-jwks-trust-anchor"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #4-7-jwks-handling not found at /spec/v0.1/",
+    "file": "content/about/press.md",
+    "line": 45,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "4-7-jwks-handling"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #3-5-claim-types not found at /spec/v0.1/",
+    "file": "content/about/press.md",
+    "line": 46,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "3-5-claim-types"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #012---2026-04-30 not found at /spec/changelog/",
+    "file": "content/updates/2026-05-04.md",
+    "line": 18,
+    "machine_data": {
+      "target_page": "/spec/changelog/",
+      "anchor": "012---2026-04-30"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #013---2026-04-30 not found at /spec/changelog/",
+    "file": "content/updates/2026-05-04.md",
+    "line": 26,
+    "machine_data": {
+      "target_page": "/spec/changelog/",
+      "anchor": "013---2026-04-30"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #014---2026-05-01 not found at /spec/changelog/",
+    "file": "content/updates/2026-05-04.md",
+    "line": 34,
+    "machine_data": {
+      "target_page": "/spec/changelog/",
+      "anchor": "014---2026-05-01"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #015---2026-05-05 not found at /spec/changelog/",
+    "file": "content/updates/2026-05-08.md",
+    "line": 16,
+    "machine_data": {
+      "target_page": "/spec/changelog/",
+      "anchor": "015---2026-05-05"
     }
   },
   {
     "cls": "cross-refs",
     "severity": "warning",
-    "message": "Spec version v0.1.6 referenced but not in changelog.md",
+    "message": "Spec version v0.1.7 referenced but not in changelog.md",
     "file": "infrastructure/BACKLOG.md",
-    "line": 668,
+    "line": 93,
     "machine_data": {
-      "reference": "v0.1.6"
+      "reference": "v0.1.7"
+    }
+  },
+  {
+    "cls": "cross-refs",
+    "severity": "warning",
+    "message": "Spec version v0.1.7 referenced but not in changelog.md",
+    "file": "infrastructure/BACKLOG.md",
+    "line": 115,
+    "machine_data": {
+      "reference": "v0.1.7"
     }
   }
 ]
