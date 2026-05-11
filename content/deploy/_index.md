@@ -90,8 +90,25 @@ in your editor and customize:
 - Add a `personnel` claim if you want to declare who's authorized
   to speak for the organization.
 
-See the [specification §3](/spec/v0.1#3-core-schema) for the full
-claim type reference.
+For richer entity data, v0.1.8 adds six core claim types you may also
+want to populate:
+
+- `contact_points` for typed contact addresses (security, abuse, press,
+  legal, support, phone, messaging) with optional verification metadata.
+- `categories` for schema.org Organization subtype URIs plus NAICS codes.
+- `locations` for physical locations or service areas (postal address,
+  WGS84 coordinates, service-area shape, per-location publisher ID).
+- `hours` for regular weekly schedule, calendar exceptions, and named
+  alternate sub-schedules (drive-through, kitchen, brunch).
+- `attributes` for boolean / enum / array attributes drawn from the
+  controlled vocabulary at [/glossary/#attributes](/glossary/#attributes).
+- `operational_status` (`open`, `opening_soon`, `temporarily_closed`,
+  `permanently_closed`) with an effective date for any non-open status.
+
+See the [Core Claim Types page](/claims/core/) for per-type schema,
+examples, and common pitfalls; see [specification §3](/spec/v0.1#3-core-schema)
+for the normative reference; and see the [glossary](/glossary/) for
+protocol terms and the controlled attribute vocabulary.
 
 ## Step 4: Sign it
 
