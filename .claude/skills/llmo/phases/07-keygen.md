@@ -18,7 +18,7 @@ Generate an ES256 keypair for the publisher. Walk them through storing the priva
 ## Recipe
 
 1. Confirm the algorithm. Default: ES256. Offer ES384 or EdDSA if the publisher has a specific reason (regulated industry preferring P-384; preference for Ed25519). Otherwise ES256.
-2. Confirm the `kid`. Suggest the default (`<short-handle>-<YYYY>-01`); accept the publisher's override if they have an existing convention.
+2. Confirm the `kid`. Suggest the default (`<short-handle>-<YYYY>-01`); accept the publisher's override if they have an existing convention. **Validate the chosen `kid` against the regex `^[a-z0-9][a-z0-9-]{0,31}$` before using it in any shell command or filename.** This guards against injection via publisher-supplied identifiers that subsequently appear in `rm`, `llmo keygen --kid`, `llmo sign --kid`, and constructed paths like `llmo-private-<kid>.pem`. If the publisher's preferred convention does not match the regex (e.g. uppercase letters, underscores, dots), ask them to pick a sanitized alias and record the mapping in `llmo-key-custody-note.txt` — do not silently transform it, and never accept a `kid` containing whitespace, shell metacharacters, or path separators.
 3. Run `llmo keygen --alg ES256 --kid <kid>` in the working directory.
 4. Confirm the two output files exist:
    - `llmo-private-<kid>.pem` (or equivalent format)
