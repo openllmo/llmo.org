@@ -15,9 +15,11 @@ The schema's `$id` is `https://llmo.org/spec/v0.1/schema.json`. Tools that fetch
 
 - Presence and types of required top-level fields (`llmo_version`, `entity`, `claims`, `valid_from`, `valid_until`, `document_id`).
 - Constant value of `llmo_version` (`"0.1"`).
-- Shape of the `entity` object, including regex constraints on `primary_domain`, `aliases`, and well-known `external_ids` (Wikidata QID, DUNS, LEI, DID).
-- Shape of each claim object.
-- Shape of the `statement` payload for each of the eight core claim types (`identity`, `canonical_urls`, `official_channels`, `product_facts`, `personnel`, `disavowal`, `supersedes`, `pointer`), applied via conditional `allOf` / `if` / `then` constructs.
+- Shape of the `entity` object, including regex constraints on `primary_domain`, `aliases`, and well-known `external_ids` (Wikidata QID, DUNS, LEI, DID, IRS EIN). Each well-known key accepts either a plain identifier string (v0.1) or a `{value, verification_method, verification_proof, verified_at}` structured object (v0.1.8) with conditional-required proof and timestamp when `verification_method` is not `none`.
+- Shape of the `entity.name` field, which accepts either a single string (v0.1) or an array of `{name, locale, primary}` entries for internationalized names (v0.1.8). The array form enforces exactly one `primary: true` via `contains` with `minContains: 1, maxContains: 1`.
+- Shape of each claim object, including the optional `provenance_markers` array on the claim envelope (v0.1.8).
+- Shape of the `statement` payload for each of the fourteen core claim types (`identity`, `canonical_urls`, `official_channels`, `product_facts`, `personnel`, `disavowal`, `supersedes`, `pointer` from v0.1; plus `contact_points`, `categories`, `locations`, `hours`, `attributes`, `operational_status` added in v0.1.8), applied via conditional `allOf` / `if` / `then` constructs.
+- Schema-encoded conditional constraints (v0.1.8): `contact_points` entries with `verification_status: verified` require `verification_proof` and `verified_at`; `operational_status` claims with non-open status require `effective_date`.
 - Shape of the optional `signature` object on both documents and claims.
 - Pattern constraints on identifier strings and domain literals.
 
