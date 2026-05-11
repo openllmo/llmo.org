@@ -1,0 +1,14 @@
+{
+  "llmo_version": "0.1",
+  "document_id": "test-vector-v0.1.8-neg-name-two-primary-001",
+  "valid_from": "2026-05-11T00:00:00Z",
+  "valid_until": "2026-11-07T00:00:00Z",
+  "entity": {
+    "name": [
+      { "name": "JungleCat, Inc.", "locale": "en", "primary": true },
+      { "name": "ジャングルキャット", "locale": "ja", "primary": true }
+    ],
+    "primary_domain": "junglecat.example.com"
+  },
+  "claims": []
+}

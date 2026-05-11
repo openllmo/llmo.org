@@ -109,6 +109,38 @@ A third strict-tier vector signed with EdDSA (Ed25519). Exercises the third algo
 
 Raw: [`signed-strict-eddsa.json`](/spec/v0.1/test-vectors/signed-strict-eddsa.json), [`signed-strict-eddsa-key.json`](/spec/v0.1/test-vectors/signed-strict-eddsa-key.json), [`signed-strict-eddsa-payload.json`](/spec/v0.1/test-vectors/signed-strict-eddsa-payload.json)
 
+#### v0.1.8 positive vectors
+
+These vectors exercise the six new core claim types added in v0.1.8 plus a comprehensive vector that combines entity.name internationalization, structured `external_ids` with the new `irs_ein` well-known key, `provenance_markers` on the claim envelope, all five new top-level fields (`revocation_registry`, `dns_corroboration`, `publication_history`, `delegates_to`, `delegated_from`), and the canonical_urls / product_facts / identity extensions. All are unsigned (Minimal-tier) so they isolate schema validation from the cryptographic layer.
+
+##### `unsigned-contact-points.json`
+
+A `contact_points` claim with one verified entry (security@junglecat.example.com, email_challenge method, proof and timestamp present per the v0.1.8 schema-encoded conditional) and one unverified entry (press@junglecat.example.com). Demonstrates the `if`/`then` conditional constraint that requires `verification_proof` and `verified_at` when `verification_status` is `verified`. Raw: [`unsigned-contact-points.json`](/spec/v0.1/test-vectors/unsigned-contact-points.json).
+
+##### `unsigned-categories.json`
+
+A `categories` claim with primary `https://schema.org/Restaurant`, one secondary schema.org subtype, and one NAICS code (`722511`). Demonstrates the v0.1.8 category vocabulary (schema.org Organization subtypes plus NAICS; no trademarked third-party taxonomies). Raw: [`unsigned-categories.json`](/spec/v0.1/test-vectors/unsigned-categories.json).
+
+##### `unsigned-locations.json`
+
+A `locations` claim with one entry: postal address (US/CA/San Francisco), WGS84 coordinates, a `radius_km`-based `service_area`, `business_type: customer_location`, and a per-location `publisher_id`. Demonstrates the location structure and the `service_area` `oneOf` branch for radius shape. Raw: [`unsigned-locations.json`](/spec/v0.1/test-vectors/unsigned-locations.json).
+
+##### `unsigned-hours.json`
+
+An `hours` claim exercising every v0.1.8 hours feature: a regular weekly schedule with split shifts on Friday; the `24:00` close on Thursday (permitted by the HH:MM pattern as an end-of-day boundary); an overnight period (`is_overnight: true`) on Friday; a calendar `exception` for 2026-12-25 (closed); and an `alternate.brunch` sub-schedule. Raw: [`unsigned-hours.json`](/spec/v0.1/test-vectors/unsigned-hours.json).
+
+##### `unsigned-attributes.json`
+
+An `attributes` claim with boolean values (`wifi: true`, `accepts_credit_cards: true`, `outdoor_seating: false`), enum values (`parking: lot`, `alcohol_served: full_bar`, `dress_code: casual`), array values (`payment_methods`, `spoken_languages`, `accessibility_features`), and one namespaced extension (`myco.signature_dish`). Demonstrates the canonical vocabulary plus the namespaced-extension fallback. Raw: [`unsigned-attributes.json`](/spec/v0.1/test-vectors/unsigned-attributes.json).
+
+##### `unsigned-operational-status.json`
+
+An `operational_status` claim with `status: opening_soon`, an `effective_date` of 2026-06-01 (required by the schema-encoded conditional for any non-open status), and a `reason` string. Raw: [`unsigned-operational-status.json`](/spec/v0.1/test-vectors/unsigned-operational-status.json).
+
+##### `unsigned-v0.1.8-comprehensive.json`
+
+A single document exercising every other v0.1.8 schema addition together: `entity.name` array form with three locales and exactly one `primary: true`; `entity.external_ids` with plain-string `wikidata` and `duns` plus structured `irs_ein` (the new v0.1.8 well-known key); `provenance_markers` on the identity claim; all five new top-level fields (`revocation_registry`, `dns_corroboration`, `publication_history`, `delegates_to`, `delegated_from`); the four new `canonical_urls` well-known keys (`appointment`, `menu`, `reservations`, `order`); `product_facts` per-product extensions (`kind`, `price`, `description`, `category`); and `identity.price_range`. Raw: [`unsigned-v0.1.8-comprehensive.json`](/spec/v0.1/test-vectors/unsigned-v0.1.8-comprehensive.json).
+
 ### Negative vectors
 
 These vectors exercise specific failure modes. Each vector identifies the rule it targets in its filename. Naming convention: `negative-<rule>-<descriptor>.json`. Each vector is documented with its expected validator output: in-browser validator first, [`llmo` CLI](https://www.npmjs.com/package/llmo) second.
@@ -181,7 +213,7 @@ A standard-conforming document with a `disavowal` claim carrying a per-claim ES2
 
 ##### `negative-schema-malformed-claim-type.json`
 
-Includes a claim with `type: "noNamespace"`, which matches neither the eight reserved core types nor the namespaced extension pattern (per [§3.6](/spec/v0.1#3-6-extension-claims) and the v0.1.4 schema fix). Schema validation against [`/spec/v0.1/schema.json`](/spec/v0.1/schema.json) fails. CLI reports tier `invalid`.
+Includes a claim with `type: "noNamespace"`, which matches neither the reserved core types (eight in v0.1, fourteen as of v0.1.8) nor the namespaced extension pattern (per [§3.6](/spec/v0.1#3-6-extension-claims) and the v0.1.4 schema fix). Schema validation against [`/spec/v0.1/schema.json`](/spec/v0.1/schema.json) fails. CLI reports tier `invalid`.
 
 ##### `negative-schema-malformed-founded.json`
 
@@ -194,6 +226,50 @@ Includes a claim with `type: "noNamespace"`, which matches neither the eight res
 ##### `negative-m5-window-over-365.json`
 
 A 400-day validity window (2026-04-20 to 2027-05-25). Schema does not constrain window length; the M5 tier rule does (§5.1: window MUST NOT exceed 365 days). CLI reports tier `invalid` with rule `window <= 365 days`.
+
+#### v0.1.8 schema negatives
+
+Each vector exercises one conditional constraint encoded in the v0.1.8 schema (via `if`/`then` or `contains`/`minContains`/`maxContains`) or a required-field omission. All ten fail canonical-schema validation via `scripts/test-vectors/verify-schema.mjs`. Validator and CLI tier-rule output is independent of the schema check; the conditional constraints fire as AJV errors regardless of which tier the document otherwise targets.
+
+##### `negative-schema-contact-points-verified-no-proof.json`
+
+A `contact_points` entry with `verification_status: "verified"` and `verified_at` but no `verification_proof`. The schema's `if`/`then` on the contact point requires both `verification_proof` and `verified_at` when `verification_status` is `verified`; omitting either fails. Raw: [`negative-schema-contact-points-verified-no-proof.json`](/spec/v0.1/test-vectors/negative-schema-contact-points-verified-no-proof.json).
+
+##### `negative-schema-contact-points-verified-no-timestamp.json`
+
+The companion to the prior vector: `verification_status: "verified"` with `verification_proof` but no `verified_at`. Same `if`/`then` clause; same failure mode. Raw: [`negative-schema-contact-points-verified-no-timestamp.json`](/spec/v0.1/test-vectors/negative-schema-contact-points-verified-no-timestamp.json).
+
+##### `negative-schema-operational-status-no-effective-date.json`
+
+An `operational_status` claim with `status: "permanently_closed"` and no `effective_date`. The schema's `if`/`then` on operational_status requires `effective_date` whenever `status` is not `open`. Raw: [`negative-schema-operational-status-no-effective-date.json`](/spec/v0.1/test-vectors/negative-schema-operational-status-no-effective-date.json).
+
+##### `negative-schema-entity-name-no-primary.json`
+
+`entity.name` is an array of two locale entries with neither marked `primary: true`. The schema's `contains` constraint with `minContains: 1` requires at least one primary entry. Raw: [`negative-schema-entity-name-no-primary.json`](/spec/v0.1/test-vectors/negative-schema-entity-name-no-primary.json).
+
+##### `negative-schema-entity-name-two-primary.json`
+
+`entity.name` is an array of two locale entries with both marked `primary: true`. The schema's `contains` constraint with `maxContains: 1` requires at most one primary entry. Raw: [`negative-schema-entity-name-two-primary.json`](/spec/v0.1/test-vectors/negative-schema-entity-name-two-primary.json).
+
+##### `negative-schema-external-id-bad-wikidata-pattern.json`
+
+`entity.external_ids.wikidata` uses the structured form with `value: "not-a-Q-id"`. The schema's per-key constraint on `wikidata` enforces the `^Q[0-9]+$` pattern on the `value` field of the structured form (preserving the v0.1 pattern when the structured form was added in v0.1.8). Raw: [`negative-schema-external-id-bad-wikidata-pattern.json`](/spec/v0.1/test-vectors/negative-schema-external-id-bad-wikidata-pattern.json).
+
+##### `negative-schema-external-id-verified-no-proof.json`
+
+`entity.external_ids.irs_ein` uses the structured form with `verification_method: "registry_lookup"` but neither `verification_proof` nor `verified_at`. The schema's `if`/`then` on `structured_external_id` requires both fields whenever `verification_method` is not `none`. Raw: [`negative-schema-external-id-verified-no-proof.json`](/spec/v0.1/test-vectors/negative-schema-external-id-verified-no-proof.json).
+
+##### `negative-schema-categories-no-primary.json`
+
+A `categories` claim with `secondary` and `naics` but no `primary`. The schema requires `primary` on every categories claim. Raw: [`negative-schema-categories-no-primary.json`](/spec/v0.1/test-vectors/negative-schema-categories-no-primary.json).
+
+##### `negative-schema-hours-malformed-time.json`
+
+An `hours` claim with `regular.monday[0].open: "25:00"`. The HH:MM pattern accepts `00:00` through `23:59` for `open`; `25:00` violates the pattern. (The pattern accepts `24:00` only for `close`.) Raw: [`negative-schema-hours-malformed-time.json`](/spec/v0.1/test-vectors/negative-schema-hours-malformed-time.json).
+
+##### `negative-schema-attributes-bad-value-type.json`
+
+An `attributes` claim with a numeric value (`"numeric_field": 42`). The `attributes` open map accepts only boolean, string, or array-of-strings values via `additionalProperties: { "oneOf": [...] }`. A number does not match any branch. Raw: [`negative-schema-attributes-bad-value-type.json`](/spec/v0.1/test-vectors/negative-schema-attributes-bad-value-type.json).
 
 ### Warning-triggering vectors
 

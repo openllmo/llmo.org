@@ -1,0 +1,79 @@
+{
+  "llmo_version": "0.1",
+  "document_id": "test-vector-v0.1.8-comprehensive-001",
+  "valid_from": "2026-05-11T00:00:00Z",
+  "valid_until": "2026-11-07T00:00:00Z",
+  "entity": {
+    "name": [
+      { "name": "JungleCat, Inc.", "locale": "en", "primary": true },
+      { "name": "ジャングルキャット", "locale": "ja" },
+      { "name": "丛林猫", "locale": "zh-Hans-CN" }
+    ],
+    "primary_domain": "junglecat.example.com",
+    "external_ids": {
+      "wikidata": "Q12345",
+      "duns": "123456789",
+      "irs_ein": {
+        "value": "12-3456789",
+        "verification_method": "registry_lookup",
+        "verification_proof": "opaque-proof-token-xyz",
+        "verified_at": "2026-04-15T12:00:00Z"
+      }
+    }
+  },
+  "revocation_registry": "https://junglecat.example.com/.well-known/llmo-revocations.json",
+  "dns_corroboration": {
+    "txt_record": "_llmo-corroboration.junglecat.example.com",
+    "hash_alg": "sha-256"
+  },
+  "publication_history": "https://history.example.com/junglecat",
+  "delegates_to": ["eu.junglecat.example.com"],
+  "delegated_from": ["parent.example.com"],
+  "claims": [
+    {
+      "claim_id": "identity-001",
+      "type": "identity",
+      "provenance_markers": [
+        "source:publisher-website",
+        "cross-validated:wikidata",
+        "human-reviewed:2026-05-11"
+      ],
+      "statement": {
+        "founded": "2024-05",
+        "description": "JungleCat is a fictional restaurant for v0.1.8 test vector purposes.",
+        "price_range": 3
+      }
+    },
+    {
+      "claim_id": "urls-canonical",
+      "type": "canonical_urls",
+      "statement": {
+        "homepage": "https://junglecat.example.com/",
+        "menu": "https://junglecat.example.com/menu",
+        "reservations": "https://junglecat.example.com/book",
+        "order": "https://junglecat.example.com/order",
+        "appointment": "https://junglecat.example.com/appointment"
+      }
+    },
+    {
+      "claim_id": "products-001",
+      "type": "product_facts",
+      "statement": {
+        "products": [
+          {
+            "name": "Quarterly Subscription",
+            "kind": "service",
+            "price": { "amount": 49.99, "currency": "USD" },
+            "description": "Quarterly subscription to the JungleCat service.",
+            "category": "https://schema.org/Service"
+          },
+          {
+            "name": "Lifetime Plan",
+            "kind": "service",
+            "price": "call_for_quote"
+          }
+        ]
+      }
+    }
+  ]
+}

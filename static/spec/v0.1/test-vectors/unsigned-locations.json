@@ -1,0 +1,42 @@
+{
+  "llmo_version": "0.1",
+  "document_id": "test-vector-v0.1.8-locations-001",
+  "valid_from": "2026-05-11T00:00:00Z",
+  "valid_until": "2026-11-07T00:00:00Z",
+  "entity": {
+    "name": "JungleCat, Inc.",
+    "primary_domain": "junglecat.example.com"
+  },
+  "claims": [
+    {
+      "claim_id": "locations-001",
+      "type": "locations",
+      "statement": {
+        "locations": [
+          {
+            "postal_address": {
+              "country": "US",
+              "region": "CA",
+              "locality": "San Francisco",
+              "postal_code": "94110",
+              "address_lines": ["123 Test Street"]
+            },
+            "coordinates": {
+              "latitude": 37.7749,
+              "longitude": -122.4194
+            },
+            "service_area": {
+              "radius_km": 5,
+              "center": {
+                "latitude": 37.7749,
+                "longitude": -122.4194
+              }
+            },
+            "business_type": "customer_location",
+            "publisher_id": "STORE-001"
+          }
+        ]
+      }
+    }
+  ]
+}
