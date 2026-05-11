@@ -322,7 +322,17 @@
       if (Array.isArray(s.superseded)) s.superseded.forEach(function (x) { if (x && x.url) push(x.url, false); });
     } else if (t === "pointer") {
       if (s.url) push(s.url, true);
+    } else if (t === "categories") {
+      // v0.1.8: schema.org Organization subtype URIs in primary + secondary.
+      // These are type identifiers (external standards URIs), not endpoints
+      // the publisher controls; classify as third-party-allowed for S4.
+      if (s.primary) push(s.primary, true);
+      if (Array.isArray(s.secondary)) s.secondary.forEach(function (u) { push(u, true); });
     }
+    // v0.1.8: contact_points, locations, hours, attributes, operational_status
+    // have no URL-typed fields that S4 evaluates. Their content (email
+    // addresses, postal addresses, coordinates, time strings, attribute
+    // values) is not collected here.
     return urls;
   }
 
@@ -563,7 +573,14 @@
           claim_id: (c && c.claim_id) || null,
           type: (c && c.type) || null,
           presence: c && c.signature ? "present" : "absent",
-          verification: null
+          verification: null,
+          // v0.1.8: surface provenance_markers in the per-claim report when
+          // the builder agent has populated them. Advisory per ADR-0007:
+          // consumers MAY use as confidence or freshness signal but MUST
+          // NOT treat as authoritative.
+          provenance_markers: c && Array.isArray(c.provenance_markers) && c.provenance_markers.length > 0
+            ? c.provenance_markers.slice()
+            : null
         };
       })
     };
@@ -1271,7 +1288,16 @@
         if (pc.verification) {
           line += " (" + pc.verification + ")";
         }
-        pul.appendChild(el("li", { text: line }));
+        var li = el("li", { text: line });
+        if (pc.provenance_markers) {
+          // v0.1.8: surface provenance_markers as a sub-line under the claim.
+          // Advisory signal per ADR-0007; rendered as a muted markers list.
+          li.appendChild(el("div", {
+            cls: "muted",
+            text: "provenance: " + pc.provenance_markers.join(", ")
+          }));
+        }
+        pul.appendChild(li);
       });
       body.appendChild(pul);
     } else {
@@ -1368,6 +1394,9 @@
           line += " (" + pc.verification + ")";
         }
         lines.push(line);
+        if (pc.provenance_markers) {
+          lines.push("    provenance: " + pc.provenance_markers.join(", "));
+        }
       });
     }
     return lines.join("\n");
