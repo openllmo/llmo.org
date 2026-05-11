@@ -13,3 +13,10 @@ ignoreFiles = ['^README\.md$', '^CONTRIBUTING\.md$', '^SECURITY\.md$', '^CLAUDE\
 # or tags, but Hugo emits empty list pages for them by default and includes
 # them in the sitemap. disableKinds removes those pages from output.
 disableKinds = ['taxonomy', 'term']
+
+# Allow raw HTML in markdown. The site is single-author with no untrusted
+# content; the default goldmark unsafe=false stripping protects against XSS
+# in third-party-authored markdown, which does not apply here. Letter-index
+# anchors in /glossary/ rely on inline <span id="..."></span> tags.
+[markup.goldmark.renderer]
+  unsafe = true
