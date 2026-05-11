@@ -30,7 +30,7 @@ Sign the confirmed payload with the publisher's private key. Produce a signed `l
    - `signature valid: unverified` → JWKS not found or kid not found; verify both files exist and the kid strings match.
    - `tier: minimal` → schema validation failed; check the payload's structure against the v0.1.8 schema (the skill prints AJV's specific error path).
 6. On verification PASS, **immediately**:
-   - **Delete the local private key file**: `rm <path-to-private-key>`. Confirm deletion. The skill must never leave the private key on disk after signing.
+   - **Delete the local private key file** by passing the literal filename string that was emitted by `llmo keygen` in phase 07 (i.e. the same string used as `--key` in step 3 of this phase). Do **not** reconstruct the filename by re-templating `<kid>` or by globbing. Never invoke `rm` with a wildcard (`rm *.pem`, `rm llmo-private-*.pem`), with a relative path containing `..`, or with any path that was not previously written by the skill in this session. Confirm deletion by checking `ls <path>` returns no-such-file; if `ls` shows the file still present, do not proceed and surface the failure to the publisher.
    - Instruct the publisher: "The signed document is at `llmo-signed.json`. The private key has been removed from the working directory. The next time you sign (next quarter), retrieve it again from <custody location>."
 7. If phase 06 was opted in, compute the `dns_corroboration` hash now:
    ```

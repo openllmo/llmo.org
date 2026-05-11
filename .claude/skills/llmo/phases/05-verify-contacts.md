@@ -23,6 +23,8 @@ The skill does not deliver email and does not use `email_challenge` in v0. SMTP 
    - `contact@diverse.org` → domain `diverse.org`
    - `hello@somebodyelses.com` → domain `somebodyelses.com` (third-party — flag and skip later)
 
+   **Domain control is proved per email-address domain, not per apex.** A publisher whose contact points include both `security@example.com` and `support@mail.example.com` adds **two** separate TXT records (`_llmo-verify.example.com` and `_llmo-verify.mail.example.com`), because controlling the apex does not automatically prove control of subdomains for email purposes. The model matches how Google Workspace and Microsoft 365 do per-domain ownership verification. Surface this to the publisher up front so they don't skip per-subdomain proof and end up with `unverified` addresses they expected to be verified.
+
 2. For each unique domain:
 
    1. Check `verify-token.txt` for an existing token. If present and the publisher confirms it's still valid (the TXT record is still in DNS), reuse it; skip to step 5.
