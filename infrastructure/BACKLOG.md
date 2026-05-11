@@ -140,6 +140,32 @@ Filed 2026-05-08 from a snapshot that predated cli PR #1's re-vendor (2026-05-07
 
 Vendor-drift CI guard added 2026-05-08 in cli PR #4, SHA f3b41aed377aede1d79f3b3c4e293ea6002d6edd, to prevent re-occurrence of the snapshot-vs-reality drift pattern.
 
+### Update validator.js for v0.1.8 claim types and conditional constraints
+
+**Track:** `changelog`
+
+**Status:** Open as of v0.1.8 publication 2026-05-11 (PR #118, SHA `8db5dee`). The canonical schema's `claim.type` `oneOf` core branch now lists fourteen types (eight from v0.1 plus the six added in v0.1.8: `contact_points`, `categories`, `locations`, `hours`, `attributes`, `operational_status`). Validator.js (`static/js/validator.js`) does not yet have tier-rule layer treatment for the new core types. Schema validation through AJV still works (the new types validate as core claim types under `oneOf`, and the three new schema-encoded conditional constraints fire automatically); what's missing is the validator's UI-layer per-claim rendering, rule labeling, and any tier-specific treatment for v0.1.8-shaped documents.
+
+**Estimate:** 4-6 hours.
+
+**Why credibility:** The reference validator at https://llmo.org/validator/ is the surface external implementers compare against. v0.1.8 documents populating the new fields validate at the schema level but the validator's per-claim breakdown shows reduced-fidelity output until the dispatch layer is updated. Without this update, schema-vs-validator alignment regresses from v0.1.6's parity baseline.
+
+**Scope:** Extend the per-claim dispatch in `static/js/validator.js` to recognize the six new core claim types. No new tier rules required beyond what the schema enforces (the conditional-required constraints fire as schema errors automatically). Update minimal/standard/strict-tier annotations to reference v0.1.8 §3.5 for the new types and §3.4 for `provenance_markers`. The CLI gets the same change in a paired PR on `openllmo/cli` after the canonical schema re-vendor; coordination follows the v0.1.4 schema completeness pattern (canonical first, then CLI re-vendor, then validator alignment).
+
+**Detection signal:** A v0.1.8 document with `contact_points` (or any of the other five new types) reaches the validator and the per-claim breakdown shows the claim as unknown-type or otherwise reduced-fidelity. Vector authoring (entry below) makes this signal mechanical.
+
+### Test vectors for v0.1.8 new claim types and conditional constraints
+
+**Track:** `changelog`
+
+**Status:** Open as of v0.1.8 publication 2026-05-11 (PR #118). The 31-vector v0.1 set under `static/spec/v0.1/test-vectors/` was the back-compat hard check during PR #118 (all 31 still pass schema validation against v0.1.8). The v0.1.8 schema additions do not yet have positive or negative vectors of their own committed to the test-vector directory. The validation harness at `TASKS/v0.1.8-validation.mjs` (gitignored, local-only) already exercises eleven cases end-to-end (one positive, ten negative) and is a starting draft for the lifted vectors.
+
+**Estimate:** 4-6 hours.
+
+**Why credibility:** Tier rules without exercising vectors invite drift between spec text, schema, validator, and CLI. The four drift findings filed on 2026-05-08 surfaced this pattern at v0.1; preventing recurrence at v0.1.8 means authoring vectors as part of the rollout, not after.
+
+**Scope:** Positive vectors (one per new core claim type, six total) plus negative vectors exercising each conditional constraint: (1) `contact_points` with `verification_status: verified` but missing `verification_proof`; (2) `contact_points` with `verification_status: verified` but missing `verified_at`; (3) `operational_status` with non-open status and missing `effective_date`; (4) `entity.name` array form with zero `primary: true`; (5) `entity.name` array form with two `primary: true`; (6) `external_ids.wikidata` structured form with `verification_method != none` and missing `verification_proof` or `verified_at`. Edge cases: `hours` `24:00` close-only enforcement; `attributes` value type mismatches; `service_area` `oneOf` branch mutual exclusivity. Add to `scripts/test-vectors/verify-schema.mjs` expectations matrix.
+
 ---
 
 ## ACTIVE PRIORITIES (sequenced for upcoming work)
@@ -697,6 +723,20 @@ The org-level setting unlocks the repo-level setting; the repo-level setting mus
 **Operator action required:** Surface the App's Client ID from `https://github.com/organizations/openllmo/settings/apps/llmo-workflow-bot` (visible on the App's General settings page, distinct from the numeric App ID). Add it as an org-level secret `LLMO_WORKFLOW_BOT_CLIENT_ID` scoped to the same three repos as the existing secrets.
 
 **Code action:** Replace `app-id: ${{ secrets.LLMO_WORKFLOW_BOT_APP_ID }}` with `client-id: ${{ secrets.LLMO_WORKFLOW_BOT_CLIENT_ID }}` in both workflows. Verify via `workflow_dispatch` that PR creation still works under the App identity. Optionally retire the `LLMO_WORKFLOW_BOT_APP_ID` secret once the workflows no longer reference it.
+
+### Attribute vocabulary curation cadence
+
+**Track:** `none`
+
+**Status:** Open as of v0.1.8 publication 2026-05-11 (PR #117, SHA `8265766`). The `/glossary/#attributes` page ships with a 25-attribute seed vocabulary (14 boolean, 5 enum, 5 array) cross-referenced from Google Business Profile, Yelp, Bing Places, and Apple Business Connect. The seed is bounded by what was obvious; production publisher data will surface attributes the seed doesn't cover and namespaced extensions agents create when they can't normalize cleanly.
+
+**Estimate:** Ongoing; approximately 1-2 hours per curation pass.
+
+**Why:** The controlled vocabulary is the builder agent's normalization layer per ADR-0007. Without a curation cadence, the vocabulary drifts: agents accumulate namespaced extensions (`myco.signature_dish`-shaped values), publishers freelance, and the cross-publisher normalization benefit erodes. ADR-0006's additive-only patch policy permits vocabulary additions in any v0.1.x patch; the open question is who looks at what's been used and when.
+
+**Scope:** Establish a periodic review (likely weekly or monthly) that scans published llmo.json documents and the builder agent's intermediate outputs for: (a) namespaced extension attributes appearing in actual publisher documents (signal that the canonical vocabulary lacks a name); (b) deviation between attribute values agents emit and the controlled enum sets (signal that the enum is too narrow); (c) attribute names that appear in zero documents over the prior review window (signal the canonical name is poorly chosen and worth a rename at the next minor bump). Output: a candidate-additions list, debated against the LLM-richness test and the agent-derivability test per ADR-0007, landed as a v0.1.x patch with new canonical entries. Owner: TBD. May warrant a dedicated Process LIP if the cadence becomes load-bearing.
+
+**Detection signal:** Multiple publishers using inconsistent attribute names for the same underlying property (e.g., `wifi` vs `myco.wireless_internet` vs `acme.has_wifi`) across documents the builder agent emits. Or: a sunday-audit (or equivalent) report showing growth in namespaced-extension attribute usage without corresponding additions to the canonical list.
 
 ---
 
