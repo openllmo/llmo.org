@@ -43,10 +43,11 @@ fi
 # Idempotency check: scan for any non-blank line between `## [Unreleased]`
 # and the next `## [` section header. If none, [Unreleased] is empty.
 HAS_CONTENT=$(awk '
+  BEGIN { result = "no" }
   /^## \[Unreleased\]/ { in_unreleased=1; next }
-  in_unreleased && /^## \[/ { print "no"; exit }
-  in_unreleased && NF > 0 { print "yes"; exit }
-  END { if (!found) print "no" }
+  in_unreleased && /^## \[/ { exit }
+  in_unreleased && NF > 0 { result = "yes"; exit }
+  END { print result }
 ' "$CHANGELOG")
 
 if [[ "$HAS_CONTENT" != "yes" ]]; then

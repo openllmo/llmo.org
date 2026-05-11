@@ -12,6 +12,8 @@ During v0.1 pre-release, changes are author-decided and no governance window app
 
 ## [Unreleased]
 
+## [0.1.8] - 2026-05-11
+
 v0.1.8 (in progress, additive) introduces six new core claim types (`contact_points`, `categories`, `locations`, `hours`, `attributes`, `operational_status`), five new top-level optional fields (`revocation_registry`, `dns_corroboration`, `publication_history`, `delegates_to`, `delegated_from`), `provenance_markers` on the claim envelope, and structured verification forms on `entity.external_ids` plus a new `irs_ein` well-known key. Every conforming v0.1 document validates unchanged. Schema `$id` and `llmo_version` are unchanged.
 
 ### Added
