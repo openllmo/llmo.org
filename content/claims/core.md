@@ -1,11 +1,12 @@
 ---
 title: Core Claim Types
 linkTitle: Core Claim Types
-description: The eight core claim types defined in LLMO v0.1.
+description: The fourteen core claim types defined in LLMO v0.1 (eight from v0.1; six added in v0.1.8).
 date: 2026-04-17
+use_lastmod: true
 ---
 
-Specification v0.1 defines eight core claim types. Every conforming consumer MUST understand all eight. Each entry below names the type, its purpose, its statement schema, an example, and common pitfalls.
+Specification v0.1 defines fourteen core claim types as of v0.1.8: eight from the original v0.1 release (`identity`, `canonical_urls`, `official_channels`, `product_facts`, `personnel`, `disavowal`, `supersedes`, `pointer`) plus six added in v0.1.8 (`contact_points`, `categories`, `locations`, `hours`, `attributes`, `operational_status`). Every conforming consumer MUST understand all fourteen. Each entry below names the type, its purpose, its statement schema, an example, and common pitfalls.
 
 The authoritative definitions live in specification [§3.5](/spec/v0.1#3-5-core-claim-types). This page summarizes and adds implementation notes.
 
@@ -276,3 +277,225 @@ Each superseded object requires `what` (a short category or label) and `reason` 
 
 - **Using `pointer` for artifacts that have a core claim type.** `canonical_urls` already covers named operational URLs (homepage, docs, api, agent_manifest, mcp_manifest, etc.). `pointer` is for artifacts outside that set, typically heavier external standards. Declaring the homepage as a `pointer` instead of a `canonical_urls.homepage` weakens the claim, because `canonical_urls` is a specific assertion about a specific purpose and `pointer` is a general reference.
 - **Conflating the pointer with the pointed-at artifact.** Same caveat as `canonical_urls`. LLMO asserts "this is our reference for that scope," not "this artifact is itself well-formed or current."
+
+---
+
+## `contact_points` (v0.1.8)
+
+**Purpose.** Asserts typed contact addresses for specific organizational functions (security, abuse, press, legal, support, billing, phone, messaging), with optional verification metadata recording how each address was confirmed.
+
+**Statement schema.**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `points` | array of point objects | yes | At least one entry. |
+
+Each point object requires `type` (enum: `billing`, `security`, `abuse`, `legal`, `press`, `support`, `phone`, `messaging`) and `address` (the contact value). Optional: `verification_method` (enum: `email_challenge`, `dns_txt`, `signed_response`, `none`), `verification_status` (enum: `verified`, `pending`, `unverified`), `verification_proof`, `verified_at` (RFC 3339).
+
+When `verification_status` is `verified`, both `verification_proof` and `verified_at` are required (schema-enforced via `if`/`then`).
+
+**Example.**
+
+```json
+{
+  "type": "contact_points",
+  "statement": {
+    "points": [
+      {
+        "type": "security",
+        "address": "security@diverse.org",
+        "verification_method": "email_challenge",
+        "verification_status": "verified",
+        "verified_at": "2026-05-01T00:00:00Z",
+        "verification_proof": "<challenge-response-token>"
+      }
+    ]
+  }
+}
+```
+
+**Common pitfalls.**
+
+- **Marking an address `verified` without proof.** Schema validation rejects this directly. Either supply the proof and timestamp, or use `verification_status: pending` or `unverified` until you can.
+- **Conflating `contact_points.address` with `official_channels.email_domains`.** The latter declares which domains your organization sends mail from (for impersonation defense); the former declares specific addresses for specific purposes. Both are useful; they answer different questions.
+
+---
+
+## `categories` (v0.1.8)
+
+**Purpose.** Asserts the organization's primary and secondary categories using schema.org Organization subtype URIs plus optional NAICS codes.
+
+**Statement schema.**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `primary` | string (URI) | yes | A schema.org Organization subtype URI (e.g., `https://schema.org/Restaurant`). |
+| `secondary` | array of URIs | no | Additional schema.org subtype URIs. |
+| `naics` | array of strings | no | NAICS codes (2-6 digit numeric strings). |
+
+**Example.**
+
+```json
+{
+  "type": "categories",
+  "statement": {
+    "primary": "https://schema.org/SoftwareApplication",
+    "secondary": ["https://schema.org/WebApplication"],
+    "naics": ["541511"]
+  }
+}
+```
+
+**Common pitfalls.**
+
+- **Using trademarked third-party taxonomies (GMB categories, Yelp categories, Apple categories).** v0.1.8 deliberately constrains the controlled category vocabulary to schema.org plus NAICS. Publishers who need finer-grained or industry-specific categorization use the namespaced extension form per [§3.6](/spec/v0.1#3-6-extension-claims), e.g., `"myco.business_subtype": "..."`. Trademark avoidance and schema-not-a-catalog discipline are the rationale.
+
+---
+
+## `locations` (v0.1.8)
+
+**Purpose.** Asserts physical locations or service areas where the organization operates. Each entry may include postal address, geographic coordinates, service-area definition, business type, and a per-location publisher identifier for cross-system routing.
+
+**Statement schema.**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `locations` | array of location objects | yes | At least one entry. |
+
+Each location object may contain `postal_address` (object with `country` ISO 3166-1 alpha-2 and optional `region`, `locality`, `administrative_division_2`, `postal_code`, `address_lines`), `coordinates` (`{latitude, longitude}` in WGS84), `service_area` (`oneOf` of `{radius_km, center}`, `{polygon}`, `{bounding_box}`, or `{named_places}`), `business_type` (enum: `customer_location`, `business_location`, `both`), and `publisher_id` (publisher's per-location identifier, distinct from any document-level identifier).
+
+**Example.**
+
+```json
+{
+  "type": "locations",
+  "statement": {
+    "locations": [
+      {
+        "postal_address": {
+          "country": "US",
+          "region": "CA",
+          "locality": "Santa Clara",
+          "postal_code": "95054",
+          "address_lines": ["2445 Augustine Dr Ste 150"]
+        },
+        "coordinates": { "latitude": 37.3737, "longitude": -121.9700 },
+        "business_type": "business_location"
+      }
+    ]
+  }
+}
+```
+
+**Common pitfalls.**
+
+- **Coordinates outside WGS84 bounds.** Schema rejects latitude outside [-90, 90] or longitude outside [-180, 180].
+- **Mixing `service_area` branches.** The `service_area` field is a strict `oneOf`: exactly one of `radius_km+center`, `polygon`, `bounding_box`, or `named_places`. A location with both a radius and a polygon is non-conforming; declare two locations or pick one representation.
+- **Conflating per-location `publisher_id` with the claim-envelope `publisher_id` (does not exist in v0.1.8).** `publisher_id` exists ONLY as a per-location field on `locations` entries, not on the claim envelope. The agent's per-claim audit trail lives on `provenance_markers` (§3.4), not in any envelope-level publisher identifier.
+
+---
+
+## `hours` (v0.1.8)
+
+**Purpose.** Asserts opening hours: a regular weekly schedule, calendar exceptions (holidays, closures, special schedules), and named alternate sub-schedules (drive-through, kitchen, brunch).
+
+**Statement schema.**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `regular` | object | no | Weekly schedule keyed by day-of-week (`monday` through `sunday`). |
+| `exceptions` | array | no | Per-date overrides. |
+| `alternate` | object | no | Named sub-schedules with the same weekly structure as `regular`. |
+
+Each day in `regular` (and in each alternate sub-schedule) is an array of `{open, close, is_overnight}` periods. Multiple periods per day are permitted (split shifts). Times are 24-hour `HH:MM`. The `close` field additionally accepts `24:00` to indicate an end-of-day boundary; `open` does not. `is_overnight: true` marks periods spanning midnight (close < open numerically, e.g., open `22:00` close `02:00`).
+
+Exception entries are `{date, periods, closed}` where `date` is RFC 3339 full-date (`YYYY-MM-DD`).
+
+**Example.**
+
+```json
+{
+  "type": "hours",
+  "statement": {
+    "regular": {
+      "monday": [{ "open": "09:00", "close": "17:00" }],
+      "friday": [
+        { "open": "09:00", "close": "17:00" },
+        { "open": "22:00", "close": "02:00", "is_overnight": true }
+      ]
+    },
+    "exceptions": [
+      { "date": "2026-12-25", "closed": true }
+    ]
+  }
+}
+```
+
+**Common pitfalls.**
+
+- **`open: "24:00"`.** Not permitted; only `close: "24:00"` is. Use `00:00` if you mean midnight as an open time.
+- **Forgetting `is_overnight: true` on midnight-spanning periods.** A period with `open: "22:00"` and `close: "02:00"` is ambiguous without the flag (some consumers would treat it as zero-hours or as a configuration error). Set `is_overnight: true` whenever close < open numerically.
+- **Mixing daily exceptions with alternate sub-schedules.** Christmas closure is an `exception` (per-date override). A drive-through that operates on a different weekly schedule than the main location is an `alternate` (named sub-schedule with its own weekly structure). The two surfaces answer different questions.
+
+---
+
+## `attributes` (v0.1.8)
+
+**Purpose.** Asserts entity attributes drawn from the controlled vocabulary at [/glossary/#attributes](/glossary/#attributes). The vocabulary is the builder agent's normalization layer per [ADR-0007](/adr/0007-claude-as-builder/): canonical names ensure that "free wifi available," "wireless internet," and "guest network" all normalize to the same `wifi: true` so consumers can answer entity queries reliably across publishers.
+
+**Statement schema.** Open map of attribute name to typed value. Values are one of: boolean, string (from an enum where applicable), array of strings. Each canonical name in the vocabulary carries a declared type.
+
+Names SHOULD come from the canonical list at `/glossary/#attributes` (24 entries as of v0.1.8: boolean attributes including `wifi`, `accepts_credit_cards`, `delivery`, etc.; enum attributes including `parking`, `alcohol_served`, `dress_code`; array attributes including `payment_methods`, `spoken_languages`, `accessibility_features`). Names not in the canonical list MUST use the namespaced extension form per [§3.6](/spec/v0.1#3-6-extension-claims), e.g., `"myco.signature_dish": "fish_tacos"`.
+
+**Example.**
+
+```json
+{
+  "type": "attributes",
+  "statement": {
+    "wifi": true,
+    "parking": "lot",
+    "payment_methods": ["visa", "mastercard", "cash"],
+    "spoken_languages": ["en", "es-MX"],
+    "myco.has_drive_through": true
+  }
+}
+```
+
+**Common pitfalls.**
+
+- **Inventing canonical names that aren't in the vocabulary.** Names not in `/glossary/#attributes` MUST be namespaced (the dot is the rule per §3.6). A bare attribute name like `has_outdoor_seating` (not in the canonical list) is non-conforming; use `outdoor_seating` (canonical) instead, or namespace it (`myco.has_outdoor_seating`) if your variant is meaningfully different.
+- **Using attribute values outside the declared enum set.** For attributes with controlled values (e.g., `parking` accepts `none`, `street`, `lot`, `garage`, `valet`, `validated`, `free`), values outside the set are publisher-invented and should be namespaced or upstreamed to the vocabulary.
+- **Conflating `attributes.price_range_tier` with `identity.price_range`.** v0.1.8 defines both: the categorical `price_range_tier` (`economy`, `mid`, `upscale`, `luxury`) on `attributes` and the numeric `price_range` (1-4 mapping to $-$$$$) on `identity`. They complement each other; publishers may declare both, one, or neither.
+
+---
+
+## `operational_status` (v0.1.8)
+
+**Purpose.** Asserts the entity's current operational status: open, opening soon, temporarily closed, or permanently closed. Useful for entities undergoing renovation, opening new locations, or having ceased operations.
+
+**Statement schema.**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `status` | string (enum) | yes | One of `open`, `permanently_closed`, `temporarily_closed`, `opening_soon`. |
+| `effective_date` | string (RFC 3339 date) | conditional | Required when `status` is not `open` (schema-enforced via `if`/`then`). |
+| `reason` | string | no | Free-text reason; max 2048 characters. |
+
+**Example.**
+
+```json
+{
+  "type": "operational_status",
+  "statement": {
+    "status": "opening_soon",
+    "effective_date": "2026-06-01",
+    "reason": "Renovation complete; reopening to the public."
+  }
+}
+```
+
+**Common pitfalls.**
+
+- **Non-open status without `effective_date`.** Schema rejects this. Either supply the date the status takes effect, or use `status: open` if the entity is currently operational.
+- **Stale `permanently_closed` entries.** A `permanently_closed` claim with `effective_date` two years ago is technically correct but may surprise consumers expecting recent context. Some publishers prefer to retire `llmo.json` entirely (let `valid_until` expire) for definitively closed entities; that's a publisher policy call.

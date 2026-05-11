@@ -21,12 +21,12 @@ LLMO does not solve the trust problem. It gives organizations a sovereign channe
 ## Current status
 
 - Specification v0.1 published 2026-04-17.
-- Seven versioned releases through 2026-05-08 (v0.1.0 through v0.1.6).
+- Nine versioned releases through 2026-05-11 (v0.1.0 through v0.1.8). v0.1.8 is the most recent: a purely additive bump adding six new core claim types (`contact_points`, `categories`, `locations`, `hours`, `attributes`, `operational_status`), five new top-level optional fields, structured verification metadata on `entity.external_ids` plus a new `irs_ein` well-known key, and `provenance_markers` on the claim envelope.
 - Reference command-line tool published on npm: [llmo](https://www.npmjs.com/package/llmo).
 - Web validator runs at [validate.llmo.org](https://validate.llmo.org), redirected to [/validator/](/validator/).
 - Improvement Proposal process active: see [LIPs](/spec/lips/).
 - Architectural Decision Records published: see [ADRs](/adr/).
-- Recent activity in plain language: see [Updates](/updates/).
+- Auto-generated per-week consolidation of spec releases: see [Updates](/updates/).
 - Formal record of specification changes: see [Changelog](/spec/changelog/).
 
 ## Who maintains it
@@ -61,4 +61,4 @@ The LLMO wordmark and logo may be used to refer to the protocol and its specific
 
 ## Recent activity
 
-For week-by-week narrative summaries of project activity in plain language, see [Updates](/updates/). For the formal record of specification text changes, see the [Changelog](/spec/changelog/). For decisions about how the project itself is run, see [ADRs](/adr/). For deferred work and operational dependencies, see the project's `BACKLOG.md` in the [GitHub repository](https://github.com/openllmo/llmo.org).
+For an auto-generated per-week consolidation of spec releases, see [Updates](/updates/). For the formal record of specification text changes, see the [Changelog](/spec/changelog/). For decisions about how the project itself is run, see [ADRs](/adr/). For deferred work and operational dependencies, see the project's `BACKLOG.md` in the [GitHub repository](https://github.com/openllmo/llmo.org).
