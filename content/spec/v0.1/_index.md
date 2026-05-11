@@ -125,6 +125,20 @@ Every conforming `llmo.json` MUST contain:
 | `valid_until` | string | RFC 3339 timestamp. The document is stale after this moment. |
 | `document_id` | string | Stable opaque identifier for this document, unique within the entity. Used for supersession. |
 
+#### Optional top-level fields (v0.1.8)
+
+v0.1.8 introduces several optional top-level fields. All are forward-compatibility slots; populating them adds signal but is not required. Every v0.1 document remains valid under v0.1.8 unchanged.
+
+| Field | Type | Description |
+|---|---|---|
+| `revocation_registry` | string (URL) | Pointer to `/.well-known/llmo-revocations.json` on the entity's primary domain. Registry wire format is deferred to a future patch; v0.1.8 introduces the pointer only. |
+| `dns_corroboration` | object | `{txt_record, hash_alg}` for out-of-band corroboration of the JCS-canonicalized signature-stripped document. Hash algorithm values: `sha-256`, `sha-384`, `sha-512`. Consulted by consumers wanting a second authoritative surface beyond the well-known location. |
+| `publication_history` | string (URL) | Pointer to a third-party append-only log of prior `llmo.json` documents on this domain. Interchange format deferred. |
+| `delegates_to` | array of domain strings | Domains to which this entity delegates authority. Asserted; not yet evaluated as a trust primitive by consumers. |
+| `delegated_from` | array of domain strings | Domains that delegate authority to this entity. Mirror of `delegates_to`. |
+
+§3.8 documents top-level field names reserved for future protocol additions; publishers MUST NOT populate those reserved names in v0.1.8.
+
 ### 3.2 Entity identity
 
 The `entity` object identifies who is publishing the file.
@@ -145,13 +159,15 @@ The `entity` object identifies who is publishing the file.
 
 Organizations MAY include `external_ids` referencing Wikidata, DUNS, or other identifier registries when those identifiers exist. The field is optional; entities without registry presence simply omit it.
 
-- `name` (required): human-readable entity name.
+- `name` (required): human-readable entity name. Accepts a single string (v0.1) or an array of `{name, locale, primary}` entries for internationalization (v0.1.8). When the array form is used, exactly one entry MUST have `primary: true`; the schema enforces this constraint via `contains` with `minContains: 1, maxContains: 1`. Locale values are [RFC 5646](https://www.rfc-editor.org/rfc/rfc5646) language tags (e.g., `en`, `en-US`, `ja`, `zh-Hant-TW`).
 - `primary_domain` (required): the registrable domain at which this `llmo.json` is authoritative. MUST match the domain serving the file.
 - `aliases` (optional): other domains owned by the entity. Each alias domain SHOULD serve its own `llmo.json` whose `primary_domain` points back to a single authoritative domain; consumers encountering an alias SHOULD prefer the authoritative document.
 - `legal_identifiers` (optional): structured legal identity. Fields are jurisdiction-dependent.
-- `external_ids` (optional): pointers into external identity systems (Wikidata, DUNS, LEI, DID, etc.).
+- `external_ids` (optional): pointers into external identity systems. Each well-known key (Wikidata, DUNS, LEI, DID, IRS EIN) accepts either a plain identifier string (v0.1) or a structured object `{value, verification_method, verification_proof, verified_at}` (v0.1.8) recording how the identifier was verified. Verification methods: `domain_proof`, `signed_attestation`, `registry_lookup`, `none`. The proof and timestamp fields are required when method is not `none` (schema-enforced via if/then). Custom (non-well-known) keys MAY also use the structured form.
 
 v0.1 does not mandate any single external identifier scheme. Rejected alternative: requiring a Wikidata QID or a DID. Requiring Wikidata would disadvantage new or private organizations; requiring DIDs would impose unfamiliar infrastructure. `external_ids` stays optional and open.
+
+**v0.1.8 additions.** The `irs_ein` well-known key is new in v0.1.8 with pattern `^[0-9]{2}-[0-9]{7}$` for U.S. Internal Revenue Service Employer Identification Numbers. The structured-verification form is uniformly available across all documented well-known keys (`wikidata`, `duns`, `lei`, `did`, `irs_ein`) and across custom keys via the open `additionalProperties` map. Third-party place identifiers (Yelp business URLs, Apple placeCardUrls, others) continue to use the namespaced extension form from §3.6 (e.g., `"yelp.business_url": "..."`) rather than dedicated well-known keys, both for trademark avoidance and for schema-not-a-catalog discipline.
 
 ### 3.3 Freshness and supersession
 
@@ -198,11 +214,14 @@ Common claim-level fields:
 | `asserted_at` | string | no | RFC 3339 timestamp of when this specific claim was asserted. Defaults to document `valid_from`. |
 | `confidence` | string | no | One of `authoritative` (default), `advisory`, or `provisional`. See §3.7. |
 | `claim_id` | string | no | Stable identifier for referencing this claim from elsewhere (e.g., from a `supersedes` within another claim). |
+| `provenance_markers` | array of strings | no | v0.1.8. Advisory markers recording how the builder agent derived this claim (e.g., `source:publisher-website`, `cross-validated:wikidata`, `human-reviewed:2026-05-11`). Inside the signed payload. Consumers MAY use as advisory signal for confidence calibration or freshness ranking; MUST NOT treat as authoritative. See [ADR-0007](/adr/0007-claude-as-builder/). Distinct from the `media_provenance` scope on `pointer` claims, which is C2PA-attested media origin. |
 | `signature` | object | no | Per-claim JWS signature, when claim-level signing is used (§4). |
 
 ### 3.5 Core claim types
 
 These types MUST be understood by any conforming consumer. Extension types (§3.6) MAY be ignored.
+
+v0.1 defines eight core types (`identity`, `canonical_urls`, `official_channels`, `product_facts`, `personnel`, `disavowal`, `supersedes`, `pointer`). v0.1.8 adds six more: `contact_points`, `categories`, `locations`, `hours`, `attributes`, `operational_status`. Their statement shapes are documented in this section after the v0.1 types.
 
 #### `identity`
 
@@ -218,6 +237,8 @@ Asserts core identity facts about the entity beyond what's in the `entity` block
   }
 }
 ```
+
+v0.1.8 extends the identity statement with `price_range` (integer 1 to 4, mapping to $, $$, $$$, $$$$), a quick consumer-facing pricing signal that complements the categorical `attributes.price_range_tier` defined in the [glossary](/glossary/#attributes). The existing `description` field SHOULD soft-cap at approximately 500 characters for LLM consumption efficiency; the schema hard cap of 2048 characters is unchanged.
 
 #### `canonical_urls`
 
@@ -236,6 +257,8 @@ The single most important claim type. Asserts which URLs are authoritative for w
 ```
 
 All keys are optional; orgs declare only the URLs they operate. Consumers MUST treat URLs declared here as preferred over URLs discovered elsewhere. Note that LLMO vouches for the pointer, not the content of the referenced artifact: if `agent_manifest` points at an agent.json, LLMO asserts "this is our agent.json," not "this agent.json is itself well-formed or safe."
+
+v0.1.8 adds four new well-known keys to this claim: `appointment`, `menu`, `reservations`, `order`. Publishers in service industries (restaurants, salons, healthcare, retail with online ordering) use these to point at booking, ordering, and menu surfaces. The `additionalProperties` shape stays open; custom URL keys may still be added via the namespaced extension form.
 
 #### `official_channels`
 
@@ -278,6 +301,13 @@ Asserts currently-true facts about the organization's products. Intentionally na
   }
 }
 ```
+
+v0.1.8 extends per-product entries with four optional fields:
+
+- `kind`: enum `product` or `service`. Defaults to `product` for v0.1 back-compat; no existing document is invalidated.
+- `price`: either a structured `{amount, currency}` object (currency is ISO 4217 alphabetic code) or a symbolic value (`free`, `varies`, `call_for_quote`).
+- `description`: free text, schema hard cap 2048 characters.
+- `category`: [schema.org](https://schema.org/) type URI (e.g., `https://schema.org/SoftwareApplication`).
 
 #### `personnel`
 
@@ -358,11 +388,167 @@ A typed reference to an external artifact the organization endorses as authorita
 }
 ```
 
+#### `contact_points` (v0.1.8)
+
+Asserts how to reach the organization for specific purposes (security disclosures, press inquiries, billing, support). Each contact point MAY include verification metadata recording how the address was confirmed.
+
+```json
+{
+  "type": "contact_points",
+  "statement": {
+    "points": [
+      {
+        "type": "support",
+        "address": "support@example.com",
+        "verification_method": "email_challenge",
+        "verification_status": "verified",
+        "verified_at": "2026-05-01T00:00:00Z",
+        "verification_proof": "<challenge-response-token>"
+      }
+    ]
+  }
+}
+```
+
+- `type` (required, enum): one of `billing`, `security`, `abuse`, `legal`, `press`, `support`, `phone`, `messaging`.
+- `address` (required): the contact value (email address, phone number, messaging handle).
+- `verification_method` (optional, enum): `email_challenge`, `dns_txt`, `signed_response`, `none`.
+- `verification_status` (optional, enum): `verified`, `pending`, `unverified`.
+- `verification_proof` (conditional): opaque artifact recording the verification. Required when `verification_status` is `verified` (schema-enforced via if/then).
+- `verified_at` (conditional): RFC 3339 timestamp. Required when `verification_status` is `verified` (schema-enforced).
+
+#### `categories` (v0.1.8)
+
+Asserts the organization's primary and secondary categories using [schema.org](https://schema.org/) Organization subtype URIs plus NAICS (North American Industry Classification System) codes.
+
+```json
+{
+  "type": "categories",
+  "statement": {
+    "primary": "https://schema.org/Restaurant",
+    "secondary": ["https://schema.org/CafeOrCoffeeShop"],
+    "naics": ["722511"]
+  }
+}
+```
+
+- `primary` (required): schema.org Organization subtype URI.
+- `secondary` (optional): array of additional schema.org subtype URIs.
+- `naics` (optional): array of NAICS codes (2 to 6 digit numeric strings).
+
+The category vocabulary is intentionally limited to schema.org plus NAICS. Trademarked third-party taxonomies (Google Business categories, Yelp categories, others) are not used. Publishers needing finer-grained categorization use namespaced extensions per §3.6.
+
+#### `locations` (v0.1.8)
+
+Asserts physical locations or service areas where the organization operates. Each location MAY include postal address, geographic coordinates, service area definition, and a per-location publisher identifier.
+
+```json
+{
+  "type": "locations",
+  "statement": {
+    "locations": [
+      {
+        "postal_address": {
+          "country": "US",
+          "region": "CA",
+          "locality": "San Francisco",
+          "postal_code": "94110",
+          "address_lines": ["123 Test Street"]
+        },
+        "coordinates": { "latitude": 37.7749, "longitude": -122.4194 },
+        "service_area": { "radius_km": 5, "center": { "latitude": 37.7749, "longitude": -122.4194 } },
+        "business_type": "customer_location",
+        "publisher_id": "STORE-001"
+      }
+    ]
+  }
+}
+```
+
+- `postal_address` (optional): structured address. `country` is ISO 3166-1 alpha-2. Other fields (`region`, `locality`, `administrative_division_2`, `postal_code`, `address_lines`) are jurisdiction-dependent and free-text.
+- `coordinates` (optional): WGS84 latitude (-90 to 90) and longitude (-180 to 180).
+- `service_area` (optional): one of `{radius_km, center}`, `{polygon}` (array of lat/lon vertices, at least 3), `{bounding_box}` (min/max lat/lon), or `{named_places}` (array of place names). Allows non-storefront businesses to declare where they operate without a fixed physical address.
+- `business_type` (optional, enum): `customer_location` (customers visit), `business_location` (business visits customers), `both`.
+- `publisher_id` (optional): publisher's per-location identifier for POS or CMS routing. Location-scoped; distinct from any document-level identifier. LLM-relevant: an agent answering "is the Mission Street store open today" can route to the publisher's per-location system using this identifier.
+
+#### `hours` (v0.1.8)
+
+Asserts opening hours: a regular weekly schedule, calendar exceptions, and named alternate sub-schedules (drive-through, kitchen, brunch).
+
+```json
+{
+  "type": "hours",
+  "statement": {
+    "regular": {
+      "monday": [{ "open": "09:00", "close": "17:00" }],
+      "friday": [
+        { "open": "09:00", "close": "17:00" },
+        { "open": "22:00", "close": "02:00", "is_overnight": true }
+      ]
+    },
+    "exceptions": [
+      { "date": "2026-12-25", "closed": true }
+    ],
+    "alternate": {
+      "brunch": {
+        "saturday": [{ "open": "10:00", "close": "14:00" }]
+      }
+    }
+  }
+}
+```
+
+- `regular` (optional): weekly schedule keyed by day of the week (`monday` through `sunday`). Each day is an array of `{open, close, is_overnight}` periods. Multiple periods per day are permitted for split shifts.
+- `exceptions` (optional): array of `{date, periods, closed}` overrides for specific calendar dates. `date` is RFC 3339 full-date `YYYY-MM-DD`.
+- `alternate` (optional): named sub-schedules with the same weekly structure as `regular` (e.g., `drive_through`, `kitchen`, `brunch`).
+
+Time format is 24-hour `HH:MM`. The schema permits `24:00` as a close time only, indicating an end-of-day boundary; it is not permitted as an open time. The `is_overnight: true` flag marks periods spanning midnight (close less than open numerically, e.g., open 22:00 close 02:00).
+
+#### `attributes` (v0.1.8)
+
+Asserts entity attributes drawn from the controlled vocabulary at [/glossary/#attributes](/glossary/#attributes). Names SHOULD come from the canonical list; names not in the list MUST use the namespaced extension form per §3.6.
+
+```json
+{
+  "type": "attributes",
+  "statement": {
+    "wifi": true,
+    "parking": "lot",
+    "payment_methods": ["visa", "mastercard", "cash"],
+    "spoken_languages": ["en", "es-MX"],
+    "myco.signature_dish": "fish_tacos"
+  }
+}
+```
+
+Attribute values are typed (boolean, string, or array of strings). The controlled vocabulary defines the canonical names, their types, and any enum value constraints. The vocabulary is curated against incumbent production systems (Google Business Profile, Yelp, Bing Places, Apple Business Connect) and will grow iteratively post-launch per [ADR-0006](/adr/0006-version-bump-and-release-cut/)'s additive patch policy.
+
+The controlled vocabulary is the builder agent's normalization layer per [ADR-0007](/adr/0007-claude-as-builder/). "Free wifi available" and "wireless internet" and "guest network" all normalize to canonical `wifi: true`; consumers can then answer "does this place have wifi" reliably across publishers.
+
+#### `operational_status` (v0.1.8)
+
+Asserts the entity's current operational status: open, opening soon, temporarily closed, or permanently closed.
+
+```json
+{
+  "type": "operational_status",
+  "statement": {
+    "status": "opening_soon",
+    "effective_date": "2026-06-01",
+    "reason": "Renovation complete; reopening to the public."
+  }
+}
+```
+
+- `status` (required, enum): `open`, `permanently_closed`, `temporarily_closed`, `opening_soon`.
+- `effective_date` (conditional): RFC 3339 full-date `YYYY-MM-DD` when the status takes effect. Required when `status` is not `open` (schema-enforced via if/then).
+- `reason` (optional): free-text reason; schema hard cap 2048 characters.
+
 ### 3.6 Extension claims
 
 Every claim `type` MUST be either one of the reserved core types listed in §3.5 (no dots) or a namespaced extension type (containing at least one dot). Un-namespaced types not in the reserved core list are non-conforming. Example extension: `"type": "acme-corp.internal_compliance"`. Consumers MUST ignore unknown extension types without error. The LLMO registry at `llmo.org/claims/` will catalog widely-adopted extensions and may promote mature ones into core in later versions.
 
-The `.` separator matches [schema.org](https://schema.org/), JSON-LD, and MIME-type conventions. Namespaces before the final `.` SHOULD be a short identifier the publisher controls, ideally matching a domain they own. Core claim types defined in this specification (`identity`, `canonical_urls`, `official_channels`, `product_facts`, `personnel`, `disavowal`, `supersedes`, `pointer`) contain no `.` and are reserved.
+The `.` separator matches [schema.org](https://schema.org/), JSON-LD, and MIME-type conventions. Namespaces before the final `.` SHOULD be a short identifier the publisher controls, ideally matching a domain they own. Core claim types defined in this specification (`identity`, `canonical_urls`, `official_channels`, `product_facts`, `personnel`, `disavowal`, `supersedes`, `pointer`, plus the v0.1.8 additions `contact_points`, `categories`, `locations`, `hours`, `attributes`, `operational_status`) contain no `.` and are reserved.
 
 ### 3.7 Confidence
 
@@ -373,6 +559,23 @@ Claims carry an optional `confidence` field:
 - `provisional`: the claim is asserted but subject to imminent revision. Use sparingly.
 
 Consumers MAY use confidence to resolve conflicts between LLMO claims and other sources: `authoritative` LLMO claims should beat scraped content; `provisional` claims need not.
+
+### 3.8 Reserved top-level namespaces (v0.1.8)
+
+v0.1.8 reserves six top-level field names for future protocol additions. The schema does not enforce the reservation: the top level is `additionalProperties: true` and remains so to preserve forward extensibility. Publishers MUST NOT populate these keys in v0.1.8 to avoid colliding with future definitions.
+
+| Reserved name | Future scope |
+|---|---|
+| `posts` | Publishing surface for time-sensitive entity updates (announcements, offers, events). |
+| `reviews` | Verified-transaction reviews. Planned future work; distinct from un-verified third-party review aggregation. |
+| `qa` | Conversational question-and-answer pairs published by the entity. Reserved pending re-evaluation. |
+| `media_pointers` | Pointers to C2PA-attested media assets, complementing the text-only constraint per §6.2. |
+| `advertising_extensions` | Industry-specific ad-extension surfaces. May never be implemented; reserved to forestall publisher squatting. |
+| `consumer_metadata` | Downstream-consumer annotation channel (for example, scoring products attaching metadata). Publishers MUST NOT populate. |
+
+Each reserved name maps to a real entity-data category drawn from incumbent production systems (Google Business Profile, Yelp, Bing Places, Apple Business Connect). The reservation is documentation only; the schema does not forbid these names. Future minor or patch versions may define them with concrete schemas, at which point the reservation becomes a binding type constraint per [ADR-0006](/adr/0006-version-bump-and-release-cut/)'s additive-only patch policy.
+
+**Wire-format compatibility.** v0.1.8 is purely additive over v0.1. Every conforming v0.1 document validates against the v0.1.8 schema unchanged. The schema `$id` remains `https://llmo.org/spec/v0.1/schema.json` per the in-place patch convention; `llmo_version` remains `"0.1"` for the lifetime of the v0.1 minor version. Publishers MAY adopt the new fields when convenient. Consumers benefit from the v0.1.8 schema-level enforcement of new conditional constraints (verified contact points require proof and timestamp; non-open operational status requires effective date; entity.name array form requires exactly one primary locale) without any code changes if they validate against the canonical schema URL.
 
 ---
 

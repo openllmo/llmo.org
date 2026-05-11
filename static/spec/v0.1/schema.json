@@ -57,6 +57,50 @@
         "$ref": "#/$defs/claim"
       }
     },
+    "revocation_registry": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL pointing to /.well-known/llmo-revocations.json on the entity's primary domain. Registry wire format deferred to a future patch; v0.1.8 introduces the pointer only."
+    },
+    "dns_corroboration": {
+      "type": "object",
+      "description": "DNS TXT record name and hash algorithm for out-of-band corroboration of the JCS-canonicalized signature-stripped document. Consulted by consumers that want a second authoritative surface beyond the well-known location.",
+      "required": ["txt_record", "hash_alg"],
+      "additionalProperties": false,
+      "properties": {
+        "txt_record": {
+          "type": "string",
+          "description": "DNS TXT record name (e.g., _llmo-corroboration.example.com)."
+        },
+        "hash_alg": {
+          "type": "string",
+          "enum": ["sha-256", "sha-384", "sha-512"]
+        }
+      }
+    },
+    "publication_history": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL pointing to a third-party append-only log of prior llmo.json documents on this domain. Interchange format deferred to a future patch; v0.1.8 introduces the pointer only."
+    },
+    "delegates_to": {
+      "type": "array",
+      "description": "Domains to which this entity delegates authority. Asserted by the publisher; not yet evaluated as a trust primitive by consumers.",
+      "items": {
+        "type": "string",
+        "pattern": "^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,}$"
+      },
+      "uniqueItems": true
+    },
+    "delegated_from": {
+      "type": "array",
+      "description": "Domains that delegate authority to this entity. Mirror of delegates_to from the receiving side.",
+      "items": {
+        "type": "string",
+        "pattern": "^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,}$"
+      },
+      "uniqueItems": true
+    },
     "signature": {
       "$ref": "#/$defs/signature"
     }
@@ -68,10 +112,26 @@
       "additionalProperties": true,
       "properties": {
         "name": {
-          "type": "string",
-          "description": "Human-readable entity name.",
-          "minLength": 1,
-          "maxLength": 512
+          "description": "Human-readable entity name. Accepts a single string (v0.1 back-compat) or an array of {name, locale, primary} entries with exactly one primary:true entry for internationalized names (v0.1.8). The primary entry SHOULD be the publisher's authoritative name.",
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": { "$ref": "#/$defs/locale_name" },
+              "contains": {
+                "type": "object",
+                "properties": { "primary": { "const": true } },
+                "required": ["primary"]
+              },
+              "minContains": 1,
+              "maxContains": 1
+            }
+          ]
         },
         "primary_domain": {
           "type": "string",
@@ -102,26 +162,63 @@
         },
         "external_ids": {
           "type": "object",
-          "description": "Pointers into external identity systems. Keys are system names; values are identifiers.",
+          "description": "Pointers into external identity systems. Keys are system names; values are either a plain identifier string (v0.1 back-compat) or a {value, verification_method, verification_proof, verified_at} structured object (v0.1.8). The structured form records how the identifier was verified.",
           "additionalProperties": {
-            "type": "string"
+            "oneOf": [
+              { "type": "string" },
+              { "$ref": "#/$defs/structured_external_id" }
+            ]
           },
           "properties": {
             "wikidata": {
-              "type": "string",
-              "pattern": "^Q[0-9]+$"
+              "oneOf": [
+                { "type": "string", "pattern": "^Q[0-9]+$" },
+                {
+                  "type": "object",
+                  "allOf": [{ "$ref": "#/$defs/structured_external_id" }],
+                  "properties": { "value": { "type": "string", "pattern": "^Q[0-9]+$" } }
+                }
+              ]
             },
             "duns": {
-              "type": "string",
-              "pattern": "^[0-9]{9}$"
+              "oneOf": [
+                { "type": "string", "pattern": "^[0-9]{9}$" },
+                {
+                  "type": "object",
+                  "allOf": [{ "$ref": "#/$defs/structured_external_id" }],
+                  "properties": { "value": { "type": "string", "pattern": "^[0-9]{9}$" } }
+                }
+              ]
             },
             "lei": {
-              "type": "string",
-              "pattern": "^[A-Z0-9]{20}$"
+              "oneOf": [
+                { "type": "string", "pattern": "^[A-Z0-9]{20}$" },
+                {
+                  "type": "object",
+                  "allOf": [{ "$ref": "#/$defs/structured_external_id" }],
+                  "properties": { "value": { "type": "string", "pattern": "^[A-Z0-9]{20}$" } }
+                }
+              ]
             },
             "did": {
-              "type": "string",
-              "pattern": "^did:[a-z0-9]+:.+$"
+              "oneOf": [
+                { "type": "string", "pattern": "^did:[a-z0-9]+:.+$" },
+                {
+                  "type": "object",
+                  "allOf": [{ "$ref": "#/$defs/structured_external_id" }],
+                  "properties": { "value": { "type": "string", "pattern": "^did:[a-z0-9]+:.+$" } }
+                }
+              ]
+            },
+            "irs_ein": {
+              "oneOf": [
+                { "type": "string", "pattern": "^[0-9]{2}-[0-9]{7}$" },
+                {
+                  "type": "object",
+                  "allOf": [{ "$ref": "#/$defs/structured_external_id" }],
+                  "properties": { "value": { "type": "string", "pattern": "^[0-9]{2}-[0-9]{7}$" } }
+                }
+              ]
             }
           }
         }
@@ -136,8 +233,8 @@
           "oneOf": [
             {
               "type": "string",
-              "enum": ["identity", "canonical_urls", "official_channels", "product_facts", "personnel", "disavowal", "supersedes", "pointer"],
-              "description": "Core claim type. The eight core types defined in §3.5."
+              "enum": ["identity", "canonical_urls", "official_channels", "product_facts", "personnel", "disavowal", "supersedes", "pointer", "contact_points", "categories", "locations", "hours", "attributes", "operational_status"],
+              "description": "Core claim type. The fourteen core types defined in §3.5 (eight from v0.1 plus six added in v0.1.8: contact_points, categories, locations, hours, attributes, operational_status)."
             },
             {
               "type": "string",
@@ -166,6 +263,16 @@
           "minLength": 1,
           "maxLength": 128,
           "pattern": "^[A-Za-z0-9._:-]+$"
+        },
+        "provenance_markers": {
+          "type": "array",
+          "description": "Optional advisory markers recording how the builder agent derived this claim (e.g., source:publisher-website, cross-validated:wikidata, human-reviewed:2026-05-11). Inside the signed payload. Consumers MAY use as advisory signal for confidence calibration or freshness ranking; MUST NOT treat as authoritative. Distinct from the media_provenance scope on pointer claims, which is C2PA-attested media origin.",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "uniqueItems": true
         },
         "signature": {
           "$ref": "#/$defs/signature"
@@ -251,6 +358,66 @@
               "statement": { "$ref": "#/$defs/statement_identity" }
             }
           }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "contact_points" } }
+          },
+          "then": {
+            "properties": {
+              "statement": { "$ref": "#/$defs/statement_contact_points" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "categories" } }
+          },
+          "then": {
+            "properties": {
+              "statement": { "$ref": "#/$defs/statement_categories" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "locations" } }
+          },
+          "then": {
+            "properties": {
+              "statement": { "$ref": "#/$defs/statement_locations" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "hours" } }
+          },
+          "then": {
+            "properties": {
+              "statement": { "$ref": "#/$defs/statement_hours" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "attributes" } }
+          },
+          "then": {
+            "properties": {
+              "statement": { "$ref": "#/$defs/statement_attributes" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "operational_status" } }
+          },
+          "then": {
+            "properties": {
+              "statement": { "$ref": "#/$defs/statement_operational_status" }
+            }
+          }
         }
       ]
     },
@@ -264,7 +431,17 @@
           "description": "Year (YYYY), year-month (YYYY-MM), or full date (YYYY-MM-DD)."
         },
         "headquarters": { "type": "string" },
-        "description": { "type": "string", "maxLength": 2048 }
+        "description": {
+          "type": "string",
+          "maxLength": 2048,
+          "description": "Entity description. Hard cap 2048 chars at schema level. Spec text SHOULD-level soft cap is ~500 chars; longer descriptions are accepted by schema but consumers may truncate."
+        },
+        "price_range": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4,
+          "description": "Categorical pricing tier 1 to 4, mapping to $, $$, $$$, $$$$ as a quick consumer-facing signal. Complements the categorical attributes.price_range_tier in the glossary."
+        }
       }
     },
     "statement_canonical_urls": {
@@ -279,7 +456,11 @@
         "pricing": { "type": "string", "format": "uri" },
         "security": { "type": "string", "format": "uri" },
         "agent_manifest": { "type": "string", "format": "uri" },
-        "mcp_manifest": { "type": "string", "format": "uri" }
+        "mcp_manifest": { "type": "string", "format": "uri" },
+        "appointment": { "type": "string", "format": "uri" },
+        "menu": { "type": "string", "format": "uri" },
+        "reservations": { "type": "string", "format": "uri" },
+        "order": { "type": "string", "format": "uri" }
       }
     },
     "statement_official_channels": {
@@ -328,7 +509,44 @@
                   "end_of_life"
                 ]
               },
-              "current_version": { "type": "string" }
+              "current_version": { "type": "string" },
+              "kind": {
+                "type": "string",
+                "enum": ["product", "service"],
+                "default": "product",
+                "description": "Whether this entry describes a tangible product or a service. Defaults to product when omitted (v0.1 back-compat)."
+              },
+              "price": {
+                "description": "Price as either a structured amount + currency or a symbolic value.",
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "required": ["amount", "currency"],
+                    "additionalProperties": false,
+                    "properties": {
+                      "amount": { "type": "number", "minimum": 0 },
+                      "currency": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$",
+                        "description": "ISO 4217 alphabetic currency code."
+                      }
+                    }
+                  },
+                  {
+                    "type": "string",
+                    "enum": ["free", "varies", "call_for_quote"]
+                  }
+                ]
+              },
+              "description": {
+                "type": "string",
+                "maxLength": 2048
+              },
+              "category": {
+                "type": "string",
+                "format": "uri",
+                "description": "Schema.org type URI (e.g., https://schema.org/SoftwareApplication)."
+              }
             }
           }
         }
@@ -402,6 +620,361 @@
         "standard": { "type": "string" },
         "url": { "type": "string", "format": "uri" }
       }
+    },
+    "locale_name": {
+      "type": "object",
+      "required": ["name", "locale"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "locale": {
+          "type": "string",
+          "description": "RFC 5646 language tag (e.g., en, en-US, ja, zh-Hant-TW)."
+        },
+        "primary": { "type": "boolean", "default": false }
+      }
+    },
+    "structured_external_id": {
+      "type": "object",
+      "required": ["value", "verification_method"],
+      "additionalProperties": false,
+      "properties": {
+        "value": { "type": "string", "minLength": 1 },
+        "verification_method": {
+          "type": "string",
+          "enum": ["domain_proof", "signed_attestation", "registry_lookup", "none"]
+        },
+        "verification_proof": {
+          "type": "string",
+          "description": "Opaque artifact, format varies by method. Required when verification_method is not 'none'."
+        },
+        "verified_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "RFC 3339 timestamp. Required when verification_method is not 'none'."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "verification_method": { "not": { "const": "none" } } },
+            "required": ["verification_method"]
+          },
+          "then": {
+            "required": ["verification_proof", "verified_at"]
+          }
+        }
+      ]
+    },
+    "day_schedule": {
+      "type": "array",
+      "description": "Array of open/close periods for a single day. Multiple periods permitted for split shifts.",
+      "items": {
+        "type": "object",
+        "required": ["open", "close"],
+        "additionalProperties": false,
+        "properties": {
+          "open": {
+            "type": "string",
+            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+            "description": "Opening time in 24-hour HH:MM. 00:00 to 23:59."
+          },
+          "close": {
+            "type": "string",
+            "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$|^24:00$",
+            "description": "Closing time in 24-hour HH:MM. 00:00 to 23:59, plus 24:00 as an end-of-day boundary marker."
+          },
+          "is_overnight": {
+            "type": "boolean",
+            "default": false,
+            "description": "True when the period spans midnight (close < open numerically, e.g., open 22:00 close 02:00)."
+          }
+        }
+      }
+    },
+    "statement_contact_points": {
+      "type": "object",
+      "required": ["points"],
+      "properties": {
+        "points": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["type", "address"],
+            "additionalProperties": true,
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["billing", "security", "abuse", "legal", "press", "support", "phone", "messaging"]
+              },
+              "address": { "type": "string", "minLength": 1 },
+              "verification_method": {
+                "type": "string",
+                "enum": ["email_challenge", "dns_txt", "signed_response", "none"]
+              },
+              "verification_status": {
+                "type": "string",
+                "enum": ["verified", "pending", "unverified"]
+              },
+              "verified_at": { "type": "string", "format": "date-time" },
+              "verification_proof": { "type": "string" }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": { "verification_status": { "const": "verified" } },
+                  "required": ["verification_status"]
+                },
+                "then": {
+                  "required": ["verification_proof", "verified_at"]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "statement_categories": {
+      "type": "object",
+      "required": ["primary"],
+      "additionalProperties": true,
+      "properties": {
+        "primary": {
+          "type": "string",
+          "format": "uri",
+          "description": "Schema.org Organization subtype URI (e.g., https://schema.org/Restaurant)."
+        },
+        "secondary": {
+          "type": "array",
+          "items": { "type": "string", "format": "uri" },
+          "uniqueItems": true
+        },
+        "naics": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9]{2,6}$",
+            "description": "NAICS code (2 to 6 digit numeric string)."
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "statement_locations": {
+      "type": "object",
+      "required": ["locations"],
+      "properties": {
+        "locations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "postal_address": {
+                "type": "object",
+                "additionalProperties": true,
+                "properties": {
+                  "country": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{2}$",
+                    "description": "ISO 3166-1 alpha-2 country code."
+                  },
+                  "region": { "type": "string" },
+                  "locality": { "type": "string" },
+                  "administrative_division_2": { "type": "string" },
+                  "postal_code": { "type": "string" },
+                  "address_lines": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                }
+              },
+              "coordinates": {
+                "type": "object",
+                "required": ["latitude", "longitude"],
+                "additionalProperties": false,
+                "properties": {
+                  "latitude": { "type": "number", "minimum": -90, "maximum": 90 },
+                  "longitude": { "type": "number", "minimum": -180, "maximum": 180 }
+                }
+              },
+              "service_area": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "required": ["radius_km", "center"],
+                    "additionalProperties": false,
+                    "properties": {
+                      "radius_km": { "type": "number", "minimum": 0 },
+                      "center": {
+                        "type": "object",
+                        "required": ["latitude", "longitude"],
+                        "additionalProperties": false,
+                        "properties": {
+                          "latitude": { "type": "number", "minimum": -90, "maximum": 90 },
+                          "longitude": { "type": "number", "minimum": -180, "maximum": 180 }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "required": ["polygon"],
+                    "additionalProperties": false,
+                    "properties": {
+                      "polygon": {
+                        "type": "array",
+                        "minItems": 3,
+                        "items": {
+                          "type": "object",
+                          "required": ["latitude", "longitude"],
+                          "additionalProperties": false,
+                          "properties": {
+                            "latitude": { "type": "number", "minimum": -90, "maximum": 90 },
+                            "longitude": { "type": "number", "minimum": -180, "maximum": 180 }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "required": ["bounding_box"],
+                    "additionalProperties": false,
+                    "properties": {
+                      "bounding_box": {
+                        "type": "object",
+                        "required": ["min_lat", "max_lat", "min_lon", "max_lon"],
+                        "additionalProperties": false,
+                        "properties": {
+                          "min_lat": { "type": "number", "minimum": -90, "maximum": 90 },
+                          "max_lat": { "type": "number", "minimum": -90, "maximum": 90 },
+                          "min_lon": { "type": "number", "minimum": -180, "maximum": 180 },
+                          "max_lon": { "type": "number", "minimum": -180, "maximum": 180 }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "required": ["named_places"],
+                    "additionalProperties": false,
+                    "properties": {
+                      "named_places": {
+                        "type": "array",
+                        "items": { "type": "string" },
+                        "minItems": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              "business_type": {
+                "type": "string",
+                "enum": ["customer_location", "business_location", "both"]
+              },
+              "publisher_id": {
+                "type": "string",
+                "description": "Publisher's per-location identifier (e.g., POS or CMS store ID). Location-scoped. LLM-relevant for routing per-location queries to the publisher's per-location system."
+              }
+            }
+          }
+        }
+      }
+    },
+    "statement_hours": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "regular": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "monday": { "$ref": "#/$defs/day_schedule" },
+            "tuesday": { "$ref": "#/$defs/day_schedule" },
+            "wednesday": { "$ref": "#/$defs/day_schedule" },
+            "thursday": { "$ref": "#/$defs/day_schedule" },
+            "friday": { "$ref": "#/$defs/day_schedule" },
+            "saturday": { "$ref": "#/$defs/day_schedule" },
+            "sunday": { "$ref": "#/$defs/day_schedule" }
+          }
+        },
+        "exceptions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["date"],
+            "additionalProperties": false,
+            "properties": {
+              "date": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                "description": "RFC 3339 full-date YYYY-MM-DD."
+              },
+              "periods": { "$ref": "#/$defs/day_schedule" },
+              "closed": { "type": "boolean" }
+            }
+          }
+        },
+        "alternate": {
+          "type": "object",
+          "description": "Named alternate sub-schedules (drive_through, kitchen, brunch, etc.) with the same weekly structure as regular.",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "monday": { "$ref": "#/$defs/day_schedule" },
+              "tuesday": { "$ref": "#/$defs/day_schedule" },
+              "wednesday": { "$ref": "#/$defs/day_schedule" },
+              "thursday": { "$ref": "#/$defs/day_schedule" },
+              "friday": { "$ref": "#/$defs/day_schedule" },
+              "saturday": { "$ref": "#/$defs/day_schedule" },
+              "sunday": { "$ref": "#/$defs/day_schedule" }
+            }
+          }
+        }
+      }
+    },
+    "statement_attributes": {
+      "type": "object",
+      "description": "Open map of attribute names to typed values. Names SHOULD come from the controlled vocabulary at /glossary/#attributes. Names not in the canonical list MUST use the namespaced extension form (e.g., myco.custom_attr) per §3.6.",
+      "additionalProperties": {
+        "oneOf": [
+          { "type": "boolean" },
+          { "type": "string" },
+          { "type": "array", "items": { "type": "string" } }
+        ]
+      }
+    },
+    "statement_operational_status": {
+      "type": "object",
+      "required": ["status"],
+      "additionalProperties": true,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["open", "permanently_closed", "temporarily_closed", "opening_soon"]
+        },
+        "effective_date": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+          "description": "RFC 3339 full-date when the status takes effect. Required when status is not 'open'."
+        },
+        "reason": { "type": "string", "maxLength": 2048 }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "status": { "not": { "const": "open" } } },
+            "required": ["status"]
+          },
+          "then": {
+            "required": ["effective_date"]
+          }
+        }
+      ]
     },
     "signature": {
       "type": "object",
