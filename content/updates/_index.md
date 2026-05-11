@@ -1,11 +1,13 @@
 ---
 title: Updates
 linkTitle: Updates
-description: Project updates from the LLMO maintainers, in plain language.
+description: Auto-generated weekly mirror of LLMO specification releases. Sourced from the canonical changelog; consolidated by ISO week.
 ---
 
-Recent activity on the LLMO project: shipped work, decisions made, and what is in flight. Each entry covers a window of approximately one week and is written in plain language for readers who want a narrative summary rather than a release-notes diff.
+`/updates/` is auto-generated. Each entry is a verbatim consolidation of `## [X.Y.Z]` sections from the [changelog](/spec/changelog/) whose release date falls within a given ISO week. The changelog is the source of truth; `/updates/` is the periodic public surface that surfaces what shipped during a period without requiring a reader to scan the full changelog.
 
-For the formal record of specification text changes, see the [changelog](/spec/changelog/). For the architectural-decision record, see the [ADRs](/adr/). For the in-progress and forward-looking project tracker, see the project's BACKLOG document in the [GitHub repository](https://github.com/openllmo/llmo.org). Updates here are the bridge between those internal records and a non-developer reader.
+Entries appear under names like `2026-W20`. Weeks with no spec releases produce no entry (an empty entry would add noise, not signal). The auto-generation pipeline is documented in [ADR-0008](/adr/0008-updates-as-auto-consolidation/).
 
-A separate long-form blog at `blog.llmo.org` is planned for protocol-design narrative and signed-by-the-protocol posts. Updates here are the lighter-weight cadence-driven surface; the blog will be the deliberate-essay surface.
+For the per-release record of specification changes, see the [changelog](/spec/changelog/). For the operational architecture record, see the [ADRs](/adr/).
+
+Human-curated long-form (protocol-design essays, narrative explainers, signed-by-the-protocol posts) belongs to a separate planned surface at `blog.llmo.org`, not here.

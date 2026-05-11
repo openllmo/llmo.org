@@ -1,0 +1,117 @@
+name: Weekly Updates
+
+on:
+  schedule:
+    # Mondays 13:00 UTC = 09:00 US/Eastern (EDT). Same cadence as the
+    # weekly-digest workflow; the two run in parallel on different artifacts.
+    - cron: '0 13 * * 1'
+  workflow_dispatch:
+    inputs:
+      start_date:
+        description: 'Start date (YYYY-MM-DD, inclusive). Leave blank for previous ISO week.'
+        required: false
+      end_date:
+        description: 'End date (YYYY-MM-DD, inclusive). Leave blank for previous ISO week.'
+        required: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  generate:
+    name: generate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Generate /updates/ consolidation
+        id: gen
+        env:
+          START_DATE: ${{ inputs.start_date }}
+          END_DATE: ${{ inputs.end_date }}
+        run: |
+          set -euo pipefail
+          if [[ -n "${START_DATE:-}" && -n "${END_DATE:-}" ]]; then
+            python3 scripts/generate-update.py "$START_DATE" "$END_DATE"
+          elif [[ -n "${START_DATE:-}" || -n "${END_DATE:-}" ]]; then
+            echo "::error::Provide both start_date and end_date, or neither."
+            exit 1
+          else
+            python3 scripts/generate-update.py
+          fi
+          # The script skips writing when no spec releases fell in the period
+          # (ADR-0008). Detect whether anything was produced.
+          CHANGED=$(git status --porcelain content/updates/ | awk '{print $2}' | grep -E '\.md$' | grep -v '_index\.md$' | head -n 1 || true)
+          if [[ -z "$CHANGED" ]]; then
+            echo "No /updates/ entry produced; no spec releases in period."
+            echo "file=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          BASENAME=$(basename "$CHANGED" .md)
+          echo "file=${CHANGED}" >> "$GITHUB_OUTPUT"
+          echo "iso=${BASENAME}" >> "$GITHUB_OUTPUT"
+          echo "msg=updates: ${BASENAME} consolidation" >> "$GITHUB_OUTPUT"
+
+      - name: Generate App token
+        id: app-token
+        if: steps.gen.outputs.file != ''
+        uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
+        with:
+          app-id: ${{ secrets.LLMO_WORKFLOW_BOT_APP_ID }}
+          private-key: ${{ secrets.LLMO_WORKFLOW_BOT_PRIVATE_KEY }}
+
+      - name: Open PR for /updates/ (auto-merge)
+        if: steps.gen.outputs.file != ''
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          set -euo pipefail
+          FILE="${{ steps.gen.outputs.file }}"
+          ISO="${{ steps.gen.outputs.iso }}"
+          MSG="${{ steps.gen.outputs.msg }}"
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          git add "$FILE"
+          if git diff --cached --quiet; then
+            echo "/updates/ entry unchanged from main; nothing to commit."
+            exit 0
+          fi
+
+          BRANCH="updates/${ISO}-$(date -u +%Y%m%d%H%M%S)"
+          git checkout -b "$BRANCH"
+          git commit -m "$MSG"
+          git push -u origin "$BRANCH"
+
+          BODY_FILE=$(mktemp)
+          {
+            echo "Automated weekly /updates/ run."
+            echo
+            echo "Period: ISO ${ISO}. Sourced from the canonical [changelog](/spec/changelog/) per [ADR-0008](/adr/0008-updates-as-auto-consolidation/)."
+            echo
+            echo "<details><summary>Update preview</summary>"
+            echo
+            cat "$FILE"
+            echo
+            echo "</details>"
+            echo
+            echo "_Workflow: \`.github/workflows/weekly-updates.yml\`. Triggered: \`schedule\` (Monday 13:00 UTC) or manual dispatch._"
+          } > "$BODY_FILE"
+
+          PR_URL=$(gh pr create \
+            --title "$MSG" \
+            --body-file "$BODY_FILE" \
+            --label "updates")
+
+          echo "Opened $PR_URL"
+          gh pr merge --squash --auto "$PR_URL" || echo "Auto-merge not available; PR left open for manual merge."
