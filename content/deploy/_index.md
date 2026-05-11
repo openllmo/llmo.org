@@ -1,34 +1,70 @@
 ---
 title: "Deploy LLMO"
 linkTitle: "Deploy"
-description: "Publish a signed llmo.json on your domain in less than 3 minutes."
+description: "Publish a signed llmo.json on your domain. Two commands. The /llmo wizard handles the rest."
 date: 2026-04-29
 weight: 5
 ---
 
-Publish a signed llmo.json on your domain. Once deployed, AI agents and language models that consume LLMO can verify your organizational claims directly from a source you control.
+Publish a signed `llmo.json` on your domain. Once deployed, AI agents and language models that consume LLMO can verify your organizational claims directly from a source you control.
 
-Most developers get this deployed in less than 3 minutes on Vercel, Netlify, or Cloudflare Pages. This timing probably expands a bit closer to ~10 minutes if you're configuring a custom server or hitting hosting quirks for the first time.
+There are two paths to that signed document:
 
-This guide assumes you control a domain and can put files at /.well-known/ on it. If you can deploy a robots.txt, you can deploy a llmo.json.
+1. **The Claude Code wizard.** Install the CLI; type `/llmo` in Claude Code. The wizard interviews you, drafts the document by querying public sources, verifies your domain via DNS, generates and stores the signing key, signs, deploys, and produces a closing report. Most publishers should use this path. Estimated time: 5-15 minutes.
+2. **The manual CLI walkthrough.** Same artifacts, all CLI commands, no AI assistance. Use this if you don't have Claude Code, you're automating in CI, or you want to understand every step. Estimated time: 10-30 minutes.
+
+Both paths produce the same signed document. Both run on the same `llmo` CLI. You can mix them: start with the wizard for the first publish, automate re-signing in CI for the quarterly rotation.
 
 ## What you'll have at the end
 
-- A keypair you own (private key local, public JWKS published).
-- A signed `llmo.json` at `https://yourdomain.com/.well-known/llmo.json`
-  containing your declared identity, canonical URLs, and any claims
-  you choose to make.
-- A health check showing your deployment is correct and verifiable.
+- A keypair you own (private key stored in your chosen secrets backend; public JWKS published).
+- A signed `llmo.json` at `https://yourdomain.com/.well-known/llmo.json` containing your declared identity, canonical URLs, and any additional claims (contact points, categories, locations, hours, attributes, operational status) you choose to publish.
+- A live verification proving your deployment achieves the tier you targeted (Strict by default).
 
 ## Prerequisites
 
-- Node.js 20 or later. Check with `node --version`. If you don't have
-  it, install from [nodejs.org](https://nodejs.org).
-- A domain you control, with the ability to serve files at
-  `/.well-known/` paths over HTTPS.
+- Node.js 20 or later. Check with `node --version`. If you don't have it, install from [nodejs.org](https://nodejs.org).
+- A domain you control, with the ability to serve files at `/.well-known/` paths over HTTPS.
 - A terminal.
 
-## Step 1: Install the CLI
+For the wizard path: also [Claude Code](https://claude.com/code). The skill ships bundled with the CLI; no separate skill install needed.
+
+## Path A: the `/llmo` Claude Code wizard
+
+```bash
+npm install -g llmo
+```
+
+That's the only command you run in a shell. The package's postinstall copies the `/llmo` skill into `~/.claude/skills/llmo/` so Claude Code can find it.
+
+Then in any Claude Code session:
+
+```
+/llmo
+```
+
+The wizard walks ten phases:
+
+1. **Greet and consent.** Confirms what `/llmo` will produce and that you control the domain.
+2. **Interview.** Asks for your email of record and derives the primary domain.
+3. **Derive.** Queries public sources (your website, Wikidata, business registries, schema.org markup) and proposes claim values. You review every claim before it's accepted.
+4. **Review.** Walks you through each claim with surgical edit prompts. Nothing lands without your confirmation.
+5. **Verify contacts.** For each unique email domain in your `contact_points`, generates a DNS TXT record and instructs you how to add it at your DNS provider (Cloudflare, Route53, Namecheap, GoDaddy, BIND). One TXT record proves control of the domain and transitively verifies every email address at that domain (the Google Workspace pattern).
+6. **DNS corroboration (optional).** Sets up the `dns_corroboration` TXT record for out-of-band integrity attestation. Skip for first publish; recommended for repeat publishers.
+7. **Keygen and custody.** Generates an ES256 keypair, walks you through storing the private key in 1Password, AWS Secrets Manager, GCP Secret Manager, Azure Key Vault, or a GitHub Actions secret. Once you've confirmed storage, the wizard deletes the local copy.
+8. **Sign.** Signs the document with your private key. The wizard never reads the key file directly; it only invokes `llmo sign` on the path.
+9. **Deploy.** Generates platform-specific deploy instructions for your hosting (Vercel, Netlify, Cloudflare Pages, GitHub Pages, AWS S3+CloudFront, Nginx, Apache, or generic), and smoke-tests both `/.well-known/` URLs with `curl`.
+10. **Validate live.** Runs `llmo verify` against the deployed URL, confirms you achieved the target tier, and writes a closing report with the next-rotation date (80 days from publish, leaving a 10-day margin before `valid_until`).
+
+Re-invoke `/llmo` next quarter and the wizard reuses the keypair and DNS verification from the working directory; signing and redeploy take 2-3 minutes.
+
+If at any phase you want to drop to the manual flow, the wizard explicitly hands off ("here's the equivalent `llmo` CLI command if you'd rather run it yourself"). The skill is layered on top of the CLI; it never replaces it.
+
+## Path B: the manual CLI walkthrough
+
+If you're not using Claude Code, or you want to automate in CI, or you simply want to understand every step before delegating, the full CLI flow is below. Same artifacts as path A.
+
+### Step 1: Install the CLI
 
 ```bash
 npm install -g llmo
@@ -42,10 +78,9 @@ Verify:
 llmo --help
 ```
 
-You should see five subcommands: `init`, `keygen`, `sign`, `verify`,
-`doctor`.
+You should see five subcommands: `init`, `keygen`, `sign`, `verify`, `doctor`.
 
-## Step 2: Generate a signing key
+### Step 2: Generate a signing key
 
 ```bash
 mkdir my-llmo && cd my-llmo
@@ -54,18 +89,12 @@ llmo keygen --alg ES256 --kid yourname-2026-01
 
 This produces two files:
 
-- `llmo-private-yourname-2026-01.pem`: your private key. **Never
-  commit this to git.** Add it to `.gitignore` immediately, store
-  the contents in a secrets manager (1Password, AWS Secrets Manager,
-  GitHub Actions secrets) for any future automation.
-- `llmo-keys.json`: the public JWKS. This gets published, alongside
-  the signed document, at `/.well-known/llmo-keys.json` on your domain.
+- `llmo-private-yourname-2026-01.pem`: your private key. **Never commit this to git.** Add it to `.gitignore` immediately, store the contents in a secrets manager (1Password, AWS Secrets Manager, GitHub Actions secrets) for any future automation.
+- `llmo-keys.json`: the public JWKS. This gets published, alongside the signed document, at `/.well-known/llmo-keys.json` on your domain.
 
-The `--kid` value is a key identifier you choose. The convention
-`yourname-YYYY-NN` works fine; the format doesn't matter as long as
-it's stable and you don't reuse it.
+The `--kid` value is a key identifier you choose. The convention `yourname-YYYY-NN` works fine; the format doesn't matter as long as it's stable and you don't reuse it.
 
-## Step 3: Scaffold your llmo.json
+### Step 3: Scaffold your llmo.json
 
 ```bash
 llmo init \
@@ -78,39 +107,25 @@ llmo init \
 
 Or run `llmo init` with no flags for interactive prompts.
 
-This writes a starter `llmo.json` to the current directory. Open it
-in your editor and customize:
+This writes a starter `llmo.json` to the current directory. Open it in your editor and customize:
 
-- Add your real homepage, docs, and security URLs to the
-  `canonical_urls` claim.
-- Add your real email domains and social handles to the
-  `official_channels` claim.
-- Add a `disavowal` claim if there are domains, accounts, or
-  attributions you want to publicly repudiate.
-- Add a `personnel` claim if you want to declare who's authorized
-  to speak for the organization.
+- Add your real homepage, docs, and security URLs to the `canonical_urls` claim.
+- Add your real email domains and social handles to the `official_channels` claim.
+- Add a `disavowal` claim if there are domains, accounts, or attributions you want to publicly repudiate.
+- Add a `personnel` claim if you want to declare who's authorized to speak for the organization.
 
-For richer entity data, v0.1.8 adds six core claim types you may also
-want to populate:
+For richer entity data, v0.1.8 adds six core claim types you may also want to populate:
 
-- `contact_points` for typed contact addresses (security, abuse, press,
-  legal, support, phone, messaging) with optional verification metadata.
+- `contact_points` for typed contact addresses (security, abuse, press, legal, support, phone, messaging) with optional verification metadata.
 - `categories` for schema.org Organization subtype URIs plus NAICS codes.
-- `locations` for physical locations or service areas (postal address,
-  WGS84 coordinates, service-area shape, per-location publisher ID).
-- `hours` for regular weekly schedule, calendar exceptions, and named
-  alternate sub-schedules (drive-through, kitchen, brunch).
-- `attributes` for boolean / enum / array attributes drawn from the
-  controlled vocabulary at [/glossary/#attributes](/glossary/#attributes).
-- `operational_status` (`open`, `opening_soon`, `temporarily_closed`,
-  `permanently_closed`) with an effective date for any non-open status.
+- `locations` for physical locations or service areas (postal address, WGS84 coordinates, service-area shape, per-location publisher ID).
+- `hours` for regular weekly schedule, calendar exceptions, and named alternate sub-schedules (drive-through, kitchen, brunch).
+- `attributes` for boolean / enum / array attributes drawn from the controlled vocabulary at [/glossary/#attributes](/glossary/#attributes).
+- `operational_status` (`open`, `opening_soon`, `temporarily_closed`, `permanently_closed`) with an effective date for any non-open status.
 
-See the [Core Claim Types page](/claims/core/) for per-type schema,
-examples, and common pitfalls; see [specification §3](/spec/v0.1#3-core-schema)
-for the normative reference; and see the [glossary](/glossary/) for
-protocol terms and the controlled attribute vocabulary.
+See the [Core Claim Types page](/claims/core/) for per-type schema, examples, and common pitfalls; see [specification §3](/spec/v0.1#3-core-schema) for the normative reference; and see the [glossary](/glossary/) for protocol terms and the controlled attribute vocabulary.
 
-## Step 4: Sign it
+### Step 4: Sign it
 
 ```bash
 llmo sign llmo.json \
@@ -119,19 +134,15 @@ llmo sign llmo.json \
   --in-place
 ```
 
-The CLI canonicalizes the document per RFC 8785 (JCS), signs the
-canonical bytes with your private key per RFC 7515 (JWS), and
-attaches the signature.
+The CLI canonicalizes the document per RFC 8785 (JCS), signs the canonical bytes with your private key per RFC 7515 (JWS), and attaches the signature.
 
 The CLI will print a reminder verbatim:
 
-> Sign last. Serve byte-stable. Do not let your CDN, framework, or
-> pre-commit hook reformat this file after signing.
+> Sign last. Serve byte-stable. Do not let your CDN, framework, or pre-commit hook reformat this file after signing.
 
-This matters. If your hosting platform reformats JSON files (some
-do), the signature breaks. More on this in Step 5.
+This matters. If your hosting platform reformats JSON files (some do), the signature breaks. More on this in Step 5.
 
-### Optional: per-claim signing
+#### Optional: per-claim signing
 
 The default signs the entire document with one key. Publishers may also sign individual claims independently using `--claim <claim_id>`:
 
@@ -147,7 +158,7 @@ Per-claim signing is useful when different organizational functions assert diffe
 
 Per-claim signatures are evaluated under the X6 strict-tier rule (§5.3). The reference validator at `https://llmo.org/validator/` and `llmo verify` both verify per-claim signatures when present. Documents with no per-claim signatures pass X6 trivially.
 
-## Step 5: Deploy to your domain
+### Step 5: Deploy to your domain
 
 You need to publish two files at well-known paths over HTTPS:
 
@@ -160,10 +171,9 @@ How you do this depends on your hosting. Common patterns:
 
 > **Note:** The `application/llmo+json` media type is preferred per [spec §2.2](/spec/v0.1#22-content-type) but is not yet registered with IANA. Some hosts may not recognize custom `+json` suffixes; serving as `application/json` is a valid fallback. Both content types are accepted by conforming validators. IANA registration is tracked as a v1.0 milestone in spec §8.12.
 
-### Vercel / Next.js
+#### Vercel / Next.js
 
-Place the files in `public/.well-known/` in your repo. Vercel serves
-them as-is. Add to `vercel.json`:
+Place the files in `public/.well-known/` in your repo. Vercel serves them as-is. Add to `vercel.json`:
 
 ```json
 {
@@ -190,10 +200,9 @@ them as-is. Add to `vercel.json`:
 
 Commit, push, deploy.
 
-### Netlify
+#### Netlify
 
-Place files in `static/.well-known/` (Hugo) or `public/.well-known/`
-(other generators). Add to `netlify.toml`:
+Place files in `static/.well-known/` (Hugo) or `public/.well-known/` (other generators). Add to `netlify.toml`:
 
 ```toml
 [[headers]]
@@ -211,10 +220,9 @@ Place files in `static/.well-known/` (Hugo) or `public/.well-known/`
     Access-Control-Allow-Origin = "*"
 ```
 
-### Cloudflare Pages
+#### Cloudflare Pages
 
-Same as Netlify: place files in your build output's `.well-known/`
-directory. Use a `_headers` file at the root:
+Same as Netlify: place files in your build output's `.well-known/` directory. Use a `_headers` file at the root:
 
 ```
 /.well-known/llmo.json
@@ -228,7 +236,7 @@ directory. Use a `_headers` file at the root:
   Access-Control-Allow-Origin: *
 ```
 
-### AWS S3 + CloudFront
+#### AWS S3 + CloudFront
 
 Upload via aws CLI. Set Content-Type metadata at upload time:
 
@@ -242,13 +250,11 @@ aws s3 cp llmo-keys.json s3://yourbucket/.well-known/llmo-keys.json \
   --cache-control "max-age=86400"
 ```
 
-Configure CloudFront to add `Access-Control-Allow-Origin: *` via a
-response headers policy.
+Configure CloudFront to add `Access-Control-Allow-Origin: *` via a response headers policy.
 
-### nginx (raw)
+#### nginx (raw)
 
-Drop the files into your web root's `.well-known/` directory. Add
-to your `server` block:
+Drop the files into your web root's `.well-known/` directory. Add to your `server` block:
 
 ```nginx
 location /.well-known/llmo.json {
@@ -266,31 +272,19 @@ location /.well-known/llmo-keys.json {
 
 Reload nginx.
 
-### WordPress / shared hosting
+#### WordPress / shared hosting
 
-Use FTP or cPanel's file manager to upload to a `.well-known/`
-directory at your web root. WordPress doesn't normally serve files
-under `/.well-known/`, so check your hosting's `.htaccess` or
-equivalent to make sure the path isn't being intercepted by the
-WordPress router.
+Use FTP or cPanel's file manager to upload to a `.well-known/` directory at your web root. WordPress doesn't normally serve files under `/.well-known/`, so check your hosting's `.htaccess` or equivalent to make sure the path isn't being intercepted by the WordPress router.
 
-### GitHub Pages
+#### GitHub Pages
 
-Place files in `.well-known/` at your repo root. GitHub Pages serves
-them with reasonable defaults. Custom headers (Content-Type,
-Cache-Control) require a build pipeline like Jekyll plugins or a
-proxy in front.
+Place files in `.well-known/` at your repo root. GitHub Pages serves them with reasonable defaults. Custom headers (Content-Type, Cache-Control) require a build pipeline like Jekyll plugins or a proxy in front.
 
-### A note on byte stability
+#### A note on byte stability
 
-Some platforms reformat JSON during deploy: pretty-printing,
-re-ordering keys, normalizing whitespace, transcoding encodings. Any
-of those breaks the signature. If you're using a build system that
-might transform files, deploy `llmo.json` as a static asset that
-bypasses transformation, or test with `llmo doctor yourdomain.com`
-immediately after deploy to catch byte-instability fast.
+Some platforms reformat JSON during deploy: pretty-printing, re-ordering keys, normalizing whitespace, transcoding encodings. Any of those breaks the signature. If you're using a build system that might transform files, deploy `llmo.json` as a static asset that bypasses transformation, or test with `llmo doctor yourdomain.com` immediately after deploy to catch byte-instability fast.
 
-## Step 6: Verify your deployment
+### Step 6: Verify your deployment
 
 After your changes are live:
 
@@ -298,9 +292,7 @@ After your changes are live:
 llmo doctor yourdomain.com --require-tier strict
 ```
 
-The `doctor` command fetches the deployed file, runs every
-consumer-side check, refetches twice with a 2-second gap to catch
-CDN reformatting, and prints a checklist. Expected output ends with:
+The `doctor` command fetches the deployed file, runs every consumer-side check, refetches twice with a 2-second gap to catch CDN reformatting, and prints a checklist. Expected output ends with:
 
 ```
 Tier: STRICT
@@ -322,50 +314,27 @@ For a shareable verification link you can send to colleagues or include in annou
 
 ## Maintenance
 
-Republish your `llmo.json` quarterly or when material changes happen
-(new canonical URL, new disavowal, key rotation). After `valid_until`
-passes, conforming consumers treat the document as stale and refetch;
-per [specification §2.4](/spec/v0.1#24-caching-and-freshness), stale
-documents should not be used to answer high-stakes queries even though
-their signatures remain mathematically verifiable.
+Republish your `llmo.json` quarterly or when material changes happen (new canonical URL, new disavowal, key rotation). After `valid_until` passes, conforming consumers treat the document as stale and refetch; per [specification §2.4](/spec/v0.1#24-caching-and-freshness), stale documents should not be used to answer high-stakes queries even though their signatures remain mathematically verifiable.
 
-The 90-day default balances signing operational overhead against
-publisher exposure: short enough that abandoned documents go stale
-within a quarter, long enough that re-signing isn't a monthly chore.
-Publishers in regulated industries, those who change canonical claims
-frequently, or those concerned about key custody may want a 30- or
-60-day window via `llmo init --validity-days 30`. The specification
-caps Standard- and Strict-tier windows at 180 days; Minimal-tier
-allows up to 365.
+The 90-day default balances signing operational overhead against publisher exposure: short enough that abandoned documents go stale within a quarter, long enough that re-signing isn't a monthly chore. Publishers in regulated industries, those who change canonical claims frequently, or those concerned about key custody may want a 30- or 60-day window via `llmo init --validity-days 30`. The specification caps Standard- and Strict-tier windows at 180 days; Minimal-tier allows up to 365.
 
-To rotate keys:
+Re-invoking `/llmo` in Claude Code on the next rotation reuses the keypair and DNS verification from the working directory the wizard created; the round trip is 2-3 minutes for a routine quarterly re-sign. The wizard's closing report (saved as `llmo-publish-report-YYYY-MM-DD.txt`) includes the exact next-rotation date so you don't have to remember.
+
+To rotate keys (separate from re-signing — typically annual, or on suspected compromise):
 
 ```bash
 llmo keygen --alg ES256 --kid yourname-2026-q3
 ```
 
-The CLI appends the new public JWK to your existing JWKS file
-(rather than overwriting), so old signatures continue to verify
-during the rotation window. Sign new documents with the new key;
-keep the old key's JWK in the JWKS for at least 90 days per
-specification §4.2.
+The CLI appends the new public JWK to your existing JWKS file (rather than overwriting), so old signatures continue to verify during the rotation window. Sign new documents with the new key; keep the old key's JWK in the JWKS for at least 90 days per specification §4.2.
 
 ## Going further
 
 - Add `llmo doctor yourdomain.com` to your CI as a post-deploy check.
-- Wire `llmo sign` into your deploy pipeline so re-signing happens
-  automatically on every deploy. The
-  [GitHub Actions snippet in the README](https://github.com/openllmo/cli#github-actions-snippet)
-  shows the pattern.
-- Read the [specification](/spec/v0.1) in full if you want to author
-  claim types specific to your domain (the extension namespace
-  mechanism in §3.6).
-- File issues at the [CLI repo](https://github.com/openllmo/cli/issues)
-  or [spec repo](https://github.com/openllmo/llmo.org/issues).
+- Wire `llmo sign` into your deploy pipeline so re-signing happens automatically on every deploy. The [GitHub Actions snippet in the README](https://github.com/openllmo/cli#github-actions-snippet) shows the pattern.
+- Read the [specification](/spec/v0.1) in full if you want to author claim types specific to your domain (the extension namespace mechanism in §3.6).
+- File issues at the [CLI repo](https://github.com/openllmo/cli/issues) or [spec repo](https://github.com/openllmo/llmo.org/issues).
 
 ---
 
-You're now publishing verifiable, signed organizational identity at
-a well-known location. AI agents and language models that consume
-LLMO will read your claims directly rather than synthesizing them
-from third-party content.
+You're now publishing verifiable, signed organizational identity at a well-known location. AI agents and language models that consume LLMO will read your claims directly rather than synthesizing them from third-party content.
