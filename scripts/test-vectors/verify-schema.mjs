@@ -69,6 +69,31 @@ const VECTORS = [
   { file: 'edge-claim-type-namespaced.json', expectValid: true, note: 'namespaced extension type matches second oneOf branch' },
   { file: 'edge-disavowal-impersonation-defense.json', expectValid: true },
   { file: 'edge-spokesperson-with-verification.json', expectValid: true },
+
+  // v0.1.8 positive vectors. One per new core claim type plus a comprehensive vector
+  // exercising entity.name array form, structured external_ids with irs_ein,
+  // provenance_markers, all five new top-level fields, and the canonical_urls /
+  // product_facts / identity extensions.
+  { file: 'unsigned-contact-points.json', expectValid: true, note: 'v0.1.8 contact_points with one verified and one unverified entry' },
+  { file: 'unsigned-categories.json', expectValid: true, note: 'v0.1.8 categories with schema.org primary, secondary, NAICS' },
+  { file: 'unsigned-locations.json', expectValid: true, note: 'v0.1.8 locations with postal_address, WGS84 coordinates, radius service_area' },
+  { file: 'unsigned-hours.json', expectValid: true, note: 'v0.1.8 hours with split shifts, 24:00 close, overnight period, exception, alternate brunch sub-schedule' },
+  { file: 'unsigned-attributes.json', expectValid: true, note: 'v0.1.8 attributes with bool/enum/array values plus namespaced extension' },
+  { file: 'unsigned-operational-status.json', expectValid: true, note: 'v0.1.8 operational_status opening_soon with effective_date' },
+  { file: 'unsigned-v0.1.8-comprehensive.json', expectValid: true, note: 'v0.1.8 comprehensive: entity.name array with primary, structured external_ids including irs_ein, provenance_markers, all 5 new top-level fields, canonical_urls/product_facts/identity v0.1.8 extensions' },
+
+  // v0.1.8 schema-failure vectors. Each exercises one conditional constraint
+  // encoded in the schema via if/then or contains/minContains/maxContains.
+  { file: 'negative-schema-contact-points-verified-no-proof.json', expectValid: false, why: 'contact_points entry with verification_status: verified but missing verification_proof' },
+  { file: 'negative-schema-contact-points-verified-no-timestamp.json', expectValid: false, why: 'contact_points entry with verification_status: verified but missing verified_at' },
+  { file: 'negative-schema-operational-status-no-effective-date.json', expectValid: false, why: 'operational_status with non-open status (permanently_closed) missing effective_date' },
+  { file: 'negative-schema-entity-name-no-primary.json', expectValid: false, why: 'entity.name array form with zero primary:true entries (minContains: 1)' },
+  { file: 'negative-schema-entity-name-two-primary.json', expectValid: false, why: 'entity.name array form with two primary:true entries (maxContains: 1)' },
+  { file: 'negative-schema-external-id-bad-wikidata-pattern.json', expectValid: false, why: 'external_ids.wikidata structured form with value that does not match ^Q[0-9]+$' },
+  { file: 'negative-schema-external-id-verified-no-proof.json', expectValid: false, why: 'external_ids.irs_ein structured with verification_method != none and missing verification_proof + verified_at' },
+  { file: 'negative-schema-categories-no-primary.json', expectValid: false, why: 'categories claim missing the required primary field' },
+  { file: 'negative-schema-hours-malformed-time.json', expectValid: false, why: 'hours regular monday open: "25:00" violates the HH:MM pattern' },
+  { file: 'negative-schema-attributes-bad-value-type.json', expectValid: false, why: 'attributes value is a number; the open map permits boolean, string, or array of strings only' },
 ];
 
 let failed = 0;

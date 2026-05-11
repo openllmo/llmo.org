@@ -1,0 +1,33 @@
+{
+  "llmo_version": "0.1",
+  "document_id": "test-vector-v0.1.8-contact-points-001",
+  "valid_from": "2026-05-11T00:00:00Z",
+  "valid_until": "2026-11-07T00:00:00Z",
+  "entity": {
+    "name": "JungleCat, Inc.",
+    "primary_domain": "junglecat.example.com"
+  },
+  "claims": [
+    {
+      "claim_id": "contact-points-001",
+      "type": "contact_points",
+      "statement": {
+        "points": [
+          {
+            "type": "security",
+            "address": "security@junglecat.example.com",
+            "verification_method": "email_challenge",
+            "verification_status": "verified",
+            "verified_at": "2026-04-15T12:00:00Z",
+            "verification_proof": "challenge-response-token-abc"
+          },
+          {
+            "type": "press",
+            "address": "press@junglecat.example.com",
+            "verification_status": "unverified"
+          }
+        ]
+      }
+    }
+  ]
+}

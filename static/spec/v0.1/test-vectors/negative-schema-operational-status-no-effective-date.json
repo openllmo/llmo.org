@@ -1,0 +1,20 @@
+{
+  "llmo_version": "0.1",
+  "document_id": "test-vector-v0.1.8-neg-opstatus-001",
+  "valid_from": "2026-05-11T00:00:00Z",
+  "valid_until": "2026-11-07T00:00:00Z",
+  "entity": {
+    "name": "JungleCat, Inc.",
+    "primary_domain": "junglecat.example.com"
+  },
+  "claims": [
+    {
+      "claim_id": "operational-status-neg-001",
+      "type": "operational_status",
+      "statement": {
+        "status": "permanently_closed",
+        "reason": "Out of business."
+      }
+    }
+  ]
+}

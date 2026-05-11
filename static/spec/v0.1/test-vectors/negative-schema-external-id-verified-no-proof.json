@@ -1,0 +1,17 @@
+{
+  "llmo_version": "0.1",
+  "document_id": "test-vector-v0.1.8-neg-extid-verified-no-proof-001",
+  "valid_from": "2026-05-11T00:00:00Z",
+  "valid_until": "2026-11-07T00:00:00Z",
+  "entity": {
+    "name": "JungleCat, Inc.",
+    "primary_domain": "junglecat.example.com",
+    "external_ids": {
+      "irs_ein": {
+        "value": "12-3456789",
+        "verification_method": "registry_lookup"
+      }
+    }
+  },
+  "claims": []
+}

@@ -1,0 +1,31 @@
+{
+  "llmo_version": "0.1",
+  "document_id": "test-vector-v0.1.8-attributes-001",
+  "valid_from": "2026-05-11T00:00:00Z",
+  "valid_until": "2026-11-07T00:00:00Z",
+  "entity": {
+    "name": "JungleCat, Inc.",
+    "primary_domain": "junglecat.example.com"
+  },
+  "claims": [
+    {
+      "claim_id": "attributes-001",
+      "type": "attributes",
+      "statement": {
+        "wifi": true,
+        "accepts_credit_cards": true,
+        "outdoor_seating": false,
+        "parking": "lot",
+        "alcohol_served": "full_bar",
+        "dress_code": "casual",
+        "payment_methods": ["visa", "mastercard", "amex", "cash"],
+        "spoken_languages": ["en", "es-MX"],
+        "accessibility_features": [
+          "wheelchair_accessible_entrance",
+          "accessible_restroom"
+        ],
+        "myco.signature_dish": "fish_tacos"
+      }
+    }
+  ]
+}
