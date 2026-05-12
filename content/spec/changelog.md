@@ -12,6 +12,32 @@ During v0.1 pre-release, changes are author-decided and no governance window app
 
 ## [Unreleased]
 
+## [0.1.9] - 2026-05-12
+
+v0.1.9 lands two normative changes accepted on the same day under editor authorship privilege during the pre-announcement Goldilocks period (see [ADR-0012](/adr/0012-goldilocks-pre-announcement-authorship-privilege/)): [LIP-4](/spec/lips/lip-0004/) introduces a Key Transparency registry as a Strict-tier requirement (rule X7) with a 14-day grace period from this release date before enforcement begins; [LIP-5](/spec/lips/lip-0005/) adds a normative `category` discriminator to the `disavowal` claim type's `disavowed[]` items and binds rule S6 to a closed two-value enum, closing the documentation-versus-enforcement gap deferred since v0.1.5.
+
+Both LIPs transitioned Draft → Final on 2026-05-12 with the LIP-1 §10 14-day governance window observed informally and the LIP-4 §5 X7 grace period revised from 90 days to 14 days. Per ADR-0012, full window observance resumes for substantive normative changes after the v0.1 public announcement.
+
+### Added
+
+- **[LIP-4](/spec/lips/lip-0004/) Final** introduces a Key Transparency (KT) registry: a public, append-only log of `(domain, kid, jwk_thumbprint, doc_url, doc_id, observed_at)` records, each a compact JWS signed by the publisher's private key with the public JWK inline in the protected header per RFC 7515 §4.1.3. SHA-384 thumbprints per RFC 7638 throughout for ~128-bit post-quantum collision resistance under Grover. Rule **X7** (KT registry inclusion required for Strict tier) added to spec §5.3. The registry is hash-committed via periodic signed snapshots so the historical record of registered keys survives any future signature-algorithm break. Reference implementation runs at `https://llmo.org/kt/v1/`.
+- **[LIP-5](/spec/lips/lip-0005/) Final** adds a normative `category` field to entries in `disavowal.disavowed[]` arrays. The field is a closed enum: `self_statement` (publisher disavows own past content) or `impersonation_defense` (publisher disavows third party falsely representing affiliation). `statement_disavowal.disavowed[].items.required` now contains `["what", "detail", "category"]`. Spec §3.5 documents the per-value semantic.
+- **Implementer-facing endpoint spec** at `/spec/v0.1/kt-registry-endpoints/` documenting every endpoint of the KT registry API: `POST /kt/v1/entries`, `GET /kt/v1/entries`, `GET /kt/v1/entries/{id}`, `GET /kt/v1/log.jsonl`, `GET /kt/v1/snapshot/latest`, `GET /kt/v1/snapshot/{id}`. Plus D1 schema, KV namespace, federation considerations.
+- **Test vector suite** for LIP-4 entries at `/spec/v0.1/test-vectors/kt/`: 3 positive (one per supported algorithm) and 10 negative (one per defined registry error code). Generator at `scripts/test-vectors/generate-kt-vectors.mjs`.
+
+### Changed
+
+- **§3.5 `disavowal` claim type** documents the new `category` discriminator with definitions for `self_statement` and `impersonation_defense`. Worked example updated to include the field on both entries.
+- **§5.2 rule S6** updated with the binding rule text. Documents whose disavowal entries are missing the field or carry an out-of-enum value MUST NOT be evaluated at Standard tier or higher; the document evaluates at Minimal tier with note `s6_disavowal_out_of_scope`.
+- **§5.4 deferral note** for S6 informational-only status (in force v0.1.5 through v0.1.8) closed. Reference validators bind S6 to tier outcome starting with v0.1.9; CLI gains the same binding in `llmo@0.1.13`.
+- **`static/spec/v0.1/schema.json`** in-place patch: `statement_disavowal.disavowed[]` items add `category` to `required` and enum-restrict the value. Schema `$id` unchanged (in-place v0.1.x patch convention per [ADR-0006](/adr/0006-version-bump-and-release-cut/)).
+
+### Migration
+
+- Documents conforming to v0.1.0 through v0.1.8 that include a `disavowal` claim without `category` fields on each `disavowed[]` entry fail M3 schema validation against the v0.1.9 schema. Affected publishers add the field with the appropriate enum value. Pre-launch the only such document is the steward's own at llmo.org, updated in the same release window.
+- Strict-tier consumers begin enforcing X7 starting 2026-05-26 (14 days after this release). During the grace period the `kt_uninlogged` note is surfaced advisorily but does not downgrade tier.
+- Documents with no disavowal claim and a registered signing key are unaffected.
+
 ## [0.1.8] - 2026-05-11
 
 v0.1.8 (in progress, additive) introduces six new core claim types (`contact_points`, `categories`, `locations`, `hours`, `attributes`, `operational_status`), five new top-level optional fields (`revocation_registry`, `dns_corroboration`, `publication_history`, `delegates_to`, `delegated_from`), `provenance_markers` on the claim envelope, and structured verification forms on `entity.external_ids` plus a new `irs_ein` well-known key. Every conforming v0.1 document validates unchanged. Schema `$id` and `llmo_version` are unchanged.
