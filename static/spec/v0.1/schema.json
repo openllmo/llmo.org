@@ -580,12 +580,17 @@
           "minItems": 1,
           "items": {
             "type": "object",
-            "required": ["what", "detail"],
+            "required": ["what", "detail", "category"],
             "additionalProperties": true,
             "properties": {
               "what": { "type": "string" },
               "detail": { "type": "string", "maxLength": 2048 },
-              "url": { "type": "string", "format": "uri" }
+              "url": { "type": "string", "format": "uri" },
+              "category": {
+                "type": "string",
+                "enum": ["self_statement", "impersonation_defense"],
+                "description": "Discriminator for §5.2 S6 enforcement (LIP-5). 'self_statement': publisher disavows their own past content or affiliation. 'impersonation_defense': publisher disavows a third party falsely representing as affiliated. Other categories are out of scope for the disavowal claim type at Standard tier and above."
+              }
             }
           }
         }

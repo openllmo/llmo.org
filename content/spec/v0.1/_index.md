@@ -339,10 +339,12 @@ Explicitly repudiates claims, attributions, or associations the organization con
     "disavowed": [
       {
         "what": "commercial_subsidiary",
+        "category": "self_statement",
         "detail": "Diverse.org has no commercial subsidiary. Any entity claiming to be a Diverse.org commercial arm is not affiliated."
       },
       {
         "what": "unaffiliated_domain",
+        "category": "impersonation_defense",
         "detail": "The domain diverse-org.example.com has no affiliation with Diverse.org and never has."
       }
     ]
@@ -350,7 +352,14 @@ Explicitly repudiates claims, attributions, or associations the organization con
 }
 ```
 
-**Scope.** A disavowal claim targets one of two categories: (a) *publisher self-statements*, including the publisher's own former positions, controlled affiliations, named personnel, or owned subsidiaries; or (b) *impersonation defense*, where a domain, account, or attribution claims or implies affiliation with the publisher and the publisher disavows that affiliation. Disavowals targeting third parties outside these two categories, parties with no claimed or implied affiliation with the publisher, are out of conformance at Standard and Strict tiers. The protocol provides attribution, not adjudication of third parties.
+**Scope.** A disavowal claim targets one of two categories declared via the normative `category` discriminator on each `disavowed[]` entry (added in v0.1.9 per [LIP-5](/spec/lips/lip-0005/)):
+
+- **`self_statement`**: the publisher disavows their own former positions, controlled affiliations, named personnel, or owned subsidiaries. The subject of the disavowal is something the publisher previously asserted or controlled.
+- **`impersonation_defense`**: the publisher disavows a domain, account, or attribution that claims or implies affiliation with the publisher when no such affiliation exists. The subject is NOT something the publisher previously asserted; it is something falsely associated with the publisher.
+
+Both `category` values are in scope at Standard and Strict tiers. Disavowals targeting third parties outside these two categories (e.g., a competitor's product quality, an unrelated news article's accuracy) are out of conformance at Standard and Strict tiers. The protocol provides attribution, not adjudication of third parties.
+
+The `category` field is required from v0.1.9 onward; documents containing a disavowal claim without `category` on each entry fail schema validation and evaluate at Minimal tier or below. See §5.2 S6 for the binding tier rule.
 
 #### `supersedes`
 
@@ -730,7 +739,7 @@ A document is **standard conforming** if it meets minimal conformance plus:
 - **S3.** `entity.primary_domain` matches the domain serving the file.
 - **S4.** All URLs in claims resolve to the entity's primary domain or declared aliases, except for fields whose semantic role is third-party reference. The third-party-allowed fields in v0.1 are: `pointer.url` (external standards manifests), `disavowal.disavowed[].url` (impersonating or unaffiliated domains being disavowed), `official_channels.community[].url` (third-party platforms like Discord or Slack), and `personnel.spokespeople[].verification` (third-party identity attestation, e.g., GitHub, LinkedIn, faculty pages, news articles). All other URL-typed fields, including `canonical_urls.*`, `product_facts.products[].url`, and `supersedes.superseded[].url`, MUST resolve to the owned domain set.
 - **S5.** `valid_until` is no more than 180 days after `valid_from`.
-- **S6.** Disavowal claims target only publisher self-statements or impersonation defense (§3.5). Supersedes claims target only URLs or documents the publisher controls or formerly controlled (§3.5).
+- **S6.** Disavowal claims target only publisher self-statements or impersonation defense (§3.5). From v0.1.9 onward (per [LIP-5](/spec/lips/lip-0005/)), every entry in a disavowal claim's `statement.disavowed[]` array MUST carry a `category` field whose value is either `self_statement` or `impersonation_defense`. Entries missing the field or carrying any other value fail S6 binding enforcement; the document evaluates at Minimal tier with note `s6_disavowal_out_of_scope`. Supersedes claims target only URLs or documents the publisher controls or formerly controlled (§3.5); the URL-ownership half of S6 is machine-checked against the owned-domain set per S4.
 
 Standard is the target for most publishers. It provides consumers with enough signal to meaningfully re-rank LLMO claims against scraped content.
 
@@ -757,7 +766,7 @@ A reference validator at `llmo.org/validate` will check these tiers. It will rep
   - **W1.** Validity window exceeds 180 days but does not exceed 365 days. Standard-tier conformance requires `valid_until` no more than 180 days after `valid_from` (§5.2 S5); windows between 181 and 365 days remain Minimal-tier conforming but are flagged as discouraged.
   - **W2.** A `personnel.spokespeople` entry omits the `verification` URL. The claim remains conforming but consumers have no corroborating reference for the named individual; the §3.5 worked example shows the recommended pattern.
 
-v0.1.5 reference validators report S6 informationally rather than as a binding tier failure. The disavowal half of S6 requires a discriminator in the §3.5 disavowal categories that v0.1's schema does not currently carry; binding S6 enforcement against publisher-asserted prose risks reference implementations diverging on interpretation. Binding S6 enforcement is deferred pending a schema discriminator added through the LIP process. The supersedes half of S6 is machine-checkable (publisher-controlled URLs versus third-party URLs) and may be enforced earlier in a v0.1 patch release once the disavowal half has a discriminator. S6 binds publishers under §5.2; consumers remain entitled to treat S6 violations as out-of-conformance.
+From v0.1.9 onward (per [LIP-5](/spec/lips/lip-0005/)), reference validators bind S6 to tier outcome via the `category` discriminator on each `disavowal.disavowed[]` entry. The §5.4 informational-only deferral that applied v0.1.5 through v0.1.8 is closed; the supersedes half of S6 was always machine-checkable from the owned-URL set and the disavowal half now reduces to a closed-enum check against the discriminator.
 
 ---
 

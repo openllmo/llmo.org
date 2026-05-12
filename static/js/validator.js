@@ -429,6 +429,38 @@
       } else {
         standard.push(check("S5", "§5.2", "validity window is <= 180 days", "FAIL", "validity window unparseable"));
       }
+
+      // S6 binding enforcement per LIP-5 (v0.1.9+). Every entry in a
+      // disavowal claim's statement.disavowed[] array MUST carry a
+      // category field with value "self_statement" or
+      // "impersonation_defense". Other values or absence fail S6.
+      // (The supersedes half of S6 is machine-checked from URL
+      // ownership via S4 above; no separate check needed.)
+      var S6_ALLOWED = ["self_statement", "impersonation_defense"];
+      var s6Issues = [];
+      claims.forEach(function (c, i) {
+        if (c.type !== "disavowal") return;
+        var st = c.statement || {};
+        var disavowed = Array.isArray(st.disavowed) ? st.disavowed : [];
+        disavowed.forEach(function (entry, j) {
+          if (!entry || typeof entry !== "object") {
+            s6Issues.push("claim[" + i + "].disavowed[" + j + "] is not an object");
+            return;
+          }
+          if (typeof entry.category !== "string") {
+            s6Issues.push("claim[" + i + "].disavowed[" + j + "] has no 'category' (LIP-5 requires self_statement or impersonation_defense)");
+            return;
+          }
+          if (S6_ALLOWED.indexOf(entry.category) < 0) {
+            s6Issues.push("claim[" + i + "].disavowed[" + j + "].category is '" + entry.category + "', out of scope at Standard tier (allowed: " + S6_ALLOWED.join(", ") + ")");
+          }
+        });
+      });
+      standard.push(check("S6", "§5.2, LIP-5",
+        "disavowal entries carry category in {self_statement, impersonation_defense}",
+        s6Issues.length === 0 ? "PASS" : "FAIL",
+        s6Issues.length === 0 ? null : "s6_disavowal_out_of_scope: " + s6Issues.join("; ")));
+
       standardOk = standard.every(function (c) { return c.status === "PASS" || c.status === "SKIP"; });
     }
 

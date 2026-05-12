@@ -31,6 +31,7 @@
         "disavowed": [
           {
             "what": "unaffiliated_domain",
+            "category": "impersonation_defense",
             "url": "https://junglecat-support.example.org/",
             "detail": "The domain junglecat-support.example.org is shaped to imply affiliation with JungleCat but has no such affiliation. Impersonation defense per §3.5; in scope at Standard and Strict tiers."
           }
