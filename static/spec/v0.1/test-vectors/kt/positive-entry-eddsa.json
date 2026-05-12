@@ -1,0 +1,7 @@
+{
+  "lip": "LIP-4 §3.2",
+  "kind": "positive",
+  "description": "Canonically constructed KT entry signed with EdDSA. All 13 validation steps at /spec/v0.1/kt-registry-endpoints/ accept this entry.",
+  "expected": "accepted",
+  "entry": "eyJhbGciOiJFZERTQSIsImtpZCI6ImV4YW1wbGUtcHVibGlzaGVyLTIwMjYtMDEiLCJ0eXAiOiJsbG1vLWt0LWVudHJ5K2p3cyIsImp3ayI6eyJrdHkiOiJPS1AiLCJjcnYiOiJFZDI1NTE5IiwieCI6IlZnQll5Z29sREZ3SC05UEdjSG1FbGRCYWRoUEc1LURreFlJaEJDejRwd3ciLCJhbGciOiJFZERTQSIsInVzZSI6InNpZyIsImtpZCI6ImV4YW1wbGUtcHVibGlzaGVyLTIwMjYtMDEifX0.eyJkb21haW4iOiJleGFtcGxlLmNvbSIsImtpZCI6ImV4YW1wbGUtcHVibGlzaGVyLTIwMjYtMDEiLCJqd2tfdGh1bWJwcmludCI6InlBcmxBTUJFRTVQUmRDNzF2SnhBeUdEdDU0cHp4akdpSHAzMlFwYXF0MTRPR194Y2lIQ1NGMzBWVUVzejhQcEsiLCJkb2NfdXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbS8ud2VsbC1rbm93bi9sbG1vLmpzb24iLCJkb2NfaWQiOiJleGFtcGxlLWRvYy0yMDI2LXEyLTAxIiwib2JzZXJ2ZWRfYXQiOiIyMDI2LTA1LTEyVDIyOjAwOjAwLjAwMFoifQ._P9cx34TEL6vauN0n5oxiJbjou-9hFHLeACmtiVuVy9V0QvGpbjugiOKd69jqph0Oba9fltrlSjcYcBZnl3-DQ"
+}
