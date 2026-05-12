@@ -114,6 +114,27 @@ v0.1.5 (2026-05-05) labeled the rule as S6 in §5.2 Standard tier without bindin
 
 **Recovery action:** Land the LIP through the normal LIP-1 process; close out v0.1.6's §5.4 deferral note in the v0.1.7 (or v0.2) changelog when binding enforcement returns.
 
+### LIP: post-quantum signature algorithms in the JWS profile (v0.2-class, gating-bound)
+
+**Track:** `lip`
+
+**Status:** Deferred per LIP-4 §4.6. Persistent until the v0.2 PQ-signature LIP reaches Final, at which point this entry moves to COMPLETED with the resolving LIP number recorded.
+
+**Gating signals** (per LIP-4 §4.7; any one fires the LIP work):
+
+1. IETF COSE standardization for ML-DSA reaches RFC status with IANA-registered `alg` parameter values (`ML-DSA-44`, `ML-DSA-65`, `ML-DSA-87`).
+2. `jose` npm package (or equivalent in the implementation dependency tree) ships first-class ML-DSA support in a stable release.
+3. NIST deprecation timeline for 112-bit-security classical signature algorithms (including ECDSA P-256) reaches the 24-month horizon. NIST guidance currently targets deprecate-by approximately 2030 and disallow-by approximately 2035; the 24-month trigger fires around 2028.
+4. Cryptographic emergency: published cryptanalytic result reduces the security margin of ES256, ES384, or EdDSA below 100-bit (classical or quantum).
+
+**Annual review:** the editor reviews these gates on the anniversary of LIP-4's Final transition. Each review records its outcome (continue deferral / initiate the v0.2 LIP) on LIP-4's transitions log. First annual review due 365 days after LIP-4's Final transition date.
+
+**Scope when initiated:** the v0.2 LIP adds post-quantum signature algorithms to the `alg` enum in spec §4.2; specifies hybrid signing (ES256 plus ML-DSA on the same document) as the migration mechanism; updates the consumer verification flow in spec §5 to accept either-or-both signature paths; preserves KT registry semantics (the registry already supports any JWS-permissible `alg`); authors test vectors and reference implementation updates in the CLI and validator.
+
+**Why credibility:** every signed document under v0.1.x is post-quantum-fragile on the signature side. The KT registry's SHA-384 commitments preserve the historical record across the transition (per LIP-4 §4.6's bridge argument), but new documents signed after the gating signals fire need PQ signatures to authenticate against a future consumer. Missing this window means published documents lose their authentication property the moment Shor capability becomes operational.
+
+**Estimate:** 6-12 hours drafting the LIP; 14-day governance window per LIP-1 §10; subsequent CLI/validator/test-vector work is a separate multi-week effort tracked in its own BACKLOG entries when initiated.
+
 ### Implement §4.3.1 b64:false and crit rejection
 
 **Track:** `changelog`
