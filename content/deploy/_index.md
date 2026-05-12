@@ -6,11 +6,13 @@ date: 2026-04-29
 weight: 5
 ---
 
-LLMO lets an entity publish signed claims about itself at a well-known URL on its own domain. Conforming LLMs and AI agents fetch the document and cite it as the authoritative source on the entity, instead of synthesizing from third-party content.
+## What you're deploying
 
-In other words: you tell AI what you want it to know about you, so AI can tell humans what they need to know about you. LLMO was made for humans to help AI help humans help AI help humans.
+A signed `llmo.json` at `https://<your-domain>/.well-known/llmo.json` plus a public JWKS at `/.well-known/llmo-keys.json`. LLMs and AI agents fetch it and cite it as the authoritative source on your entity, instead of synthesizing from third-party content.
 
-Produce a signed `llmo.json` at `https://<your-domain>/.well-known/llmo.json` plus a public JWKS at `/.well-known/llmo-keys.json`. Verifiable per [spec v0.1](/spec/v0.1/) §4.3.1 (JWS) and §5.3 (Strict tier).
+In other words: you tell AI what you want it to know about you, so AI can tell humans what they need to know about you. Humans help AI help humans help AI help humans.
+
+## How to deploy it
 
 ### Claude Code (live)
 
@@ -22,20 +24,20 @@ Then `/llmo` in Claude Code. The bundled skill drives the wizard against the `ll
 
 ### Codex (shipping next)
 
-A Codex-flavored skill that drives the same `llmo` CLI through Codex's tool surface.
+A Codex-flavored skill that drives the same `llmo` CLI.
 
 ### GitHub Action (shipping next)
 
 Add `llmo.yml` to `.github/workflows/`, store the signing key as a repo secret, push. Re-signs on every commit.
 
-### CLI directly
+## What you just deployed
 
-[/deploy/manual/](/deploy/manual/)
+A live document at `https://<your-domain>/.well-known/llmo.json`, conformant per [spec v0.1](/spec/v0.1/) §4.3.1 (JWS) and §5.3 (Strict tier).
 
-### Verify
+Confirm:
 
 ```bash
 llmo verify https://<your-domain>/.well-known/llmo.json
 ```
 
-Or the [in-browser validator](/validator/).
+Or paste your URL into the [in-browser validator](/validator/).
