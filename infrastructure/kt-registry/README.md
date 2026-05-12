@@ -131,13 +131,36 @@ curl -X POST https://llmo-kt-snapshot.<account>.workers.dev \
 
 Returns the new snapshot's metadata as JSON.
 
-### D1-to-log flush (follow-up work)
+### D1-to-log flush Worker
 
-The current implementation appends entries to D1 but does not auto-flush them to the static `static/kt/v1/log.jsonl` file. Until this flush is implemented, the log file is updated only by manual commit. The pattern intended for the v0.1.x flush:
+The `flush-worker/` directory holds a separate Cloudflare Worker that closes the cryptographic loop: D1 stores entries as they're submitted, but the daily snapshot Worker reads its content from the static `static/kt/v1/log.jsonl` file. Without an automatic flush from D1 to the file, the snapshot's `log_hash` commits to whatever was last manually committed, not to the actual set of D1-stored entries.
 
-- A scheduled GitHub Action (or a second Cloudflare Worker with cron trigger every 60 minutes) queries D1 for entries with `log_position > last_committed_log_position`, appends them to the log file, commits via the `llmo-kt-bot[bot]` GitHub App identity.
+The flush Worker runs every hour at :05 UTC (offset from the snapshot Worker's 02:00 trigger), reads the current log file from the repo via the GitHub Contents API, queries D1 for entries beyond the file's current high-water mark, appends them in `log_position` order, and commits back via the GitHub API. By 02:00 the next morning, the flush has caught the file up to the previous hour's entries; the snapshot then signs over the committed content.
 
-Tracked as a follow-up implementation task.
+**Provisioning (one-time, after this code is deployed):**
+
+1. **Mint a GitHub token authorized to commit to `openllmo/llmo.org`.** Two options:
+   - **Fine-grained PAT (faster).** GitHub Settings → Developer settings → Personal access tokens → Fine-grained → Generate new token. Scope: repository access to `openllmo/llmo.org` only, contents `Read and write`, metadata `Read`. Set expiration to 1 year. Save the token string.
+   - **GitHub App (preferred long-term, per ADR-0010).** Register a new App `llmo-kt-bot` in the openllmo org following the same pattern as the existing `llmo-workflow-bot` from ADR-0004. The Worker needs an installation token at runtime; either mint a long-lived installation access token (12 hours max) and rotate via a separate scheduled Worker, OR use a fine-grained PAT for v0.1.x and migrate to App after federation work.
+   
+   For v0.1.x, the fine-grained PAT is acceptable. Document the choice in the operator's runbook.
+
+2. **Deploy the Worker:**
+   ```bash
+   cd infrastructure/kt-registry/flush-worker
+   wrangler deploy
+   wrangler secret put GITHUB_TOKEN       # paste the PAT or installation token
+   wrangler secret put MANUAL_FLUSH_TOKEN # optional, paste a random hex string
+   ```
+
+3. **Verify with a manual trigger:**
+   ```bash
+   curl -X POST https://llmo-kt-flush.<account>.workers.dev \
+     -H "Authorization: Bearer <MANUAL_FLUSH_TOKEN>"
+   ```
+   Should return `{"flushed": <n>, ...}` and produce a new commit on `main` of `openllmo/llmo.org` from the token's bound identity.
+
+4. **Confirm by re-running a snapshot:** trigger the snapshot Worker manually and observe `log_size` jumping from 0 to the flushed-entry count, with `log_hash` changing.
 
 ### Rate-limit cleanup
 
