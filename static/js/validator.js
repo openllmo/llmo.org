@@ -524,6 +524,24 @@
           "SKIP", "skipped in paste mode (origin needed for JWKS fetch)"));
       }
 
+      // X7 (LIP-4): KT registry inclusion. Advisory in v0.1.x until
+      // LIP-4 transitions Final and its 90-day grace period elapses;
+      // currently surfaced as an informational status rather than a
+      // tier-determining check. URL mode defers to a registry fetch;
+      // paste mode skips because we have no primary_domain origin.
+      if (urlContext) {
+        if (hasSig) {
+          strict.push({ id: "X7", cite: "LIP-4 §3.4", desc: "document signing key recorded in a conforming KT registry (advisory in v0.1.x)",
+            status: "DEFERRED", note: null });
+        } else {
+          strict.push(check("X7", "LIP-4 §3.4", "document signing key recorded in a conforming KT registry (advisory in v0.1.x)",
+            "SKIP", "no document-level signature present"));
+        }
+      } else {
+        strict.push(check("X7", "LIP-4 §3.4", "document signing key recorded in a conforming KT registry (advisory in v0.1.x)",
+          "SKIP", "skipped in paste mode (origin needed for KT registry query)"));
+      }
+
       var docInternalOk = x1ok && x4ok;
       if (docInternalOk) {
         if (urlContext) {
@@ -628,6 +646,8 @@
         "SKIP", "skipped because JWKS fetch did not resolve");
     }).then(function (evAfterX23) {
       return verifyAndApplyX5X6(evAfterX23, doc, urlContext);
+    }).then(function (evAfterX5X6) {
+      return verifyAndApplyX7(evAfterX5X6, doc, urlContext);
     });
   }
 
@@ -767,6 +787,153 @@
   // Document-level (X5) and claim-level (X6) signatures share the same
   // attached-JWS framing, so both paths funnel through verifyAttachedSignature.
   function verifyDocumentSignature(doc, urlContext) { return verifyAttachedSignature(doc, urlContext); }
+
+  // ---- X7: KT registry inclusion (LIP-4) -------------------------------
+
+  var KT_REGISTRY_BASE = "https://llmo.org/kt/v1";
+
+  // RFC 7638 JWK Thumbprint with SHA-384. LIP-4 §3.1 explicitly selects
+  // SHA-384 over SHA-256 for ~128-bit post-quantum collision resistance.
+  async function computeJwkThumbprintSha384(jwk) {
+    var canonical;
+    if (jwk.kty === "EC") {
+      canonical = '{"crv":' + JSON.stringify(jwk.crv) + ',"kty":"EC","x":' + JSON.stringify(jwk.x) + ',"y":' + JSON.stringify(jwk.y) + '}';
+    } else if (jwk.kty === "OKP") {
+      canonical = '{"crv":' + JSON.stringify(jwk.crv) + ',"kty":"OKP","x":' + JSON.stringify(jwk.x) + '}';
+    } else {
+      throw new Error("unsupported kty for thumbprint: " + jwk.kty);
+    }
+    var hash = new Uint8Array(await crypto.subtle.digest("SHA-384", new TextEncoder().encode(canonical)));
+    return base64UrlEncode(hash);
+  }
+
+  // Verify a single registry-entry compact JWS against its inline JWK,
+  // returning { ok: bool, thumbprintMatches: bool, payload: object|null,
+  // detail: string|null }. ok=true requires both signature verification
+  // and inline-thumbprint-matches-payload-thumbprint.
+  async function verifyKtEntryJws(entryJws) {
+    var segments = entryJws.split(".");
+    if (segments.length !== 3) return { ok: false, detail: "not a compact JWS" };
+    var header, payload;
+    try { header = JSON.parse(base64UrlDecodeToString(segments[0])); }
+    catch (e) { return { ok: false, detail: "header decode failed" }; }
+    try { payload = JSON.parse(base64UrlDecodeToString(segments[1])); }
+    catch (e) { return { ok: false, detail: "payload decode failed" }; }
+    if (!header.jwk) return { ok: false, detail: "no inline jwk in protected header" };
+    if (!header.alg) return { ok: false, detail: "no alg in protected header" };
+    var params = ALG_PARAMS[header.alg];
+    if (!params) return { ok: false, detail: "unsupported alg: " + header.alg };
+    if (header.alg === "EdDSA" && ed25519Supported === false) {
+      return { ok: false, detail: "browser lacks EdDSA support", payload: payload };
+    }
+    var computedThumbprint;
+    try { computedThumbprint = await computeJwkThumbprintSha384(header.jwk); }
+    catch (e) { return { ok: false, detail: e.message }; }
+    if (computedThumbprint !== payload.jwk_thumbprint) {
+      return { ok: false, detail: "inline jwk thumbprint mismatch with payload", payload: payload };
+    }
+    var publicKey;
+    try {
+      publicKey = await crypto.subtle.importKey("jwk", params.jwk(header.jwk), params.importParams, false, ["verify"]);
+    } catch (e) {
+      return { ok: false, detail: "inline jwk import failed: " + ((e && e.message) || String(e)), payload: payload };
+    }
+    var signingInput = new TextEncoder().encode(segments[0] + "." + segments[1]);
+    var sigBytes;
+    try { sigBytes = base64UrlDecodeToBytes(segments[2]); }
+    catch (e) { return { ok: false, detail: "signature decode failed", payload: payload }; }
+    var verified;
+    try {
+      verified = await crypto.subtle.verify(params.verifyParams, publicKey, sigBytes, signingInput);
+    } catch (e) {
+      return { ok: false, detail: "signature verification threw: " + ((e && e.message) || String(e)), payload: payload };
+    }
+    return verified
+      ? { ok: true, payload: payload, thumbprint: computedThumbprint }
+      : { ok: false, detail: "signature did not verify", payload: payload };
+  }
+
+  async function verifyAndApplyX7(ev, doc, urlContext) {
+    var x7Current = ev.strict.find(function (c) { return c.id === "X7"; });
+    if (!x7Current || x7Current.status !== "DEFERRED") return ev;
+
+    function setX7(status, note) {
+      ev.strict = ev.strict.map(function (c) {
+        return c.id === "X7"
+          ? check("X7", "LIP-4 §3.4", "document signing key recorded in a conforming KT registry (advisory in v0.1.x)", status, note)
+          : c;
+      });
+      return ev;
+    }
+
+    // Extract the doc's signing-key kid from the JWS protected header.
+    var header;
+    try {
+      header = JSON.parse(base64UrlDecodeToString(doc.signature.protected));
+    } catch (e) {
+      return setX7("SKIP", "cannot evaluate: document signature protected header undecodable");
+    }
+    if (!header.kid) return setX7("SKIP", "cannot evaluate: document JWS has no kid");
+
+    // Find that key in the publisher's JWKS, compute its thumbprint.
+    var jwksResult = await fetchJwksOnce(urlContext);
+    if (jwksResult.error) {
+      return setX7("SKIP", "cannot evaluate: JWKS unavailable (" + (jwksResult.detail || jwksResult.error) + ")");
+    }
+    var docKey = jwksResult.jwks.keys.find(function (k) { return k.kid === header.kid; });
+    if (!docKey) return setX7("SKIP", "cannot evaluate: doc signing kid not found in publisher JWKS");
+    var docThumbprint;
+    try {
+      docThumbprint = await computeJwkThumbprintSha384(docKey);
+    } catch (e) {
+      return setX7("SKIP", "cannot compute publisher JWK thumbprint: " + ((e && e.message) || String(e)));
+    }
+
+    // Query the KT registry for entries under the publisher's domain.
+    var domain = urlContext.primaryDomainHost;
+    var registryUrl = KT_REGISTRY_BASE + "/entries?domain=" + encodeURIComponent(domain);
+    var resp;
+    try {
+      resp = await fetch(registryUrl, { cache: "no-store" });
+    } catch (e) {
+      return setX7("SKIP", "KT registry unreachable (transient): " + ((e && e.message) || String(e)));
+    }
+    if (!resp.ok) {
+      return setX7("SKIP", "KT registry returned HTTP " + resp.status);
+    }
+    var body;
+    try { body = await resp.json(); }
+    catch (e) { return setX7("SKIP", "KT registry response not valid JSON"); }
+    var entries = (body && Array.isArray(body.entries)) ? body.entries : [];
+    if (entries.length === 0) {
+      return setX7("FAIL", "kt_uninlogged: no KT entries returned for domain " + domain);
+    }
+
+    // For each entry, verify the inline-signed JWS and check the
+    // thumbprint matches the publisher's deployed JWKS key.
+    var verifiedEntries = 0;
+    var matched = false;
+    for (var i = 0; i < entries.length; i++) {
+      var entry = entries[i];
+      var entryJws = entry && entry.entry;
+      if (!entryJws) continue;
+      var v = await verifyKtEntryJws(entryJws);
+      if (!v.ok) continue;
+      verifiedEntries += 1;
+      if (v.payload && v.payload.jwk_thumbprint === docThumbprint) {
+        matched = true;
+        break;
+      }
+    }
+
+    if (matched) {
+      return setX7("PASS", "publisher's signing key registered in KT log; entry JWS verifies against its inline JWK and thumbprint matches deployed JWKS");
+    }
+    return setX7("FAIL",
+      "kt_uninlogged: " + entries.length + " entries returned for " + domain + ", "
+      + verifiedEntries + " verified by signature, but none match the deployed JWKS key thumbprint"
+    );
+  }
   function verifyClaimSignature(claim, urlContext) { return verifyAttachedSignature(claim, urlContext); }
 
   async function verifyAndApplyX5X6(ev, doc, urlContext) {
