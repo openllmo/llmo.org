@@ -28,7 +28,7 @@ The forces in tension:
 
 ### 1. Storage backend
 
-The registry's log is stored as a flat JSONL file in the `openllmo/llmo.org` Hugo repository at `static/.well-known/kt/v1/log.jsonl` and served as a static asset by Cloudflare Pages. Each line of the file is the compact JWS of one accepted entry. Entries are appended in monotonic order by append timestamp. The file's commit history in git is the secondary audit trail of append events.
+The registry's log is stored as a flat JSONL file in the `openllmo/llmo.org` Hugo repository at `static/kt/v1/log.jsonl` and served as a static asset by Cloudflare Pages. Each line of the file is the compact JWS of one accepted entry. Entries are appended in monotonic order by append timestamp. The file's commit history in git is the secondary audit trail of append events.
 
 The write path is decoupled from the read path. Writes flow through a Cloudflare Worker fronting a Cloudflare D1 database (serverless SQL). Periodically (every 60 minutes), a scheduled Worker rolls the D1 contents into a JSONL file and commits the update to the repository through the GitHub API using a dedicated commit identity (`llmo-kt-bot[bot]`, a GitHub App parallel in design to the existing `llmo-workflow-bot` per [ADR-0004](/adr/0004-github-app-workflow-auth/)).
 
@@ -60,7 +60,7 @@ The Worker enforces rate limits per source IP (no more than 100 entries per hour
 
 Snapshots are produced by a scheduled Cloudflare Worker triggered every 24 hours at 02:00 UTC (selected to fall during the operational quiet period and after typical North American business hours). The Worker:
 
-1. Fetches the current canonical log from `static/.well-known/kt/v1/log.jsonl` (i.e., after the most recent flush from D1 to git).
+1. Fetches the current canonical log from `static/kt/v1/log.jsonl` (i.e., after the most recent flush from D1 to git).
 2. Computes `log_hash = base64url(SHA-384(log_file_bytes))`.
 3. Builds the snapshot payload per LIP-4 §3.3: `snapshot_id`, `log_size`, `log_hash`, `snapshot_at`, `previous_snapshot_id`, `previous_log_hash`.
 4. Signs the payload with the registry signing key (see §4 below) using ES384.
