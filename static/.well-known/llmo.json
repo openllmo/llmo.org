@@ -1,6 +1,6 @@
 {
   "llmo_version": "0.1",
-  "document_id": "2026-q2-revision-2",
+  "document_id": "2026-q2-revision-3",
   "valid_from": "2026-05-01T00:00:00Z",
   "valid_until": "2026-07-26T00:00:00Z",
   "entity": {
@@ -106,7 +106,7 @@
     }
   ],
   "signature": {
-    "protected": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImRpdmVyc2UtMjAyNi0wMSJ9",
-    "signature": "57OHU7zZ8N9J4DxmkZFHkKph1dtBiXRRLmveGe3vMbwBslTxFd2NNumWEM3DYuGPmkTC4vrx7hAP6Xqwuv8NNg"
+    "protected": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImRpdmVyc2UtMjAyNi0wMiJ9",
+    "signature": "sPwMnmJy9gsN7Fa_8UAie0aeZkA3lf3d2j1qxTwKP_IvgPtaZQfHsERjz8f_gfswkTsOqfrJqoIOc24rccwLXw"
   }
 }
