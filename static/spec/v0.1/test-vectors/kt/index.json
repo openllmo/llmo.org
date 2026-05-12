@@ -1,0 +1,19 @@
+{
+  "lip": "LIP-4",
+  "generated": "2026-05-12",
+  "vectors": [
+    "positive-entry-es256.json",
+    "positive-entry-es384.json",
+    "positive-entry-eddsa.json",
+    "negative-thumbprint-mismatch.json",
+    "negative-kid-mismatch.json",
+    "negative-wrong-typ.json",
+    "negative-jwk-contains-private-material.json",
+    "negative-signature-invalid.json",
+    "negative-doc-url-mismatch.json",
+    "negative-timestamp-out-of-range.json",
+    "negative-missing-payload-field.json",
+    "negative-invalid-domain.json",
+    "negative-unsupported-alg.json"
+  ]
+}
