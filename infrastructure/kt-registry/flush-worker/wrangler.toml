@@ -17,7 +17,10 @@ database_name = "llmo-kt-registry"
 database_id = "9963a78a-fc4e-4995-abf4-12dea9674310"
 
 # Secrets to provision via `wrangler secret put`:
-#   - GITHUB_TOKEN              token authorized to commit to
-#                               openllmo/llmo.org (fine-grained PAT
-#                               or GitHub App installation token)
-#   - MANUAL_FLUSH_TOKEN        optional bearer token for manual trigger
+#   - KT_BOT_APP_ID             GitHub App ID for llmo-kt-bot
+#   - KT_BOT_INSTALLATION_ID    Installation ID for the App on
+#                               openllmo/llmo.org
+#   - KT_BOT_PRIVATE_KEY        PKCS#8 PEM private key for the App
+#                               (download from GitHub Apps settings;
+#                               paste full PEM text including BEGIN/END)
+#   - MANUAL_FLUSH_TOKEN        Optional bearer token for manual trigger
