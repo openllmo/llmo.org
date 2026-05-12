@@ -1,0 +1,23 @@
+name = "llmo-kt-snapshot"
+main = "src/index.js"
+compatibility_date = "2026-05-12"
+compatibility_flags = ["nodejs_compat"]
+
+# Cron trigger: every day at 02:00 UTC, per ADR-0010 §3.
+[triggers]
+crons = ["0 2 * * *"]
+
+# Shared KV namespace with the Pages Functions. Configure the ID in
+# wrangler.toml or via dashboard before deploy. See README.
+[[kv_namespaces]]
+binding = "KT_KV"
+id = "REPLACE_WITH_KT_KV_NAMESPACE_ID"
+
+# Public URL for the canonical log served from llmo.org.
+[vars]
+LOG_URL = "https://llmo.org/kt/v1/log.jsonl"
+
+# Secrets to provision via `wrangler secret put`:
+#   - KT_SIGNING_KEY_JWK   (JSON of the private signing JWK)
+#   - KT_SIGNING_KID       (registry kid string, e.g. "llmo-kt-2026-01")
+#   - MANUAL_SNAPSHOT_TOKEN (optional bearer token for manual trigger)
