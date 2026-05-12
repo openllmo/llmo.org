@@ -1,0 +1,23 @@
+name = "llmo-kt-flush"
+main = "src/index.js"
+compatibility_date = "2026-05-12"
+compatibility_flags = ["nodejs_compat"]
+
+# Cron: every hour at :05. The 5-minute offset keeps the flush from
+# coinciding with the snapshot Worker's 02:00 UTC trigger; flushes
+# always finish (or fail and retry next cycle) before snapshots run.
+[triggers]
+crons = ["5 * * * *"]
+
+# D1 binding — same database the Pages Functions write to.
+# Database ID is set during operator provisioning per the README.
+[[d1_databases]]
+binding = "KT_DB"
+database_name = "llmo-kt-registry"
+database_id = "9963a78a-fc4e-4995-abf4-12dea9674310"
+
+# Secrets to provision via `wrangler secret put`:
+#   - GITHUB_TOKEN              token authorized to commit to
+#                               openllmo/llmo.org (fine-grained PAT
+#                               or GitHub App installation token)
+#   - MANUAL_FLUSH_TOKEN        optional bearer token for manual trigger
