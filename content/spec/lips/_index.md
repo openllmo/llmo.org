@@ -17,6 +17,7 @@ The authoritative process document is [LIP-1](/spec/lips/lip-0001), which define
 | LIP-2 | (placeholder withdrawn before merge) |  | Withdrawn | Process | 2026-04-21 |
 | [LIP-3](/spec/lips/lip-0003/) | LIP Authoring Conventions | Nic Chavez | Final | Informational | 2026-04-21 |
 | [LIP-4](/spec/lips/lip-0004/) | Key Transparency: registry membership as a Strict-tier requirement | Nic Chavez | Final | Standards Track | 2026-05-12 |
+| [LIP-5](/spec/lips/lip-0005/) | Disavowal category discriminator and S6 binding enforcement | Nic Chavez | Final | Standards Track | 2026-05-12 |
 
 LIP numbers are not necessarily contiguous. LIP-2 was reserved during initial scaffolding for a Process LIP defining core claim type submission mechanics. The placeholder was removed from the repository before being formally numbered, and the number is permanently retained as withdrawn per the registry's append-only rule.
 

@@ -1,6 +1,6 @@
 {
   "llmo_version": "0.1",
-  "document_id": "2026-q2-revision-3",
+  "document_id": "2026-q2-revision-4",
   "valid_from": "2026-05-01T00:00:00Z",
   "valid_until": "2026-07-26T00:00:00Z",
   "entity": {
@@ -91,22 +91,20 @@
         "disavowed": [
           {
             "what": "commercial_subsidiary",
-            "detail": "Diverse.org has no commercial subsidiary. Any entity claiming to be a Diverse.org commercial arm is not affiliated."
+            "detail": "Diverse.org has no commercial subsidiary. Any entity claiming to be a Diverse.org commercial arm is not affiliated.",
+            "category": "self_statement"
           },
           {
             "what": "unaffiliated_domain",
-            "detail": "The domain diverse-org.example.com is shaped to imply affiliation with Diverse.org but has no such affiliation. This is an impersonation defense per §3.5."
+            "detail": "The domain diverse-org.example.com is shaped to imply affiliation with Diverse.org but has no such affiliation. This is an impersonation defense per §3.5.",
+            "category": "impersonation_defense"
           }
         ]
-      },
-      "signature": {
-        "protected": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImRpdmVyc2UtMjAyNi0wMSJ9",
-        "signature": "xiELr3hcPzfNoQp9vJLlYKA-sep6nC741Zzd2rwqXGxCXtk0Iy9jne9RxjpIoDqs6mHDqMZuN5PheU599PNhKg"
       }
     }
   ],
   "signature": {
     "protected": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImRpdmVyc2UtMjAyNi0wMiJ9",
-    "signature": "sPwMnmJy9gsN7Fa_8UAie0aeZkA3lf3d2j1qxTwKP_IvgPtaZQfHsERjz8f_gfswkTsOqfrJqoIOc24rccwLXw"
+    "signature": "AR7usuv_jntI-Bkkn36K0K4HB7tqcE2BNhrK9mPYQqHtnLxgUBeQ0oM9bNgaoX3yub2f4eG6picQ5UKPL6lU9w"
   }
 }

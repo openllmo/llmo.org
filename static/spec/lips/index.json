@@ -28,6 +28,15 @@
       "type": "Standards Track",
       "created": "2026-05-12",
       "path": "/spec/lips/lip-0004/"
+    },
+    {
+      "lip": 5,
+      "title": "Disavowal category discriminator and S6 binding enforcement",
+      "author": "Nic Chavez",
+      "status": "Final",
+      "type": "Standards Track",
+      "created": "2026-05-12",
+      "path": "/spec/lips/lip-0005/"
     }
   ]
 }
