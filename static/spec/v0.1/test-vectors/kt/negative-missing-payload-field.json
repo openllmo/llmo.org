@@ -1,0 +1,8 @@
+{
+  "lip": "LIP-4 §3.2",
+  "kind": "negative",
+  "error_code": "missing_payload_field",
+  "description": "payload is missing the jwk_thumbprint field.",
+  "expected": "rejected:missing_payload_field",
+  "entry": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImV4YW1wbGUtcHVibGlzaGVyLTIwMjYtMDEiLCJ0eXAiOiJsbG1vLWt0LWVudHJ5K2p3cyIsImp3ayI6eyJrdHkiOiJFQyIsImNydiI6IlAtMjU2IiwieCI6ImlnSndmOVZXTnBqR1lma01HM2MtRHByZHkxNS1zZGFJdEg2YnlJQ0xIWTgiLCJ5IjoiUnY4SmVkek9rLXpZNk16M1NvTGw1S1VrTURBbmxvLWk0eldwQjdjbDNudyIsImFsZyI6IkVTMjU2IiwidXNlIjoic2lnIiwia2lkIjoiZXhhbXBsZS1wdWJsaXNoZXItMjAyNi0wMSJ9fQ.eyJkb21haW4iOiJleGFtcGxlLmNvbSIsImtpZCI6ImV4YW1wbGUtcHVibGlzaGVyLTIwMjYtMDEiLCJkb2NfdXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbS8ud2VsbC1rbm93bi9sbG1vLmpzb24iLCJkb2NfaWQiOiJleGFtcGxlLWRvYy0yMDI2LXEyLTAxIiwib2JzZXJ2ZWRfYXQiOiIyMDI2LTA1LTEyVDIyOjAwOjAwLjAwMFoifQ.rOapKLW8zp3lW3kau_UQXfIV9SaHNar3q2DF9iHkvN6EiS0odf36Nu36g0iMs4t2sPUb5jxeVTeqqVDF1RDahw"
+}
