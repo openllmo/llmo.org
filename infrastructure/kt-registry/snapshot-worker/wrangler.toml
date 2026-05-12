@@ -11,7 +11,7 @@ crons = ["0 2 * * *"]
 # wrangler.toml or via dashboard before deploy. See README.
 [[kv_namespaces]]
 binding = "KT_KV"
-id = "REPLACE_WITH_KT_KV_NAMESPACE_ID"
+id = "8ba19f8ee2c14754b67fcec803ea165b"
 
 # Public URL for the canonical log served from llmo.org.
 [vars]

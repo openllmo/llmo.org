@@ -13,9 +13,10 @@ function err(status, code, detail) {
 }
 
 export const onRequestGet = async ({ params, env }) => {
-  const raw = params.entry_id;
-  const entryIdStr = Array.isArray(raw) ? raw[0] : raw;
-  const entryId = parseInt(entryIdStr, 10);
+  // Single-segment dynamic routing: params.entry_id is a string,
+  // not an array. (Catch-all routing [[name]] returns an array; the
+  // old form was a bug because [[]] eats sibling literal paths.)
+  const entryId = parseInt(params.entry_id, 10);
   if (isNaN(entryId) || entryId < 1) return err(400, 'invalid_entry_id', 'entry_id must be a positive integer.');
 
   const row = await env.KT_DB.prepare(
