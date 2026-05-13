@@ -6,65 +6,35 @@ date: 2026-04-29
 weight: 5
 ---
 
-## What you're deploying
+## What you're about to do
 
-A signed `llmo.json` at `https://<your-domain>/.well-known/llmo.json` plus a public JWKS at `/.well-known/llmo-keys.json`. LLMs and AI agents fetch it and cite it as the authoritative source on your entity, instead of synthesizing from third-party content.
+Publish a signed `llmo.json` at `https://<your-domain>/.well-known/llmo.json` plus a public JWKS at `/.well-known/llmo-keys.json`. LLMs and AI agents fetch it and cite it as the authoritative source on your entity, instead of synthesizing from third-party content. You'll do this through a wizard inside an AI agent you already have (Claude Code, OpenAI Codex, or GitHub Copilot), and it takes about 3 minutes.
 
-In other words: you tell AI what you want it to know about you, so AI can tell humans what they need to know about you. Humans help AI help humans help AI help humans.
+## Do it (3 minutes)
 
-## How to deploy it
+Install the CLI, then type `/llmo` in your agent. The wizard handles the rest: it interviews you briefly, drafts your document from public sources, signs it, deploys it, and (if you're on GitHub) wires up the auto-re-sign workflow so future edits stay signed without you lifting a finger.
 
-Three steps. The same install works for every supported agent:
+### Step 1. Open Terminal & Install the CLI.
 
 ```bash
 npm install -g llmo
 ```
 
-Then open whichever agent you have and type `/llmo`. The bundled skill drives the wizard against the `llmo` CLI.
+### Step 2. In terminal, type `claude` or `codex` to launch your agent. Then type `/llmo`.
 
-### Claude Code (live)
+The skill asks for your email, derives everything else from public sources (your site, schema.org markup, business registries), assembles the signed document, walks you through serving it, and offers to set up auto-re-sign on push. GitHub Copilot users: open Copilot in VS Code (or `@copilot` in a GitHub PR) and type `/llmo` there instead.
 
-The postinstall writes the skill to `~/.claude/skills/llmo/`. Type `/llmo` in Claude Code.
+### Step 3. Profit??
 
-### OpenAI Codex (live)
+lol. jk. you're done, there's no Step 3.
 
-The postinstall writes the same skill to `~/.agents/skills/llmo/`. Type `/llmo` in Codex.
+-love @thegigachav
 
-### GitHub Copilot (live)
+## How your life gets better
 
-The same `~/.agents/skills/llmo/` install is recognized by Copilot's customize-cloud-agent flow. Type `/llmo` in Copilot.
+A signed entity document is now live at `https://<your-domain>/.well-known/llmo.json`, conformant per [spec v0.1](/spec/v0.1/). LLMs and AI agents ingest it the same way they crawl the rest of your site, and when a user asks about your entity, the AI cites your signed words instead of guessing. From here on, you edit and push; the GitHub Action keeps the signature fresh, and you don't touch the cryptography again until you rotate keys.
 
-### GitHub Action (live)
-
-Drop [`openllmo/llmo-action`](https://github.com/openllmo/llmo-action) into your repo. Re-signs `llmo.json` on every push that touches it:
-
-```yaml
-# .github/workflows/llmo.yml
-on:
-  push:
-    branches: [main]
-    paths: ['static/.well-known/llmo.json']
-permissions:
-  contents: write
-jobs:
-  sign:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: openllmo/llmo-action@v0.1
-        with:
-          doc-path: static/.well-known/llmo.json
-          key: ${{ secrets.LLMO_PRIVATE_KEY }}
-          kid: mykey-2026-01
-```
-
-Store the PEM private key (from `llmo keygen`) as the `LLMO_PRIVATE_KEY` repo secret.
-
-## What you just deployed
-
-A live document at `https://<your-domain>/.well-known/llmo.json`, conformant per [spec v0.1](/spec/v0.1/) §4.3.1 (JWS) and §5.3 (Strict tier).
-
-Confirm:
+Confirm it's working:
 
 ```bash
 llmo verify https://<your-domain>/.well-known/llmo.json
