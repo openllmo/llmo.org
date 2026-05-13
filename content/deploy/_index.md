@@ -14,17 +14,25 @@ In other words: you tell AI what you want it to know about you, so AI can tell h
 
 ## How to deploy it
 
-### Claude Code (live)
+Three steps. The same install works for every supported agent:
 
 ```bash
 npm install -g llmo
 ```
 
-Then `/llmo` in Claude Code. The bundled skill drives the wizard against the `llmo` CLI.
+Then open whichever agent you have and type `/llmo`. The bundled skill drives the wizard against the `llmo` CLI.
 
-### Codex (shipping next)
+### Claude Code (live)
 
-A Codex-flavored skill that drives the same `llmo` CLI.
+The postinstall writes the skill to `~/.claude/skills/llmo/`. Type `/llmo` in Claude Code.
+
+### OpenAI Codex (live)
+
+The postinstall writes the same skill to `~/.agents/skills/llmo/`. Type `/llmo` in Codex.
+
+### GitHub Copilot (live)
+
+The same `~/.agents/skills/llmo/` install is recognized by Copilot's customize-cloud-agent flow. Type `/llmo` in Copilot.
 
 ### GitHub Action (shipping next)
 

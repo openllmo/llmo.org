@@ -65,8 +65,16 @@ See https://llmo.org/adr/0009-llmo-skill-scope/ for the firewall rationale.
 ## Workflow
 
 The orchestrator walks through ten phases. Each is documented in detail in
-`phases/<phase>.md`. The orchestrator coordinates; the phase files hold the
-recipes you follow inside each phase.
+`phases/<NN>-<name>.md` (sibling directory to this `SKILL.md`). The
+orchestrator coordinates; the phase files hold the recipes you follow inside
+each phase.
+
+**Phase loop.** For each phase, in order: (1) read the phase file from disk
+using your Read tool, (2) execute the steps in that file, (3) update the
+draft and your state, then (4) move on. Do not summarize a phase from this
+overview without first reading the phase file — the phase files carry the
+defaults, the exact CLI invocations, the failure-mode handling, and the
+decision points that this overview omits.
 
 1. **Greet and consent** — `phases/01-greet.md`. Confirm the publisher's role,
    explain what the skill does, confirm consent to proceed.
