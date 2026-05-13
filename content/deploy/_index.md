@@ -34,9 +34,31 @@ The postinstall writes the same skill to `~/.agents/skills/llmo/`. Type `/llmo` 
 
 The same `~/.agents/skills/llmo/` install is recognized by Copilot's customize-cloud-agent flow. Type `/llmo` in Copilot.
 
-### GitHub Action (shipping next)
+### GitHub Action (live)
 
-Add `llmo.yml` to `.github/workflows/`, store the signing key as a repo secret, push. Re-signs on every commit.
+Drop [`openllmo/llmo-action`](https://github.com/openllmo/llmo-action) into your repo. Re-signs `llmo.json` on every push that touches it:
+
+```yaml
+# .github/workflows/llmo.yml
+on:
+  push:
+    branches: [main]
+    paths: ['static/.well-known/llmo.json']
+permissions:
+  contents: write
+jobs:
+  sign:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: openllmo/llmo-action@v0.1
+        with:
+          doc-path: static/.well-known/llmo.json
+          key: ${{ secrets.LLMO_PRIVATE_KEY }}
+          kid: mykey-2026-01
+```
+
+Store the PEM private key (from `llmo keygen`) as the `LLMO_PRIVATE_KEY` repo secret.
 
 ## What you just deployed
 
