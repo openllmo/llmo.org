@@ -64,7 +64,7 @@ See https://llmo.org/adr/0009-llmo-skill-scope/ for the firewall rationale.
 
 ## Workflow
 
-The orchestrator walks through ten phases. Each is documented in detail in
+The orchestrator walks through eleven phases. Each is documented in detail in
 `phases/<NN>-<name>.md` (sibling directory to this `SKILL.md`). The
 orchestrator coordinates; the phase files hold the recipes you follow inside
 each phase.
@@ -108,7 +108,15 @@ decision points that this overview omits.
 10. **Validate live** — `phases/10-validate.md`. Fetch the deployed
     `https://<domain>/.well-known/llmo.json` and run it through both
     `llmo verify <url>` and the in-browser validator at https://llmo.org/validator/.
-    Confirm the tier the publisher targets is achieved. Report and close.
+    Confirm the tier the publisher targets is achieved.
+11. **Enable auto-re-sign on push** (optional, GitHub-only) — `phases/11-auto-resign.md`.
+    For publishers whose site lives in a GitHub repo: wire up
+    `openllmo/llmo-action@v0.1` in `.github/workflows/llmo.yml` and set the
+    `LLMO_PRIVATE_KEY` repo secret. After this phase, the publisher edits
+    `llmo.json` like any other file in their repo and GitHub re-signs on push;
+    they don't touch the cryptography again until key rotation. Publishers on
+    non-GitHub hosting skip this phase and re-invoke `/llmo` (or run
+    `llmo sign` manually) on subsequent edits. Report and close.
 
 ## Defaults you carry across phases
 
