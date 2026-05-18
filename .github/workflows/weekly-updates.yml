@@ -93,6 +93,12 @@ jobs:
           git commit -m "$MSG"
           git push -u origin "$BRANCH"
 
+          # gh pr create exits non-zero if the label is missing; make creation idempotent.
+          gh label create updates \
+            --color "0e8a16" \
+            --description "Weekly /updates/ consolidation PRs auto-opened by weekly-updates workflow" \
+            2>/dev/null || true
+
           BODY_FILE=$(mktemp)
           {
             echo "Automated weekly /updates/ run."
