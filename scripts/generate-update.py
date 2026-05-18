@@ -138,6 +138,9 @@ def write_update(
         f'description: "{description}"\n'
         f"date: {start.isoformat()}\n"
         "use_lastmod: true\n"
+        # Hugo lowercases the URL slug; alias the uppercase form so links
+        # written with the canonical ISO-week label (`W20`) also resolve.
+        f'aliases: ["/updates/{iso_label}/"]\n'
         "---\n\n"
     )
 
