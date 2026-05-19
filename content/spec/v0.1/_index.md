@@ -73,7 +73,7 @@ The primary location is:
 https://{domain}/.well-known/llmo.json
 ```
 
-The `.well-known` prefix follows [RFC 8615](https://www.rfc-editor.org/rfc/rfc8615). A conforming organization MUST serve the file at this path on its primary domain.
+The `.well-known` prefix follows [RFC 8615](https://www.rfc-editor.org/rfc/rfc8615). A conforming organization MUST serve the file at this path on its primary domain. Organizations whose primary-domain serving topology does not permit publication under `/.well-known/` (typically SaaS-hosted publishers on platforms whose edge controls the primary domain) MAY satisfy this requirement by serving the file at the fallback location specified in §2.6 instead.
 
 Organizations MAY additionally serve the file at `https://{domain}/llmo.json` as a convenience, but consumers MUST check `.well-known` first and MUST prefer it when both exist. Rejected alternative: allowing arbitrary locations declared via `<link rel="llmo">` tags. This was rejected because it re-introduces the discovery ambiguity that the well-known convention exists to eliminate, and because LLMO files need to be reachable without HTML parsing.
 
@@ -104,7 +104,35 @@ The file is expected to be consulted frequently and to change occasionally. The 
 
 ### 2.5 Discovery failure
 
-If `.well-known/llmo.json` returns 404, 403, or any non-2xx status, the consumer MUST treat the organization as having no LLMO record. Consumers MUST NOT fall back to heuristic discovery (e.g., guessing at `/llmo.json`, `/about/llmo.json`, etc.). Silent failure is preferable to false positives.
+The consumer's response to a failed primary-path fetch depends on the failure mode. If the primary path at `https://{domain}/.well-known/llmo.json` returns HTTP 404, or DNS resolution of `{domain}` returns NXDOMAIN, or the TCP connection to `{domain}` on port 443 is refused, the consumer SHOULD attempt the fallback location specified in §2.6 before treating the organization as having no LLMO record. These are absence-class signals: the primary path is structurally not serving an LLMO document.
+
+For any other failure mode, including 5xx server errors, 4xx responses other than 404 (403 Forbidden, 410 Gone), TLS handshake failures, response timeouts, redirects that do not resolve to a usable response, and 200 responses whose body is not a verifiable LLMO document, the consumer MUST treat the organization as having no LLMO record and MUST NOT attempt fallback discovery. These are presence-with-failure modes: the primary path responded, and the response signals either publisher intent (4xx other than 404, 403), transient failure (5xx, timeout), publisher misconfiguration (200 with malformed content), or a security-relevant condition (TLS handshake error indistinguishable from active interception). Routing around these would mask the underlying signal.
+
+Consumers MUST NOT fall back to any heuristic discovery beyond the single fixed-subdomain fallback in §2.6 (e.g., guessing at `/llmo.json`, `/about/llmo.json`, or alternate hostnames other than `llmo.{domain}`). Silent failure is preferable to false positives.
+
+### 2.6 Resolver fallback for SaaS-hosted publishers
+
+Organizations whose primary-domain serving topology is controlled by a hosted-platform edge often cannot publish under `https://{primary_domain}/.well-known/llmo.json` without CDN-level access most merchants do not have. The pattern is common across SaaS commerce platforms (Shopify, BigCommerce, Wix, Squarespace) and several CMS platforms with restrictive `/.well-known/` policies. To preserve LLMO publication for this population without breaking the serving-location authority model of §2.1, v0.1.10 adds a single non-heuristic fallback location.
+
+**Location.** The fallback is served at:
+
+```
+https://llmo.{primary_domain}/.well-known/llmo.json
+```
+
+The `llmo.` label is fixed. No discovery indirection (TXT record, link relation, or otherwise) selects an alternate hostname for v0.1. Publishers using this fallback retain `entity.primary_domain = {primary_domain}` (the apex); only the serving location differs. The signed document is unchanged from any other LLMO publication.
+
+**Publisher conformance.** A publisher serving exclusively at the fallback location satisfies §2.1's publication MUST. Rule S3 (§5.2) is expanded to accept either `{primary_domain}` or `llmo.{primary_domain}` as a serving-domain match for `entity.primary_domain`. Documents conforming to S3 under v0.1.0 through v0.1.9 continue to conform unchanged; the rule is broadened, not narrowed.
+
+**Resolver behavior.** Consumers SHOULD attempt the fallback location when, and only when, the primary path is structurally absent per the absence-class definition in §2.5 (HTTP 404 at `https://{primary_domain}/.well-known/llmo.json`, DNS NXDOMAIN at `{primary_domain}`, or TCP connection refused on port 443). Any other failure mode MUST NOT trigger fallback (§2.5).
+
+**Precedence.** The primary path is authoritative when it returns a usable document. Resolvers SHOULD NOT fetch the fallback when the primary path has returned a usable response. Diagnostic tools (validators, observability surfaces) MAY fetch both paths for comparison, but the document used for downstream conformance evaluation is the primary's.
+
+**Caching.** Positive responses (a 200 with a verifiable LLMO document) are cached per response `Cache-Control` headers, capped at the §2.4 24-hour ceiling, identical to the primary path. Resolvers SHOULD negative-cache the primary path's absence-class result (404, NXDOMAIN, or connection refused) for a bounded window before re-probing, with a recommended default of 5 minutes. This bounds the lookup amplification cost for SaaS-hosted brands at one extra HTTP request per resolver per cache window, not one per resolver per lookup.
+
+**Security considerations.** A dangling `llmo.{primary_domain}` CNAME (a DNS record pointed at a deallocated infrastructure target) is subject to subdomain takeover: an attacker who claims the CNAME target can serve content at the fallback hostname. Signature verification is the actual trust binding for LLMO documents; an attacker cannot produce a document with a valid signature under the publisher's publication key without access to that key. Subdomain takeover therefore degrades availability of the fallback path, not authenticity of the document. Publishers SHOULD remove the `llmo.` DNS record when decommissioning their fallback infrastructure.
+
+See [ADR-0013](/adr/0013-resolver-fallback-for-saas-hosted-publishers/) for the full rationale, considered alternatives, and operational guidance.
 
 ---
 
@@ -736,7 +764,7 @@ A document is **standard conforming** if it meets minimal conformance plus:
 
 - **S1.** Contains at least one `canonical_urls` claim.
 - **S2.** Contains at least one `official_channels` claim.
-- **S3.** `entity.primary_domain` matches the domain serving the file.
+- **S3.** `entity.primary_domain` matches the domain serving the file, or the file is served at `llmo.<entity.primary_domain>` under the resolver fallback specified in §2.6. From v0.1.10 onward, the S3 match accepts either the apex `<entity.primary_domain>` or the fixed-subdomain fallback hostname. Documents conforming to S3 under v0.1.0 through v0.1.9 continue to conform unchanged.
 - **S4.** All URLs in claims resolve to the entity's primary domain or declared aliases, except for fields whose semantic role is third-party reference. The third-party-allowed fields in v0.1 are: `pointer.url` (external standards manifests), `disavowal.disavowed[].url` (impersonating or unaffiliated domains being disavowed), `official_channels.community[].url` (third-party platforms like Discord or Slack), and `personnel.spokespeople[].verification` (third-party identity attestation, e.g., GitHub, LinkedIn, faculty pages, news articles). All other URL-typed fields, including `canonical_urls.*`, `product_facts.products[].url`, and `supersedes.superseded[].url`, MUST resolve to the owned domain set.
 - **S5.** `valid_until` is no more than 180 days after `valid_from`.
 - **S6.** Disavowal claims target only publisher self-statements or impersonation defense (§3.5). From v0.1.9 onward (per [LIP-5](/spec/lips/lip-0005/)), every entry in a disavowal claim's `statement.disavowed[]` array MUST carry a `category` field whose value is either `self_statement` or `impersonation_defense`. Entries missing the field or carrying any other value fail S6 binding enforcement; the document evaluates at Minimal tier with note `s6_disavowal_out_of_scope`. Supersedes claims target only URLs or documents the publisher controls or formerly controlled (§3.5); the URL-ownership half of S6 is machine-checked against the owned-domain set per S4.
@@ -975,6 +1003,8 @@ A plausible input to any such reputation layer is **immutable publication histor
 **8.11 Post-quantum cryptographic readiness.** Signatures in v0.1 use Ed25519 or comparable pre-quantum algorithms. Sufficiently large quantum computers would break these signatures, undermining the trust model that binds claims to publisher key control. A future version of LLMO will specify a migration path: algorithm identifiers in the schema, hybrid signature support during the transition, and a deprecation window for pre-quantum-only documents.
 
 **8.12 IANA registrations.** Several LLMO surfaces will require IANA registration when the protocol moves beyond pre-release. The `.well-known/llmo` URI suffix needs registration via [RFC 8615](https://www.rfc-editor.org/rfc/rfc8615) (well-known URIs require expert review and a specification reference). The `application/llmo+json` media type needs registration via [RFC 6838](https://www.rfc-editor.org/rfc/rfc6838). A `llmo` link relation may also be appropriate if future versions specify HTML-discoverable references to llmo.json. v0.1 uses these surfaces as-if-registered for protocol implementation purposes; formal registration is a v1.0 milestone task. Until registration completes, consumers SHOULD accept `application/json` as a fallback for the document content type per §2.2.
+
+**8.13 Reservation of the `_llmo.<primary_domain>` DNS namespace for future discovery.** §2.6 specifies a single fixed-subdomain fallback location. v0.1 reserves the `_llmo.<primary_domain>` underscore-prefixed DNS namespace for future LLMO discovery mechanisms. The reservation is namespace-only; v0.1 does NOT pre-specify what records this namespace will carry or what their value format will be. One particular shape (a TXT record whose value is a URL the resolver fetches from) was considered for v0.1.10 and not adopted, on speculative-need and implementation-cost grounds recorded in [ADR-0013](/adr/0013-resolver-fallback-for-saas-hosted-publishers/). Future versions are free to define a different shape at this namespace (structured TXT, multiple TXT entries, SVCB or HTTPS DNS records, or other future formats) without being constrained by the considered-and-not-adopted v0.1.10 shape. Publishers SHOULD NOT publish records at `_llmo.<primary_domain>` under v0.1; the namespace is reserved, not yet defined.
 
 ---
 
