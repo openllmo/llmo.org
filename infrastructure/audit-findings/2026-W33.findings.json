@@ -1,0 +1,930 @@
+[
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 404: https://diverse.org/.well-known/security.txt",
+    "file": ".claude/skills/llmo/phases/04-review.md",
+    "line": 21,
+    "machine_data": {
+      "url": "https://diverse.org/.well-known/security.txt",
+      "status": 404
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "Local URL has no corresponding file in Hugo output: https://llmo.org/spec/v0.1/#4-3-document-level-vs-claim-level-signing",
+    "file": ".claude/skills/llmo/phases/07-keygen.md",
+    "line": 52,
+    "machine_data": {
+      "url": "https://llmo.org/spec/v0.1/#4-3-document-level-vs-claim-level-signing",
+      "expected_path": "public/spec/v0.1/#4-3-document-level-vs-claim-level-signing/index.html"
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "Local URL has no corresponding file in Hugo output: https://llmo.org/validator/?url=https://",
+    "file": ".claude/skills/llmo/phases/10-validate.md",
+    "line": 46,
+    "machine_data": {
+      "url": "https://llmo.org/validator/?url=https://",
+      "expected_path": "public/validator/?url=https:/index.html"
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "Local URL has no corresponding file in Hugo output: https://llmo.org/validator/?url=",
+    "file": ".claude/skills/llmo/phases/10-validate.md",
+    "line": 103,
+    "machine_data": {
+      "url": "https://llmo.org/validator/?url=",
+      "expected_path": "public/validator/?url=/index.html"
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 0: https://acme.com/.well-known/llmo.json",
+    "file": "content/adr/0005-publisher-domain-proof-via-well-known.md",
+    "line": 16,
+    "machine_data": {
+      "url": "https://acme.com/.well-known/llmo.json",
+      "status": 0
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 0: https://acme.com/.well-known/security.txt",
+    "file": "content/adr/0005-publisher-domain-proof-via-well-known.md",
+    "line": 26,
+    "machine_data": {
+      "url": "https://acme.com/.well-known/security.txt",
+      "status": 0
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 0: https://acme.com/.well-known/llmo.json",
+    "file": "content/adr/0005-publisher-domain-proof-via-well-known.md",
+    "line": 28,
+    "machine_data": {
+      "url": "https://acme.com/.well-known/llmo.json",
+      "status": 0
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 0: https://llmo",
+    "file": "content/adr/0013-resolver-fallback-for-saas-hosted-publishers.md",
+    "line": 54,
+    "machine_data": {
+      "url": "https://llmo",
+      "status": 0
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 0: https://llmo",
+    "file": "content/spec/changelog.md",
+    "line": 21,
+    "machine_data": {
+      "url": "https://llmo",
+      "status": 0
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "Local URL has no corresponding file in Hugo output: https://llmo.org/kt/v1/",
+    "file": "content/spec/changelog.md",
+    "line": 44,
+    "machine_data": {
+      "url": "https://llmo.org/kt/v1/",
+      "expected_path": "public/kt/v1/index.html"
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "Local URL has no corresponding file in Hugo output: https://llmo.org/kt/v1/",
+    "file": "content/spec/lips/lip-0004.md",
+    "line": 103,
+    "machine_data": {
+      "url": "https://llmo.org/kt/v1/",
+      "expected_path": "public/kt/v1/index.html"
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "Local URL has no corresponding file in Hugo output: https://llmo.org/kt/v1",
+    "file": "content/spec/lips/lip-0004.md",
+    "line": 424,
+    "machine_data": {
+      "url": "https://llmo.org/kt/v1",
+      "expected_path": "public/kt/v1/index.html"
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 404: https://diverse.org/.well-known/llmo.json",
+    "file": "content/spec/v0.1/_index.md",
+    "line": 843,
+    "machine_data": {
+      "url": "https://diverse.org/.well-known/llmo.json",
+      "status": 404
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 404: https://diverse.org/.well-known/llmo.json",
+    "file": "content/spec/v0.1/_index.md",
+    "line": 958,
+    "machine_data": {
+      "url": "https://diverse.org/.well-known/llmo.json",
+      "status": 404
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 404: https://diverse.org/.well-known/llmo.json",
+    "file": "content/spec/v0.1/_index.md",
+    "line": 969,
+    "machine_data": {
+      "url": "https://diverse.org/.well-known/llmo.json",
+      "status": 404
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "Local URL has no corresponding file in Hugo output: https://llmo.org/kt/v1/",
+    "file": "content/spec/v0.1/kt-registry-endpoints.md",
+    "line": 11,
+    "machine_data": {
+      "url": "https://llmo.org/kt/v1/",
+      "expected_path": "public/kt/v1/index.html"
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "Local URL has no corresponding file in Hugo output: https://llmo.org/kt/v1/",
+    "file": "content/spec/v0.1/kt-registry-endpoints.md",
+    "line": 269,
+    "machine_data": {
+      "url": "https://llmo.org/kt/v1/",
+      "expected_path": "public/kt/v1/index.html"
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 404: https://github.com/junglecat-ceo",
+    "file": "content/spec/v0.1/test-vectors.md",
+    "line": 308,
+    "machine_data": {
+      "url": "https://github.com/junglecat-ceo",
+      "status": 404
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "Local URL has no corresponding file in Hugo output: https://llmo.org/kt/v1/",
+    "file": "content/updates/2026-W20.md",
+    "line": 22,
+    "machine_data": {
+      "url": "https://llmo.org/kt/v1/",
+      "expected_path": "public/kt/v1/index.html"
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 0: https://llmo",
+    "file": "content/updates/2026-W21.md",
+    "line": 20,
+    "machine_data": {
+      "url": "https://llmo",
+      "status": 0
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 404: https://diverse.org/.well-known/llmo.json",
+    "file": "infrastructure/BACKLOG.md",
+    "line": 269,
+    "machine_data": {
+      "url": "https://diverse.org/.well-known/llmo.json",
+      "status": 404
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 404: https://diverse.org/.well-known/security.txt",
+    "file": "infrastructure/BACKLOG.md",
+    "line": 283,
+    "machine_data": {
+      "url": "https://diverse.org/.well-known/security.txt",
+      "status": 404
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 404: https://diverse.org/.well-known/llmo.json",
+    "file": "infrastructure/BACKLOG.md",
+    "line": 295,
+    "machine_data": {
+      "url": "https://diverse.org/.well-known/llmo.json",
+      "status": 404
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 404: https://diverse.org/.well-known/llmo.json",
+    "file": "infrastructure/BACKLOG.md",
+    "line": 295,
+    "machine_data": {
+      "url": "https://diverse.org/.well-known/llmo.json",
+      "status": 404
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 0: https://llmo",
+    "file": "infrastructure/BACKLOG.md",
+    "line": 860,
+    "machine_data": {
+      "url": "https://llmo",
+      "status": 0
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "External URL returned HTTP 404: https://diverse.org/about/leadership",
+    "file": "infrastructure/SIGNING-CEREMONY.md",
+    "line": 88,
+    "machine_data": {
+      "url": "https://diverse.org/about/leadership",
+      "status": 404
+    }
+  },
+  {
+    "cls": "url-resolution",
+    "severity": "error",
+    "message": "Local URL has no corresponding file in Hugo output: https://llmo.org/spec/changelog/#016---2026-05-08",
+    "file": "infrastructure/blog-staging/2026-05-08.md",
+    "line": 50,
+    "machine_data": {
+      "url": "https://llmo.org/spec/changelog/#016---2026-05-08",
+      "expected_path": "public/spec/changelog/#016---2026-05-08/index.html"
+    }
+  },
+  {
+    "cls": "adr-registry",
+    "severity": "error",
+    "message": "ADR-0000 file exists but is not in the _index.md table",
+    "file": "content/adr/0000-record-architecture-decisions.md",
+    "line": null,
+    "machine_data": {
+      "adr_number": 0
+    }
+  },
+  {
+    "cls": "adr-registry",
+    "severity": "error",
+    "message": "ADR-0001 file exists but is not in the _index.md table",
+    "file": "content/adr/0001-two-entity-firewall.md",
+    "line": null,
+    "machine_data": {
+      "adr_number": 1
+    }
+  },
+  {
+    "cls": "adr-registry",
+    "severity": "error",
+    "message": "ADR-0002 file exists but is not in the _index.md table",
+    "file": "content/adr/0002-branch-protection-on-main.md",
+    "line": null,
+    "machine_data": {
+      "adr_number": 2
+    }
+  },
+  {
+    "cls": "adr-registry",
+    "severity": "error",
+    "message": "ADR-0003 file exists but is not in the _index.md table",
+    "file": "content/adr/0003-backlog-discipline-track-conventions.md",
+    "line": null,
+    "machine_data": {
+      "adr_number": 3
+    }
+  },
+  {
+    "cls": "adr-registry",
+    "severity": "error",
+    "message": "ADR-0004 file exists but is not in the _index.md table",
+    "file": "content/adr/0004-github-app-workflow-auth.md",
+    "line": null,
+    "machine_data": {
+      "adr_number": 4
+    }
+  },
+  {
+    "cls": "adr-registry",
+    "severity": "error",
+    "message": "ADR-0005 file exists but is not in the _index.md table",
+    "file": "content/adr/0005-publisher-domain-proof-via-well-known.md",
+    "line": null,
+    "machine_data": {
+      "adr_number": 5
+    }
+  },
+  {
+    "cls": "adr-registry",
+    "severity": "error",
+    "message": "ADR-0006 file exists but is not in the _index.md table",
+    "file": "content/adr/0006-version-bump-and-release-cut.md",
+    "line": null,
+    "machine_data": {
+      "adr_number": 6
+    }
+  },
+  {
+    "cls": "adr-registry",
+    "severity": "error",
+    "message": "ADR-0007 file exists but is not in the _index.md table",
+    "file": "content/adr/0007-claude-as-builder.md",
+    "line": null,
+    "machine_data": {
+      "adr_number": 7
+    }
+  },
+  {
+    "cls": "adr-registry",
+    "severity": "error",
+    "message": "ADR-0008 file exists but is not in the _index.md table",
+    "file": "content/adr/0008-updates-as-auto-consolidation.md",
+    "line": null,
+    "machine_data": {
+      "adr_number": 8
+    }
+  },
+  {
+    "cls": "adr-registry",
+    "severity": "error",
+    "message": "ADR-0009 file exists but is not in the _index.md table",
+    "file": "content/adr/0009-llmo-skill-scope.md",
+    "line": null,
+    "machine_data": {
+      "adr_number": 9
+    }
+  },
+  {
+    "cls": "adr-registry",
+    "severity": "error",
+    "message": "ADR-0010 file exists but is not in the _index.md table",
+    "file": "content/adr/0010-kt-registry-operations.md",
+    "line": null,
+    "machine_data": {
+      "adr_number": 10
+    }
+  },
+  {
+    "cls": "adr-registry",
+    "severity": "error",
+    "message": "ADR-0011 file exists but is not in the _index.md table",
+    "file": "content/adr/0011-key-compromise-response.md",
+    "line": null,
+    "machine_data": {
+      "adr_number": 11
+    }
+  },
+  {
+    "cls": "adr-registry",
+    "severity": "error",
+    "message": "ADR-0012 file exists but is not in the _index.md table",
+    "file": "content/adr/0012-goldilocks-pre-announcement-authorship-privilege.md",
+    "line": null,
+    "machine_data": {
+      "adr_number": 12
+    }
+  },
+  {
+    "cls": "adr-registry",
+    "severity": "error",
+    "message": "ADR-0013 file exists but is not in the _index.md table",
+    "file": "content/adr/0013-resolver-fallback-for-saas-hosted-publishers.md",
+    "line": null,
+    "machine_data": {
+      "adr_number": 13
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #origin not found at /about/",
+    "file": "content/about/announcement-2025-11/_index.md",
+    "line": 46,
+    "machine_data": {
+      "target_page": "/about/",
+      "anchor": "origin"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #2-publication-and-discovery not found at /spec/v0.1/",
+    "file": "content/about/press.md",
+    "line": 42,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "2-publication-and-discovery"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #4-2-signature-algorithms not found at /spec/v0.1/",
+    "file": "content/about/press.md",
+    "line": 43,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "4-2-signature-algorithms"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #5-conformance not found at /spec/v0.1/",
+    "file": "content/about/press.md",
+    "line": 44,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "5-conformance"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #4-6-jwks-trust-anchor not found at /spec/v0.1/",
+    "file": "content/about/press.md",
+    "line": 45,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "4-6-jwks-trust-anchor"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #4-7-jwks-handling not found at /spec/v0.1/",
+    "file": "content/about/press.md",
+    "line": 45,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "4-7-jwks-handling"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #3-5-claim-types not found at /spec/v0.1/",
+    "file": "content/about/press.md",
+    "line": 46,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "3-5-claim-types"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #21-location not found at /spec/v0.1/",
+    "file": "content/adr/0013-resolver-fallback-for-saas-hosted-publishers.md",
+    "line": 85,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "21-location"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #25-discovery-failure not found at /spec/v0.1/",
+    "file": "content/adr/0013-resolver-fallback-for-saas-hosted-publishers.md",
+    "line": 85,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "25-discovery-failure"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #26-resolver-fallback-for-saas-hosted-publishers not found at /spec/v0.1/",
+    "file": "content/adr/0013-resolver-fallback-for-saas-hosted-publishers.md",
+    "line": 85,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "26-resolver-fallback-for-saas-hosted-publishers"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #52-standard-conformance not found at /spec/v0.1/",
+    "file": "content/adr/0013-resolver-fallback-for-saas-hosted-publishers.md",
+    "line": 85,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "52-standard-conformance"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #8-open-questions-for-future-versions not found at /spec/v0.1/",
+    "file": "content/adr/0013-resolver-fallback-for-saas-hosted-publishers.md",
+    "line": 85,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "8-open-questions-for-future-versions"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #attributes not found at /glossary/",
+    "file": "content/claims/core.md",
+    "line": 444,
+    "machine_data": {
+      "target_page": "/glossary/",
+      "anchor": "attributes"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #12-glossary not found at /spec/lips/lip-0001/",
+    "file": "content/glossary/_index.md",
+    "line": 17,
+    "machine_data": {
+      "target_page": "/spec/lips/lip-0001/",
+      "anchor": "12-glossary"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #3-5-core-claim-types not found at /spec/v0.1/",
+    "file": "content/glossary/_index.md",
+    "line": 51,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "3-5-core-claim-types"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #5-conformance-levels not found at /spec/v0.1/",
+    "file": "content/glossary/_index.md",
+    "line": 59,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "5-conformance-levels"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #3-5-core-claim-types not found at /spec/v0.1/",
+    "file": "content/glossary/_index.md",
+    "line": 71,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "3-5-core-claim-types"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #1-1-what-llmo-json-is not found at /spec/v0.1/",
+    "file": "content/glossary/_index.md",
+    "line": 77,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "1-1-what-llmo-json-is"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #2-discovery not found at /spec/v0.1/",
+    "file": "content/glossary/_index.md",
+    "line": 81,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "2-discovery"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #3-6-extension-claims not found at /spec/v0.1/",
+    "file": "content/glossary/_index.md",
+    "line": 99,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "3-6-extension-claims"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #4-3-1-jws-payload-encoding not found at /spec/v0.1/",
+    "file": "content/glossary/_index.md",
+    "line": 113,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "4-3-1-jws-payload-encoding"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #5-1-minimal-conformance not found at /spec/v0.1/",
+    "file": "content/glossary/_index.md",
+    "line": 139,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "5-1-minimal-conformance"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #4-2-keys-and-jwks not found at /spec/v0.1/",
+    "file": "content/glossary/_index.md",
+    "line": 165,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "4-2-keys-and-jwks"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #5-2-standard-conformance not found at /spec/v0.1/",
+    "file": "content/glossary/_index.md",
+    "line": 173,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "5-2-standard-conformance"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #5-3-strict-conformance not found at /spec/v0.1/",
+    "file": "content/glossary/_index.md",
+    "line": 177,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "5-3-strict-conformance"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #3-5-core-claim-types not found at /spec/v0.1/",
+    "file": "content/glossary/_index.md",
+    "line": 181,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "3-5-core-claim-types"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #5-conformance-levels not found at /spec/v0.1/",
+    "file": "content/glossary/_index.md",
+    "line": 187,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "5-conformance-levels"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #4-6-what-trust-does-not-mean not found at /spec/v0.1/",
+    "file": "content/glossary/_index.md",
+    "line": 191,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "4-6-what-trust-does-not-mean"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #3-6-extension-claims not found at /spec/v0.1/",
+    "file": "content/glossary/_index.md",
+    "line": 253,
+    "machine_data": {
+      "target_page": "/spec/v0.1/",
+      "anchor": "3-6-extension-claims"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #12-glossary not found at /spec/lips/lip-0001/",
+    "file": "content/glossary/_index.md",
+    "line": 409,
+    "machine_data": {
+      "target_page": "/spec/lips/lip-0001/",
+      "anchor": "12-glossary"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #attributes not found at /glossary/",
+    "file": "content/spec/v0.1/_index.md",
+    "line": 269,
+    "machine_data": {
+      "target_page": "/glossary/",
+      "anchor": "attributes"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #attributes not found at /glossary/",
+    "file": "content/spec/v0.1/_index.md",
+    "line": 546,
+    "machine_data": {
+      "target_page": "/glossary/",
+      "anchor": "attributes"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #32-entry-format not found at /spec/lips/lip-0004/",
+    "file": "content/spec/v0.1/kt-registry-endpoints.md",
+    "line": 35,
+    "machine_data": {
+      "target_page": "/spec/lips/lip-0004/",
+      "anchor": "32-entry-format"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #012---2026-04-30 not found at /spec/changelog/",
+    "file": "infrastructure/blog-staging/2026-05-04.md",
+    "line": 18,
+    "machine_data": {
+      "target_page": "/spec/changelog/",
+      "anchor": "012---2026-04-30"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #013---2026-04-30 not found at /spec/changelog/",
+    "file": "infrastructure/blog-staging/2026-05-04.md",
+    "line": 26,
+    "machine_data": {
+      "target_page": "/spec/changelog/",
+      "anchor": "013---2026-04-30"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #014---2026-05-01 not found at /spec/changelog/",
+    "file": "infrastructure/blog-staging/2026-05-04.md",
+    "line": 34,
+    "machine_data": {
+      "target_page": "/spec/changelog/",
+      "anchor": "014---2026-05-01"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #015---2026-05-05 not found at /spec/changelog/",
+    "file": "infrastructure/blog-staging/2026-05-08.md",
+    "line": 16,
+    "machine_data": {
+      "target_page": "/spec/changelog/",
+      "anchor": "015---2026-05-05"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #017---2026-05-11 not found at /spec/changelog/",
+    "file": "infrastructure/blog-staging/2026-05-11.md",
+    "line": 14,
+    "machine_data": {
+      "target_page": "/spec/changelog/",
+      "anchor": "017---2026-05-11"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #attributes not found at /glossary/",
+    "file": "infrastructure/blog-staging/2026-05-11.md",
+    "line": 26,
+    "machine_data": {
+      "target_page": "/glossary/",
+      "anchor": "attributes"
+    }
+  },
+  {
+    "cls": "spec-anchors",
+    "severity": "error",
+    "message": "Anchor #018---2026-05-11 not found at /spec/changelog/",
+    "file": "infrastructure/blog-staging/2026-05-11.md",
+    "line": 37,
+    "machine_data": {
+      "target_page": "/spec/changelog/",
+      "anchor": "018---2026-05-11"
+    }
+  },
+  {
+    "cls": "cross-refs",
+    "severity": "warning",
+    "message": "Spec version v0.1.13 referenced but not in changelog.md",
+    "file": "infrastructure/BACKLOG.md",
+    "line": 870,
+    "machine_data": {
+      "reference": "v0.1.13"
+    }
+  },
+  {
+    "cls": "cross-refs",
+    "severity": "warning",
+    "message": "Spec version v0.1.11 referenced but not in changelog.md",
+    "file": "infrastructure/BACKLOG.md",
+    "line": 872,
+    "machine_data": {
+      "reference": "v0.1.11"
+    }
+  },
+  {
+    "cls": "cross-refs",
+    "severity": "warning",
+    "message": "Spec version v0.1.12 referenced but not in changelog.md",
+    "file": "infrastructure/BACKLOG.md",
+    "line": 874,
+    "machine_data": {
+      "reference": "v0.1.12"
+    }
+  },
+  {
+    "cls": "cross-refs",
+    "severity": "warning",
+    "message": "Spec version v0.1.11 referenced but not in changelog.md",
+    "file": "infrastructure/BACKLOG.md",
+    "line": 876,
+    "machine_data": {
+      "reference": "v0.1.11"
+    }
+  },
+  {
+    "cls": "jwks-freshness",
+    "severity": "error",
+    "message": "Live llmo.json valid_until (2026-07-26T00:00:00Z) is in the past",
+    "file": null,
+    "line": null,
+    "machine_data": {
+      "valid_until": "2026-07-26T00:00:00Z",
+      "days_remaining": -21.757430854652778
+    }
+  }
+]
