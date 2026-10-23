@@ -118,11 +118,11 @@ This skill's job is to catch the *smaller-than-promised* failure mode, not to dr
 
 > "The signed document fails Standard tier S3 but passes Minimal tier. We can re-sign tomorrow." (first signing of llmo.json). Apply skill: re-sign tonight to pass Strict tier before conference.
 
-> "Section 7 references Serval. We can update the worked example post-conference." (Serval is also a Greyfront commercial customer). Apply skill: refactor to use Diverse.org as self-referential example now.
+> "Section 7 references a stale example org name. We can update the worked example post-conference." (customer-relationship risk if the stale name is also a commercial customer). Apply skill: refactor to use a clearly hypothetical example (Example Standards Foundation) now.
 
 **NOT triggered (real deferrals):**
 
-> "We need to migrate from `diverse-org` GitHub identity to a service account, but Diverse.org has no employees yet to use the service account." (real dependency). Defer to BACKLOG.md with trigger ("when Diverse.org has employees").
+> "We need to migrate the openllmo GitHub organization from a personal account to an entity service account, but no stewarding entity exists yet (see ADR-0014)." (real dependency). Defer to BACKLOG.md with trigger ("when a stewarding entity is formed").
 
 > "The v0.2 schema additions (mission, address as object, distinct leadership claim type) are nice but require a v0.2 LIP." (real reason). v0.1 is anchored. Defer to BACKLOG.md.
 

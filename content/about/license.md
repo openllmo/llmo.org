@@ -15,7 +15,7 @@ The full text is in [`LICENSE`](https://github.com/openllmo/llmo.org/blob/main/L
 
 ## Code, schemas, and tools
 
-Code, the JSON Schema at `/spec/v0.1/schema.json`, and any tools published in the repository (including the future reference validator) are licensed under the [MIT License](https://opensource.org/license/mit). Copyright holder: Diverse.org.
+Code, the JSON Schema at `/spec/v0.1/schema.json`, and any tools published in the repository (including the future reference validator) are licensed under the [MIT License](https://opensource.org/license/mit). Copyright holder: Nicholas Chavez.
 
 The full text is in [`LICENSE-CODE`](https://github.com/openllmo/llmo.org/blob/main/LICENSE-CODE) at the root of the repository.
 

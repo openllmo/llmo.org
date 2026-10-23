@@ -18,7 +18,7 @@ The validator lives in this repository (`openllmo/llmo.org`):
 - `static/spec/v0.1/schema.json`: the v0.1 JSON Schema. Source of truth for the validator's schema; auto-inlined at build.
 - `static/spec/v0.1/test-vectors/signed-strict.json`: the strict-tier test vector. Source of truth; auto-inlined at build.
 
-License: MIT, copyright 2026 Diverse.org. The validator's CSS is scoped under a `.validator-app` div so its color tokens, font stack, and button styles don't bleed into other pages on the site.
+License: MIT, copyright 2026 Nicholas Chavez. The validator's CSS is scoped under a `.validator-app` div so its color tokens, font stack, and button styles don't bleed into other pages on the site.
 
 ## Inlined assets and auto-sync
 
@@ -104,7 +104,7 @@ The validator's version, date, and commit SHA appear in its footer.
   - `Zone → DNS → Edit` on specific zone `llmo.org` (rarely needed)
   - `Account → Cloudflare Pages → Edit` on account `5d9418e9813fd14854487fc005ff07c1`
 
-Token is personal credential material. Store in a password manager under the Diverse.org Cloudflare entry. Never commit. Never paste into PRs or issues.
+Token is personal credential material. Store in a password manager under the Cloudflare account entry (login identity `team@diverse.org`). Never commit. Never paste into PRs or issues.
 
 ## Migration log
 

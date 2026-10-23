@@ -4,13 +4,13 @@ This document records the DNS and hosting configuration for llmo.org and related
 
 ## Domain registrar
 
-llmo.org is registered at GoDaddy. Registrar account owned by Diverse.org. Do not transfer the registration to a different registrar without the editor's explicit authorization; registrar transfers require 60-day post-creation wait periods and can disrupt TLS certificate issuance if mistimed.
+llmo.org is registered at GoDaddy. Registrar account owned by Nicholas Chavez (individual steward; see [ADR-0014](/adr/0014-single-steward-individual/)). Do not transfer the registration to a different registrar without the editor's explicit authorization; registrar transfers require 60-day post-creation wait periods and can disrupt TLS certificate issuance if mistimed.
 
-A future migration to Cloudflare Registrar is under consideration. It would consolidate DNS and registration under a single account (team@diverse.org Cloudflare account) and eliminate GoDaddy as a dependency.
+A future migration to Cloudflare Registrar is under consideration. It would consolidate DNS and registration under a single account (the Cloudflare account logged in as `team@diverse.org`) and eliminate GoDaddy as a dependency.
 
 ## DNS
 
-DNS is served by Cloudflare. The `llmo.org` zone is under the Cloudflare account owned by `team@diverse.org` (account ID `5d9418e9813fd14854487fc005ff07c1`).
+DNS is served by Cloudflare. The `llmo.org` zone is under the Cloudflare account authenticated via `team@diverse.org` Google SSO (account ID `5d9418e9813fd14854487fc005ff07c1`). The account is personally owned by the steward; the `team@diverse.org` email is used as a login identity and does not imply Diverse.org, Inc. ownership. See `infrastructure/ACCOUNTS.md`.
 
 Cloudflare-assigned nameservers:
 - `liv.ns.cloudflare.com`
@@ -70,7 +70,7 @@ To make record changes programmatically, mint a Custom API Token from the Cloudf
 
 Export the token as `CLOUDFLARE_API_TOKEN` in the environment for API calls.
 
-Do not commit the token to the repo. Do not paste it into PR descriptions. Tokens are personal credentials equivalent to a password; store them in a password manager under the Diverse.org Cloudflare account entry.
+Do not commit the token to the repo. Do not paste it into PR descriptions. Tokens are personal credentials equivalent to a password; store them in a password manager under the Cloudflare account entry (login identity `team@diverse.org`).
 
 ## Migration log
 

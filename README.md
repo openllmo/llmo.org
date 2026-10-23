@@ -72,7 +72,7 @@ See `CONTRIBUTING.md` for the full contribution process. Short version: bug repo
 
 ## Governance
 
-The LLMO specification is stewarded by Diverse.org, a California 501(c)(3) nonprofit. The specification is vendor-neutral. Governance details and the editor role are documented at https://llmo.org/about.
+The LLMO specification is stewarded by Nicholas Chavez as an individual. There is no stewarding entity at this time; earlier materials described Diverse.org, a California 501(c)(3) nonprofit, as the steward, but that stewardship was never formally stood up. See [ADR-0014](https://llmo.org/adr/0014-single-steward-individual/) for the decision and its tradeoffs. Governance details and the editor role are documented at https://llmo.org/about.
 
 ## License
 

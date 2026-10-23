@@ -19,9 +19,9 @@ The LIP intentionally does not specify the operational layer: where the log is s
 
 The forces in tension:
 
-- **Operational simplicity.** The registry must be runnable by a single steward (Diverse.org) at v0.1.x scale without dedicated infrastructure engineering. Anything that requires standing up a database cluster, on-call rotation, or specialized operations expertise is out of scope.
+- **Operational simplicity.** The registry must be runnable by a single individual steward at v0.1.x scale without dedicated infrastructure engineering. Anything that requires standing up a database cluster, on-call rotation, or specialized operations expertise is out of scope.
 - **Cryptographic seriousness.** The registry's signed snapshots are cryptographic commitments. The signing key custody, the snapshot signing pipeline, and the append-only enforcement mechanism all carry the trust property of the registry. Operational shortcuts that erode those properties are not acceptable.
-- **Cost discipline.** Diverse.org operates on donations and grants. Recurring infrastructure cost should be at most modest. Free-tier infrastructure is preferred where it does not compromise the trust properties.
+- **Cost discipline.** The LLMO steward operates on personal funds; there is no 501(c)(3) at this time. Recurring infrastructure cost should be at most modest. Free-tier infrastructure is preferred where it does not compromise the trust properties.
 - **Future federation.** v0.2 anticipates multiple registry operators (LIP-4 §7.2). The v0.1.x operational architecture should not foreclose a federated deployment; choices that bake llmo.org-specific assumptions deeply into the wire format or the snapshot signing pipeline are penalized.
 
 ## Decision
@@ -90,7 +90,7 @@ The read endpoints inherit Cloudflare Pages SLA (target 99.9% monthly uptime, no
 
 Consumers MUST handle registry unavailability gracefully per LIP-4 §3.8 (transient failure: provisional cache for 24 hours; sustained failure: degrade to Standard tier with `kt_unevaluable_sustained`). The protocol does not require any specific availability target from the registry operator; the operator is responsible for documenting the target they aim for.
 
-Diverse.org's commitment for the v0.1.x registry: best-effort 99.5% monthly availability on read endpoints, best-effort 99.0% on the write endpoint. These are not contractual; they are operational targets. Public outage logs are published at llmo.org/incidents/.
+The steward's commitment for the v0.1.x registry: best-effort 99.5% monthly availability on read endpoints, best-effort 99.0% on the write endpoint. These are not contractual; they are operational targets. Public outage logs are published at llmo.org/incidents/.
 
 ### 6. Scaling trigger from flat append-only log to Merkle tree
 
@@ -106,13 +106,13 @@ When any trigger fires, the editor commits to a Merkle migration. The migration 
 
 ### 7. v0.2 federation roadmap
 
-Federation is the long-term shape of the KT registry. v0.1.x is single-operator (Diverse.org). v0.2 anticipates multiple independent operators, each running their own log with their own signing key. The federation model under consideration is:
+Federation is the long-term shape of the KT registry. v0.1.x is single-operator (the LLMO steward). v0.2 anticipates multiple independent operators, each running their own log with their own signing key. The federation model under consideration is:
 
 - Each operator signs the others' snapshot roots on a regular cadence (cross-witness).
 - Consumers evaluating X7 query at least N of M conforming logs; an entry must appear in at least K of N for the check to pass.
 - Specific N, M, K values are protocol parameters chosen in the v0.2 LIP.
 
-This ADR commits Diverse.org to participating as one of the federation operators in v0.2 and to not exercising any special privilege over other operators. The v0.1.x registry at llmo.org/kt/v1 is the bootstrap; v0.2 makes it one of many.
+This ADR commits the LLMO steward to participating as one of the federation operators in v0.2 and to not exercising any special privilege over other operators. The v0.1.x registry at llmo.org/kt/v1 is the bootstrap; v0.2 makes it one of many.
 
 This ADR does not commit any specific party to running the second log. That is recruitment work for v0.2.
 
@@ -152,8 +152,8 @@ Alerts:
 
 Considered as the dedicated-infrastructure path. Rejected on three grounds:
 
-1. **Operational burden.** Bare-metal hosting requires capacity planning, OS patching, monitoring, log rotation, and on-call response. Diverse.org's volunteer steward cannot guarantee that response capacity.
-2. **Cost.** Recurring monthly VPS cost ($5-$50/month depending on tier) on a nonprofit operating budget is a small but recurring drag.
+1. **Operational burden.** Bare-metal hosting requires capacity planning, OS patching, monitoring, log rotation, and on-call response. The individual steward cannot guarantee that response capacity.
+2. **Cost.** Recurring monthly VPS cost ($5-$50/month depending on tier) on a self-funded operating budget is a small but recurring drag.
 3. **Geographic distribution.** A single-region VPS provides worse availability for global consumers than Cloudflare's edge-cached static surface.
 
 ### Run on a different cloud (AWS, GCP, Fly.io, etc.)
@@ -168,11 +168,11 @@ Considered. Rejected because:
 
 Considered as the zero-infrastructure option: post entries to Rekor, rely on sigstore's existing log and signing infrastructure. Rejected because:
 
-1. **Trust delegation.** Rekor's trust root is sigstore's; relying on Rekor delegates the snapshot signing and log integrity to a third party. LLMO's design intent (per LIP-4) is that Diverse.org operates the v0.1.x registry directly.
+1. **Trust delegation.** Rekor's trust root is sigstore's; relying on Rekor delegates the snapshot signing and log integrity to a third party. LLMO's design intent (per LIP-4) is that the LLMO steward operates the v0.1.x registry directly.
 2. **Schema mismatch.** Rekor entries are typed for sigstore's use cases (signed commits, signed artifacts). Adapting Rekor entry types to LLMO KT semantics is engineering work without clear win over running our own log at this scale.
-3. **Future federation.** v0.2's federation roadmap assumes Diverse.org is one operator among many. Starting with Rekor would mean the first operator is sigstore, which is not the intended trust topology.
+3. **Future federation.** v0.2's federation roadmap assumes the LLMO steward is one operator among many. Starting with Rekor would mean the first operator is sigstore, which is not the intended trust topology.
 
-If a future Diverse.org steward inherits this registry and wants to migrate to Rekor (or a successor), the entry JWS format is portable; the migration cost is real but bounded.
+If a future steward inherits this registry and wants to migrate to Rekor (or a successor), the entry JWS format is portable; the migration cost is real but bounded.
 
 ### Run the registry as a static Hugo build with manual append commits
 
@@ -194,20 +194,20 @@ Considered. The maximally-minimal option: writes are commits to the repo, no Wor
 
 **Negative.**
 
-- The registry is single-operator for v0.1.x. Trust concentrates in Diverse.org's operational discipline. The v0.2 federation roadmap is the long-term mitigation; until then, this is a known concentration of trust.
+- The registry is single-operator for v0.1.x. Trust concentrates in the steward's operational discipline. The v0.2 federation roadmap is the long-term mitigation; until then, this is a known concentration of trust.
 - Cloudflare is a single vendor. A Cloudflare-scale outage or account-level failure affects the registry. The Workers Secret + 1Password backup mitigates account-level failure for the signing key, but the read endpoints' availability is bound to Cloudflare's. Vendor diversification is a v0.2 federation consideration.
 - The Worker code is a piece of operational software that needs maintenance: dependency updates, occasional Cloudflare API breaking changes, etc. The maintenance burden is small but real.
 - D1 is a relatively new Cloudflare product (general availability 2024). If it changes pricing or capabilities significantly, the architecture may need to shift. The flat JSONL file in the repo is the durable record; D1 is a query accelerator that could be replaced with another store without changing the wire format or the trust properties.
 
 **Neutral.**
 
-- The registry's operational surface is documented publicly at llmo.org/kt/v1 (the API) and at this ADR (the architecture). External reviewers can verify the trust properties without needing access to Diverse.org's Cloudflare account.
+- The registry's operational surface is documented publicly at llmo.org/kt/v1 (the API) and at this ADR (the architecture). External reviewers can verify the trust properties without needing access to the steward's Cloudflare account.
 - The snapshot signing pipeline produces a daily commitment to log state. Consumers and external auditors who retain snapshots can detect retroactive modification independently of any access to the registry's operational backend.
 
 ## References
 
 - [LIP-4](/spec/lips/lip-0004/): the protocol-level specification this ADR operationalizes.
-- [ADR-0001](/adr/0001-two-entity-firewall/): the two-entity firewall placing the registry on the Diverse.org side.
+- [ADR-0001](/adr/0001-two-entity-firewall/) (superseded by [ADR-0014](/adr/0014-single-steward-individual/)): placed the registry on the open-spec side of the stewardship-vs-commercial boundary.
 - [ADR-0004](/adr/0004-github-app-workflow-auth/): GitHub App identity pattern reused for the `llmo-kt-bot[bot]` commit identity.
 - [ADR-0009](/adr/0009-llmo-skill-scope/): the `/llmo` skill's scope ceiling, which places registry interaction inside scope (the skill's phase 10b registers the publisher).
 - RFC 6962 (Certificate Transparency) and RFC 9162 (CT v2.0): prior art for the log + snapshot + cross-witness pattern.

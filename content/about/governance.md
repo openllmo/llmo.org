@@ -5,21 +5,27 @@ date: 2026-04-17
 use_lastmod: true
 ---
 
-## Maintaining entity
+## Steward
 
-The LLMO specification is maintained by **Diverse.org**, a California nonprofit public benefit corporation with its executive office in Santa Clara, California. Diverse.org is recognized as tax-exempt under Section 501(c)(3) of the Internal Revenue Code. The Diverse.org board has adopted the LLMO specification and related open-standards work as the organization's programmatic focus.
+The LLMO specification is currently stewarded by **Nicholas Chavez** as an individual. There is no stewarding entity at this time. Earlier public materials described LLMO as stewarded by Diverse.org, a California 501(c)(3) nonprofit; that stewardship was never formally stood up and is withdrawn. The decision and its tradeoffs are recorded in [ADR-0014](/adr/0014-single-steward-individual/), which supersedes [ADR-0001](/adr/0001-two-entity-firewall/).
+
+Standing up a formal stewarding entity (nonprofit or working group) remains an option when adoption warrants it. It is not promised.
 
 ## Editor
 
-The current editor is **Nic Chavez**. The editor drafts and proposes changes, reviews contributions, and maintains the claim types registry. The editor does not have sole authority to adopt substantive normative changes; substantive changes follow the decision process described below.
+The editor is **Nic Chavez**. The editor drafts and proposes changes, reviews contributions, and maintains the claim types registry. The editor does not have sole authority to adopt substantive normative changes from v0.2 forward; substantive changes follow the decision process described below.
 
 Editor contact: [spec@llmo.org](mailto:spec@llmo.org) for matters that cannot be discussed in public. Public discussion defaults to [GitHub Issues](https://github.com/openllmo/llmo.org/issues).
 
-## Separation from commercial activity
+## Commercial activity and conflicts of interest
 
-LLMO is intended to remain a specification in the public interest. A separate commercial entity, **Greyfront, Inc.**, a Delaware corporation with its executive office in Denver, Colorado, operates commercial services at [llmo.com](https://llmo.com) that implement the LLMO specification.
+The `llmo.com` domain is operated by the LLMO steward, Nicholas Chavez, as an individual. If and when a commercial product ships at that URL (a validator-as-a-service, a WordPress plugin, or similar), it will ship under individual operation. There is no distinct commercial entity currently named as operator of llmo.com.
 
-Diverse.org and Greyfront are distinct legal entities with separate governance, separate infrastructure, and separate funding. Decisions about the specification are made by Diverse.org without regard to their commercial effect on Greyfront or any other implementer. Any commercial entity, including Greyfront, is an implementer of the specification on the same terms as any other.
+This is a conflict-of-interest surface and is stated as such. Earlier public materials described a structural two-entity firewall between a nonprofit protocol steward (Diverse.org) and a Delaware C-corporation commercial vehicle (Greyfront, Inc.). Neither entity was ever operationally stood up: no board resolutions, no asset transfers, no distinct operational systems. Both are withdrawn from public materials as of 2026-10-22. See [ADR-0014](/adr/0014-single-steward-individual/) and [ADR-0015](/adr/0015-full-collapse-individual/).
+
+The current state is that the same individual decides the protocol's shape and operates any commercial activity built on top of it. The separation between protocol decisions and commercial decisions is now purely behavioral: a commitment to make protocol decisions on protocol merits, with no structural backstop. External parties relying on vendor-neutrality should calibrate trust accordingly. Protocol decisions are documented in LIPs and ADRs; the public record is the audit trail.
+
+Any commercial product that ships on top of LLMO, whether built by the steward or by any third party, is an implementer of the specification on the same terms as any other.
 
 ## Decision process
 
@@ -39,6 +45,6 @@ See [CONTRIBUTING.md](https://github.com/openllmo/llmo.org/blob/main/CONTRIBUTIN
 
 ## Funding and resources
 
-Diverse.org operates the specification site, the claim types registry, and the reference infrastructure. Infrastructure costs are met by Diverse.org's operating funds. Diverse.org accepts charitable contributions consistent with its tax-exempt purpose.
+The specification site, the claim types registry, and the reference infrastructure are operated by the steward out of personal funds. There is no 501(c)(3) at this time, so tax-deductible charitable contributions are not available. If a stewarding entity is formed in the future, funding mechanisms will be revisited.
 
-No contributor, donor, or implementer receives preferential treatment in the specification development process. Commercial implementers, including Greyfront, participate in the specification development process on the same terms as any other contributor.
+No contributor, donor, or implementer receives preferential treatment in the specification development process. Commercial implementers, including any built by the steward at llmo.com, participate in the specification development process on the same terms as any other contributor.

@@ -4,19 +4,19 @@ This file is the canonical map of which entity owns which service account, who h
 
 This file is committed to a public repository. It documents **identities** (emails, account IDs, service-account names) and **resource ownership**, but it **never** contains credentials. Passwords, API tokens, recovery codes, and 2FA backup codes live in the operator's password manager (or a hardware key for high-stakes accounts). See "What this file does NOT contain" at the bottom.
 
-The two entities that own production infrastructure today, plus a third grouping for personal / individual accounts that connect to the projects:
+Production infrastructure for LLMO is operated by Nicholas Chavez as an individual. Earlier materials described Diverse.org, Inc. as the steward and Greyfront, Inc. as a commercial vehicle; neither entity was ever operationally stood up and both are withdrawn from public materials as of 2026-10-22 per [ADR-0014](/adr/0014-single-steward-individual/) and [ADR-0015](/adr/0015-full-collapse-individual/). The `diverse.org` domain is a Google Workspace personally owned by the steward and used as an operational login identity for Cloudflare and other services; it does not represent corporate ownership. The parked commercial-side domains (`greyfront.com`, `grayfront.com`, `llmo.com`) are personally owned by the steward and listed below under "Reserved domains" rather than under a Greyfront, Inc. section.
 
-- **Diverse.org**: California 501(c)(3); steward of the LLMO protocol.
-- **Greyfront, Inc.**: Delaware C-corp; future commercial vehicle. No live infrastructure deployed yet; domains reserved.
-- **Personal / individual**: accounts attached to specific humans rather than to either entity.
+- **LLMO stewardship (Nicholas Chavez, individual):** owns the production infrastructure for the protocol and the site.
+- **Reserved domains (Nicholas Chavez, individual):** parked commercial-side domains kept for future product work; no infrastructure deployed under them yet.
+- **Personal / individual:** accounts attached to specific humans and not routed through any entity.
 
 ---
 
-## Diverse.org
+## LLMO stewardship (Nicholas Chavez, individual)
 
 ### Cloudflare
 
-- **Account email:** `team@diverse.org`
+- **Account email:** `team@diverse.org` (personal Google Workspace, see below; not a Diverse.org, Inc. account)
 - **Account ID:** `5d9418e9813fd14854487fc005ff07c1`
 - **Auth:** Google SSO via the `team@diverse.org` Google Workspace identity.
 - **Resources owned:**
@@ -24,15 +24,17 @@ The two entities that own production infrastructure today, plus a third grouping
   - Pages project `llmo-org` (serves `llmo.org` and `www.llmo.org`)
   - Pages project `llmo-validator` (legacy; held as a redirect after the validator migrated into `llmo.org/validator/` on 2026-04-29; scheduled for deletion ~6 months later. The `validate.llmo.org/* -> llmo.org/validator/*` redirect is held by an account-level Cloudflare Bulk Redirect rule, independent of this Pages project.)
 - **API access:** the wrangler OAuth flow on this account grants `zone:read`. DNS edits are done through the dashboard manually; no long-lived API token exists. If programmatic edits become needed, mint a scoped token per `infrastructure/DNS.md` "API access".
+- **TODO:** migrate the Cloudflare account login identity away from `team@diverse.org` to a non-Diverse-named identity, consistent with the ADR-0014 stewardship withdrawal. Low urgency; operational continuity is unaffected.
 
 ### Google Workspace
 
-- **Domain:** `diverse.org`
+- **Domain:** `diverse.org` (personally owned by Nicholas Chavez; retained operationally even though Diverse.org, Inc. no longer appears on protocol surfaces)
 - **Aliases configured:**
   - `spec@llmo.org`: protocol editor and primary public contact
   - `security@llmo.org`: security disclosure address (see `SECURITY.md`)
   - `team@diverse.org`: operational / infrastructure address used as the SSO identity for Cloudflare
 - **Notes:** Workspace pays for the email infrastructure that backs all three aliases. Mail flow for `llmo.org` is configured via MX records on the Cloudflare zone (see `infrastructure/DNS.md`).
+- **TODO:** decide whether to retain the `diverse.org` Workspace indefinitely, migrate to an `llmo.org`-only Workspace, or move to a steward-named Workspace. Low urgency; current routing works.
 
 ### GitHub organization
 
@@ -42,7 +44,7 @@ The two entities that own production infrastructure today, plus a third grouping
 - **Org-level GitHub Apps installed:**
   - `cloudflare-workers-and-pages`: drives Cloudflare Pages auto-deploy on push to `main` for both Pages projects.
   - `Mintlify`: **REMOVED 2026-04-26** during the migration. See "Mintlify" below.
-- **Notes:** the org is administered by a personal GitHub account (`@thegigachav`) rather than a Diverse.org-owned identity. Migrating ownership to a `team@diverse.org`-tied GitHub identity is a TODO; there is no urgency until staffing changes or for governance reasons.
+- **Notes:** the org is administered by a personal GitHub account (`@thegigachav`). This is consistent with the individual stewardship model recorded in ADR-0014. If a stewarding entity is ever formed, org-ownership transfer to an entity-tied identity becomes relevant work; until then there is no action required.
 
 ### Mintlify (DEFUNCT, retained for historical record)
 
@@ -63,15 +65,15 @@ The two entities that own production infrastructure today, plus a third grouping
 
 ---
 
-## Greyfront, Inc.
+## Reserved domains (Nicholas Chavez, individual)
 
-### Domains reserved (no infrastructure deployed)
+Parked domains kept for future commercial-side product work. These were formerly described as held under Greyfront, Inc.; that entity was never operationally stood up and is withdrawn per [ADR-0015](/adr/0015-full-collapse-individual/). The registrations themselves are personally held by the steward.
 
 - `greyfront.com`: registered, parked.
 - `grayfront.com`: registered, parked.
 - `llmo.com`: registered, parked.
 
-No DNS, hosting, email, or other services are configured for these domains yet. They will be commissioned during the `llmo.com` product build.
+No DNS, hosting, email, or other services are configured for these domains yet. They will be commissioned if and when a commercial product ships at `llmo.com`.
 
 **TODO when commissioned:** registrar of record for each domain, DNS provider, hosting provider, email provider, and the email/account identity used to administer each.
 
@@ -83,12 +85,12 @@ No DNS, hosting, email, or other services are configured for these domains yet. 
 
 - **`@thegigachav`**: primary personal GitHub account. Owner of the `openllmo` organization (administers `llmo.org`, `llmo-validator`).
 - **Primary email on file:** rocketmail address (the same address Mintlify still has on file for the orphaned project).
-- **Notes:** this is the human who can administer the `openllmo` org. Org-ownership migration to a Diverse.org-tied identity is the TODO noted under "GitHub organization" above.
+- **Notes:** this is the human who can administer the `openllmo` org. The individual-steward model (ADR-0014) is consistent with the current personal-account ownership; no entity-tied migration is required.
 
 ### Anthropic Pro
 
 - **Owner:** Nic Chavez (personal account).
-- **Notes:** powers Claude.ai, Claude Code, and Claude Design access used during LLMO protocol development. Not a Diverse.org or Greyfront subscription; expensed personally.
+- **Notes:** powers Claude.ai, Claude Code, and Claude Design access used during LLMO protocol development. Expensed personally.
 
 ---
 
