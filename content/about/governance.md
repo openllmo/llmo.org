@@ -19,11 +19,13 @@ Editor contact: [spec@llmo.org](mailto:spec@llmo.org) for matters that cannot be
 
 ## Commercial activity and conflicts of interest
 
-A separate commercial entity, **Greyfront, Inc.**, a Delaware corporation with its executive office in Denver, Colorado, operates commercial services at [llmo.com](https://llmo.com) that implement the LLMO specification. The individual steward of LLMO also operates Greyfront.
+The `llmo.com` domain is operated by the LLMO steward, Nicholas Chavez, as an individual. If and when a commercial product ships at that URL (a validator-as-a-service, a WordPress plugin, or similar), it will ship under individual operation. There is no distinct commercial entity currently named as operator of llmo.com.
 
-This is a conflict-of-interest surface and is stated as such. Earlier public materials described a structural two-entity firewall between protocol stewardship and commercial activity. That firewall was aspirational; the stewarding nonprofit was never formally stood up, so the structural separation did not operationally exist. The current separation is behavioral — the steward's own discipline in distinguishing protocol-stewardship decisions from commercial-product decisions — which is a weaker guarantee than a structural firewall. External parties relying on vendor-neutrality should understand this limitation.
+This is a conflict-of-interest surface and is stated as such. Earlier public materials described a structural two-entity firewall between a nonprofit protocol steward (Diverse.org) and a Delaware C-corporation commercial vehicle (Greyfront, Inc.). Neither entity was ever operationally stood up: no board resolutions, no asset transfers, no distinct operational systems. Both are withdrawn from public materials as of 2026-10-22. See [ADR-0014](/adr/0014-single-steward-individual/) and [ADR-0015](/adr/0015-full-collapse-individual/).
 
-Decisions about the specification are made on protocol merits, not on commercial advantage to Greyfront or any other implementer. Any commercial entity, including Greyfront, is an implementer of the specification on the same terms as any other.
+The current state is that the same individual decides the protocol's shape and operates any commercial activity built on top of it. The separation between protocol decisions and commercial decisions is now purely behavioral: a commitment to make protocol decisions on protocol merits, with no structural backstop. External parties relying on vendor-neutrality should calibrate trust accordingly. Protocol decisions are documented in LIPs and ADRs; the public record is the audit trail.
+
+Any commercial product that ships on top of LLMO, whether built by the steward or by any third party, is an implementer of the specification on the same terms as any other.
 
 ## Decision process
 
@@ -45,4 +47,4 @@ See [CONTRIBUTING.md](https://github.com/openllmo/llmo.org/blob/main/CONTRIBUTIN
 
 The specification site, the claim types registry, and the reference infrastructure are operated by the steward out of personal funds. There is no 501(c)(3) at this time, so tax-deductible charitable contributions are not available. If a stewarding entity is formed in the future, funding mechanisms will be revisited.
 
-No contributor, donor, or implementer receives preferential treatment in the specification development process. Commercial implementers, including Greyfront, participate in the specification development process on the same terms as any other contributor.
+No contributor, donor, or implementer receives preferential treatment in the specification development process. Commercial implementers, including any built by the steward at llmo.com, participate in the specification development process on the same terms as any other contributor.

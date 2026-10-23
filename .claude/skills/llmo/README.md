@@ -65,5 +65,5 @@ The orchestrator (`SKILL.md`) names the ten phases and the defaults that carry a
 ## What this skill is not
 
 - It is not a replacement for the spec. It implements one path through the spec; publishers with edge cases should still consult [/spec/v0.1/](https://llmo.org/spec/v0.1/).
-- It is not a hosted service. It runs locally in the publisher's Claude Code session. A future hosted web wizard at llmo.com (Greyfront, commercial) would expose the same library logic via a web UI for publishers who don't have Claude Code.
+- It is not a hosted service. It runs locally in the publisher's Claude Code session. A future hosted web wizard at llmo.com (steward-operated commercial product) would expose the same library logic via a web UI for publishers who don't have Claude Code.
 - It does not handle key custody for the publisher. It generates a keypair and walks them through storing the private key in 1Password / a hardware token / a platform secrets manager; the skill never sees the private key again.

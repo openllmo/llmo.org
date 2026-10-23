@@ -4,11 +4,11 @@ This file is the canonical map of which entity owns which service account, who h
 
 This file is committed to a public repository. It documents **identities** (emails, account IDs, service-account names) and **resource ownership**, but it **never** contains credentials. Passwords, API tokens, recovery codes, and 2FA backup codes live in the operator's password manager (or a hardware key for high-stakes accounts). See "What this file does NOT contain" at the bottom.
 
-Production infrastructure for LLMO is operated by Nicholas Chavez as an individual. Earlier materials described Diverse.org, Inc. as the steward; that stewardship was never formally stood up ([ADR-0014](/adr/0014-single-steward-individual/)), so no infrastructure is held by Diverse.org, Inc. The `diverse.org` domain is a Google Workspace personally owned by the steward and used as an operational login identity for Cloudflare and other services; it does not represent corporate ownership. Migration off the `diverse.org`-tied login identity to a non-Diverse-named identity is a TODO (see "Open migrations" below).
+Production infrastructure for LLMO is operated by Nicholas Chavez as an individual. Earlier materials described Diverse.org, Inc. as the steward and Greyfront, Inc. as a commercial vehicle; neither entity was ever operationally stood up and both are withdrawn from public materials as of 2026-10-22 per [ADR-0014](/adr/0014-single-steward-individual/) and [ADR-0015](/adr/0015-full-collapse-individual/). The `diverse.org` domain is a Google Workspace personally owned by the steward and used as an operational login identity for Cloudflare and other services; it does not represent corporate ownership. The parked commercial-side domains (`greyfront.com`, `grayfront.com`, `llmo.com`) are personally owned by the steward and listed below under "Reserved domains" rather than under a Greyfront, Inc. section.
 
 - **LLMO stewardship (Nicholas Chavez, individual):** owns the production infrastructure for the protocol and the site.
-- **Greyfront, Inc.**: Delaware C-corp; future commercial vehicle. No live infrastructure deployed yet; domains reserved. The individual steward also operates Greyfront.
-- **Personal / individual**: accounts attached to specific humans and not routed through any entity.
+- **Reserved domains (Nicholas Chavez, individual):** parked commercial-side domains kept for future product work; no infrastructure deployed under them yet.
+- **Personal / individual:** accounts attached to specific humans and not routed through any entity.
 
 ---
 
@@ -65,15 +65,15 @@ Production infrastructure for LLMO is operated by Nicholas Chavez as an individu
 
 ---
 
-## Greyfront, Inc.
+## Reserved domains (Nicholas Chavez, individual)
 
-### Domains reserved (no infrastructure deployed)
+Parked domains kept for future commercial-side product work. These were formerly described as held under Greyfront, Inc.; that entity was never operationally stood up and is withdrawn per [ADR-0015](/adr/0015-full-collapse-individual/). The registrations themselves are personally held by the steward.
 
 - `greyfront.com`: registered, parked.
 - `grayfront.com`: registered, parked.
 - `llmo.com`: registered, parked.
 
-No DNS, hosting, email, or other services are configured for these domains yet. They will be commissioned during the `llmo.com` product build.
+No DNS, hosting, email, or other services are configured for these domains yet. They will be commissioned if and when a commercial product ships at `llmo.com`.
 
 **TODO when commissioned:** registrar of record for each domain, DNS provider, hosting provider, email provider, and the email/account identity used to administer each.
 
@@ -90,7 +90,7 @@ No DNS, hosting, email, or other services are configured for these domains yet. 
 ### Anthropic Pro
 
 - **Owner:** Nic Chavez (personal account).
-- **Notes:** powers Claude.ai, Claude Code, and Claude Design access used during LLMO protocol development. Not a Greyfront subscription; expensed personally.
+- **Notes:** powers Claude.ai, Claude Code, and Claude Design access used during LLMO protocol development. Expensed personally.
 
 ---
 

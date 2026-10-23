@@ -13,7 +13,7 @@ Accepted. Records the scope decision made at the point the `/llmo` Claude Code s
 
 ## Context
 
-The LLMO open spec at llmo.org is stewarded by Nicholas Chavez as an individual ([ADR-0014](/adr/0014-single-steward-individual/)). Commercial activity adjacent to the protocol is conducted by Greyfront, Inc., a Delaware C-corporation, through the llmo.com surface. The individual steward also operates Greyfront, so the separation between open-spec tooling and commercial product tooling is enforced behaviorally rather than at the entity boundary. This ADR records how that boundary is maintained inside the tooling.
+The LLMO open spec at llmo.org is stewarded by Nicholas Chavez as an individual ([ADR-0014](/adr/0014-single-steward-individual/)). Any commercial activity adjacent to the protocol is also operated by Nicholas Chavez as an individual at the `llmo.com` surface ([ADR-0015](/adr/0015-full-collapse-individual/) retired the Greyfront, Inc. commercial-vehicle framing). The same individual makes both open-spec and commercial decisions, so the separation between open-spec tooling and any commercial product tooling is enforced behaviorally only. This ADR records how that boundary is maintained inside the tooling, and the scope rules it defines are product discipline that survives the entity collapse.
 
 In May 2026 the open spec gained two new surfaces that together change the publisher's experience:
 

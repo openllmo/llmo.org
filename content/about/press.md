@@ -35,7 +35,7 @@ The LLMO specification is stewarded by **Nicholas Chavez** as an individual. The
 
 Nic Chavez is the v0.1 specification author, the current LIP editor, and the current individual steward. The governance model is documented at [/about/governance/](/about/governance/), including the planned transition from author-decided revisions during pre-release to a broader community process from v0.2 onward.
 
-Commercial activity around LLMO, including the validator-as-a-service product at llmo.com, is operated by Greyfront, Inc., a Delaware C-corporation, under separate commercial governance. The individual steward of LLMO also operates Greyfront. This is a conflict-of-interest surface and the separation between protocol stewardship and commercial activity is behavioral (steward's own role discipline) rather than structural. The governance page describes the limitation.
+Any commercial activity around LLMO, including a future validator-as-a-service product at llmo.com, is operated by Nicholas Chavez as an individual. There is no distinct commercial entity currently named as operator. Earlier public materials described a separate Delaware C-corporation (Greyfront, Inc.) as the commercial vehicle; that entity was never operationally stood up and is withdrawn from public materials as of 2026-10-22 per [ADR-0015](/adr/0015-full-collapse-individual/). The same individual decides the protocol's shape and operates any commercial activity on top of it, so protocol-stewardship and commercial-activity decisions share a decision-maker. The governance page states the conflict-of-interest surface explicitly.
 
 ## Key technical claims
 

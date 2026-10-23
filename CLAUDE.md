@@ -18,7 +18,7 @@ For deeper context (history, decision rationale, strategic backlog), see:
 
 **Stewardship:** Nicholas Chavez (individual). Earlier materials described Diverse.org, Inc. (CA 501(c)(3)) as steward; that stewardship was never formally stood up and is withdrawn as of 2026-10-22. See [ADR-0014](/adr/0014-single-steward-individual/) and governance page.
 
-**Commercial vehicle:** Greyfront, Inc. (DE C-corp), operates at llmo.com. The individual steward also operates Greyfront, so the stewardship-vs-commercial separation is behavioral, not structural. See ADR-0014.
+**Commercial surface:** `llmo.com` is operated by Nicholas Chavez as an individual. Earlier materials described Greyfront, Inc. (DE C-corp) as the commercial vehicle; the entity was never operationally stood up and is withdrawn from public materials as of 2026-10-22 ([ADR-0015](/adr/0015-full-collapse-individual/) extends [ADR-0014](/adr/0014-single-steward-individual/)). The same individual decides on both sides; the separation is behavioral only, with no entity backstop.
 
 **Repo:** This is the spec/site repo (openllmo/llmo.org). Validator is at openllmo/llmo-validator.
 

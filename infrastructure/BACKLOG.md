@@ -220,12 +220,12 @@ Vendor-drift CI guard added 2026-05-08 in cli PR #4, SHA f3b41aed377aede1d79f3b3
 
 ### WordPress plugin development
 
-**Status:** Not started. Strategic priority for Greyfront commercial arc.
+**Status:** Not started. Strategic priority for the steward's commercial side-plans at llmo.com.
 
 **Why it matters:** Yoast SEO has demonstrated that the WordPress plugin distribution channel is real (Yoast: $12M ARR at acquisition). LLMO's commercial product can follow the same path: a WordPress plugin that helps publishers configure and validate their llmo.json.
 
 **Pre-conditions before starting:**
-1. Greyfront has actual infrastructure (no DNS/hosting/email yet)
+1. llmo.com has actual infrastructure (no DNS/hosting/email yet)
 2. Brand brief for llmo.com (v6 brief was sketched, not formalized)
 3. Initial product spec for the plugin (what exactly does it do?)
 
@@ -239,22 +239,22 @@ Vendor-drift CI guard added 2026-05-08 in cli PR #4, SHA f3b41aed377aede1d79f3b3
 
 **Context:** Joost is the founder of Yoast. The Yoast distribution thesis was Nic's framing for the LLMO commercial arc. Joost may be a useful advisor, investor, or partnership conversation when the time is right.
 
-**When:** Not yet. Wait until the Greyfront/llmo.com product has more shape so the conversation has substance. Cold outreach with "we're building a thing" goes worse than "we built a thing and want to talk about distribution."
+**When:** Not yet. Wait until the llmo.com product has more shape so the conversation has substance. Cold outreach with "we're building a thing" goes worse than "we built a thing and want to talk about distribution."
 
 ---
 
-### Greyfront infrastructure stub
+### llmo.com infrastructure stub
 
-**Status:** Three domains parked (greyfront.com, grayfront.com, llmo.com), no infrastructure deployed.
+**Status:** Three domains parked (greyfront.com, grayfront.com, llmo.com), no infrastructure deployed. Previously framed as "Greyfront, Inc." infrastructure; the entity was never operationally stood up and is withdrawn per [ADR-0015](/adr/0015-full-collapse-individual/). The domains are personally held by the steward.
 
 **What's needed:**
-- Registrar/DNS for the three domains (likely the same one used for llmo.org and diverse.org)
-- Email infrastructure (Greyfront Google Workspace or similar)
+- Registrar/DNS for the three domains (likely the same one used for llmo.org)
+- Email infrastructure (Google Workspace or similar for the commercial side)
 - Web infrastructure (Cloudflare Pages probably)
-- Admin identity (who's the admin user, currently nobody)
+- Admin identity (steward's personal account by default)
 - Add to ACCOUNTS.md once provisioned
 
-**Why deferred:** Greyfront has no products yet. Provisioning infrastructure for an empty company is premature. When the first commercial product is real (likely the WordPress plugin), Greyfront infrastructure gets stood up alongside.
+**Why deferred:** No commercial products yet. Provisioning infrastructure for a side-plan that hasn't shipped is premature. When the first commercial product is real (likely the WordPress plugin), llmo.com infrastructure gets stood up alongside.
 
 ---
 
@@ -298,7 +298,7 @@ Vendor-drift CI guard added 2026-05-08 in cli PR #4, SHA f3b41aed377aede1d79f3b3
 
 **What's needed:** A consolidated v6 brief document that supersedes v5. Captures pricing tiers, verification semantics, distribution thesis, plugin roadmap.
 
-**Why deferred:** Brand briefs are strategic documents for Greyfront/llmo.com, not for v0.1 spec work. Tackle in the post-conference Greyfront-stand-up window.
+**Why deferred:** Brand briefs are strategic documents for the llmo.com commercial side-plans, not for v0.1 spec work. Tackle in the post-conference llmo.com stand-up window.
 
 ---
 
@@ -386,7 +386,7 @@ Vendor-drift CI guard added 2026-05-08 in cli PR #4, SHA f3b41aed377aede1d79f3b3
 
 **Estimate:** 2-3 hours.
 
-**Scope:** Register `llmo.dev`, `llmo.io`, `llmo.protocol` (if available), anti-typosquatting variants (`llmoo.org`, `llmo-protocol.org`, etc.). Verify `llmo.com` status (Greyfront-operated). Park under the party that holds the relevant brand: protocol-name variants under the LLMO steward (Nicholas Chavez, individual); commercial-product variants under Greyfront.
+**Scope:** Register `llmo.dev`, `llmo.io`, `llmo.protocol` (if available), anti-typosquatting variants (`llmoo.org`, `llmo-protocol.org`, etc.). Verify `llmo.com` status (steward-operated, personally held). All variants parked under the LLMO steward (Nicholas Chavez, individual).
 
 ---
 

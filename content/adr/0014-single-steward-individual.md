@@ -9,7 +9,7 @@ status: Accepted
 
 ## Status
 
-Accepted. Supersedes [ADR-0001](/adr/0001-two-entity-firewall/). Accepted under the pre-launch authorship privilege of [ADR-0012](/adr/0012-goldilocks-pre-announcement-authorship-privilege/); the LIP-1 §10 14-day governance window was not observed and no LIP was filed. The decision is recorded here so future external review can audit the rationale.
+Accepted. Supersedes [ADR-0001](/adr/0001-two-entity-firewall/) on the open-spec side. Extended by [ADR-0015](/adr/0015-full-collapse-individual/) on the commercial side (Greyfront, Inc. withdrawn on the same day, 2026-10-22, for the same reasons): references below to "Greyfront continues to exist as a separate commercial vehicle" describe the state between the two decisions and are no longer current. Accepted under the pre-launch authorship privilege of [ADR-0012](/adr/0012-goldilocks-pre-announcement-authorship-privilege/); the LIP-1 §10 14-day governance window was not observed and no LIP was filed. The decision is recorded here so future external review can audit the rationale.
 
 ## Context
 
