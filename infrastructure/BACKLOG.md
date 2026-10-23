@@ -829,7 +829,7 @@ This section grows over time. Move items here when done.
 - ✅ ACCOUNTS.md created (commit `e7de79d`)
 - ✅ SVG logo variants (commit `9ddbb71`)
 - ✅ Phase A site shell + theme toggle (commit `8fa9f64`)
-- ✅ Serval → Diverse.org self-referential worked example (commit `186a4e3`)
+- ✅ JungleCatExample → Diverse.org self-referential worked example (commit `186a4e3`)
 - ✅ First Diverse.org llmo.json signed and published (commit `6778b88`)
 - ✅ Re-sign for Strict tier conformance (commit `3c98bef`)
 - ✅ Hugo 404 page (commit `f1167cd`)

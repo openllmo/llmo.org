@@ -261,8 +261,6 @@ Section 7 of v0.1 uses "Example Standards Foundation" as the worked example — 
 
 Prior to 2026-10-22 the worked example was Diverse.org (the then-claimed steward); that was removed when stewardship was withdrawn. See [ADR-0014](/adr/0014-single-steward-individual/).
 
-If you ever see "Serval" anywhere in the repo, it's stale. Replace with "Example Standards Foundation" or remove. (Serval is also a Greyfront commercial customer name; using it as a fictional example created a customer-relationship issue.)
-
 ### LIP numbering
 - Numbers permanent and append-only
 - Withdrawn LIPs stay in registry as "Withdrawn"
@@ -367,7 +365,7 @@ Long agentic sessions accumulate stale context. Signs of drift:
 - You reference Mintlify as if it's still the publishing platform (it's Hugo)
 - You forget the OTS proofs are already Bitcoin-anchored
 - You confuse llmo.org and llmo.com (org vs. com, different entities)
-- You describe Serval or Diverse.org as the worked example (it's "Example Standards Foundation" now; Diverse.org was removed in ADR-0014)
+- You describe Diverse.org or any other prior-named entity as the worked example (it's "Example Standards Foundation" now; Diverse.org was removed in ADR-0014)
 - You assume CI is broken or DNS is wrong without checking
 - You propose deferring something that's actually demo-blocking
 

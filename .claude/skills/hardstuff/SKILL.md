@@ -118,7 +118,7 @@ This skill's job is to catch the *smaller-than-promised* failure mode, not to dr
 
 > "The signed document fails Standard tier S3 but passes Minimal tier. We can re-sign tomorrow." (first signing of llmo.json). Apply skill: re-sign tonight to pass Strict tier before conference.
 
-> "Section 7 references Serval. We can update the worked example post-conference." (Serval is also a Greyfront commercial customer). Apply skill: refactor to use a hypothetical example (Example Standards Foundation) now.
+> "Section 7 references a stale example org name. We can update the worked example post-conference." (customer-relationship risk if the stale name is also a commercial customer). Apply skill: refactor to use a clearly hypothetical example (Example Standards Foundation) now.
 
 **NOT triggered (real deferrals):**
 
