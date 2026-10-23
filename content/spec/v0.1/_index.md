@@ -174,12 +174,12 @@ The `entity` object identifies who is publishing the file.
 ```json
 {
   "entity": {
-    "name": "Diverse.org, Inc.",
-    "primary_domain": "diverse.org",
-    "aliases": ["llmo.org"],
+    "name": "Example Standards Foundation",
+    "primary_domain": "example.org",
+    "aliases": ["example.net"],
     "legal_identifiers": {
-      "jurisdiction": "US-CA",
-      "registration_number": "99-2870125"
+      "jurisdiction": "US-DE",
+      "registration_number": "99-9999999"
     }
   }
 }
@@ -368,12 +368,12 @@ Explicitly repudiates claims, attributions, or associations the organization con
       {
         "what": "commercial_subsidiary",
         "category": "self_statement",
-        "detail": "Diverse.org has no commercial subsidiary. Any entity claiming to be a Diverse.org commercial arm is not affiliated."
+        "detail": "Example Standards Foundation has no commercial subsidiary. Any entity claiming to be an Example Standards Foundation commercial arm is not affiliated."
       },
       {
         "what": "unaffiliated_domain",
         "category": "impersonation_defense",
-        "detail": "The domain diverse-org.example.com has no affiliation with Diverse.org and never has."
+        "detail": "The domain example-foundation.example.com has no affiliation with Example Standards Foundation and never has."
       }
     ]
   }
@@ -804,7 +804,7 @@ LLMO deliberately stays narrow. This section maps the boundaries.
 
 ### 6.1 schema.org / JSON-LD
 
-[Schema.org](https://schema.org/) markup is per-page and descriptive; LLMO is per-entity and operational. Schema.org tells a search engine "this page describes an Organization named Diverse.org, with this address." LLMO tells any machine consumer "these are the URLs we vouch for, this statement we repudiate, this document supersedes the last one."
+[Schema.org](https://schema.org/) markup is per-page and descriptive; LLMO is per-entity and operational. Schema.org tells a search engine "this page describes an Organization named Example Corp, with this address." LLMO tells any machine consumer "these are the URLs we vouch for, this statement we repudiate, this document supersedes the last one."
 
 Use both. An organization's homepage should carry schema.org markup; the organization should additionally publish `llmo.json`. When claims overlap (name, homepage URL), LLMO is authoritative by virtue of being single-sourced and signable; schema.org is authoritative for page-level facts that LLMO does not carry.
 
@@ -838,9 +838,9 @@ LLMO uses `.well-known/` as intended: a stable, discoverable location for per-or
 
 ---
 
-## 7. Worked Example: Diverse.org, Inc. {#7-worked-example-diverse-org-inc}
+## 7. Worked Example: Example Standards Foundation {#7-worked-example-example-standards-foundation}
 
-This section walks through a complete `llmo.json` for Diverse.org, Inc., the nonprofit that stewards this protocol. The example is real: the entity exists, the address is correct, the products are real initiatives, and an actual signed `llmo.json` corresponding to this example is published at `https://diverse.org/.well-known/llmo.json`. The example meets strict conformance.
+This section walks through a complete `llmo.json` for Example Standards Foundation, a hypothetical nonprofit stewarding open standards. The example is illustrative, not published; it exercises every claim type in the v0.1 core set and meets strict conformance. For a live signed document that validates against this spec, see [`https://llmo.org/.well-known/llmo.json`](https://llmo.org/.well-known/llmo.json).
 
 ```json
 {
@@ -850,12 +850,12 @@ This section walks through a complete `llmo.json` for Diverse.org, Inc., the non
   "valid_until": "2026-07-26T00:00:00Z",
 
   "entity": {
-    "name": "Diverse.org, Inc.",
-    "primary_domain": "llmo.org",
-    "aliases": ["diverse.org", "emerging.org"],
+    "name": "Example Standards Foundation",
+    "primary_domain": "example.org",
+    "aliases": ["example.net"],
     "legal_identifiers": {
-      "jurisdiction": "US-CA",
-      "registration_number": "99-2870125"
+      "jurisdiction": "US-DE",
+      "registration_number": "99-9999999"
     }
   },
 
@@ -865,26 +865,26 @@ This section walks through a complete `llmo.json` for Diverse.org, Inc., the non
       "type": "identity",
       "statement": {
         "founded": "2024-05",
-        "headquarters": "2445 Augustine Dr Ste 150, Santa Clara, CA 95054-3032, US",
-        "description": "California 501(c)(3) nonprofit. Stewardship of open protocols for organizational identity in the AI era."
+        "headquarters": "1 Example Way, Dover, DE 19901, US",
+        "description": "Nonprofit stewardship of open protocols for organizational identity on the AI-mediated web."
       }
     },
     {
       "claim_id": "urls-canonical",
       "type": "canonical_urls",
       "statement": {
-        "homepage": "https://diverse.org",
-        "docs": "https://llmo.org/spec",
-        "security": "https://diverse.org/.well-known/security.txt"
+        "homepage": "https://example.org",
+        "docs": "https://example.org/spec",
+        "security": "https://example.org/.well-known/security.txt"
       }
     },
     {
       "claim_id": "channels-official",
       "type": "official_channels",
       "statement": {
-        "email_domains": ["diverse.org", "llmo.org"],
+        "email_domains": ["example.org", "example.net"],
         "social": {
-          "github": "openllmo"
+          "github": "example-org"
         }
       }
     },
@@ -894,12 +894,12 @@ This section walks through a complete `llmo.json` for Diverse.org, Inc., the non
       "statement": {
         "products": [
           {
-            "name": "LLMO Protocol Specification",
-            "url": "https://llmo.org"
+            "name": "Example Protocol Specification",
+            "url": "https://example.org/spec"
           },
           {
-            "name": "Emerging.org Podcast",
-            "url": "https://emerging.org"
+            "name": "Example Reference Validator",
+            "url": "https://example.org/validator"
           }
         ]
       }
@@ -911,15 +911,16 @@ This section walks through a complete `llmo.json` for Diverse.org, Inc., the non
         "spokespeople": [
           {
             "role": "chairman",
-            "name": "Nic Chavez"
+            "name": "Alex Chair",
+            "verification": "https://github.com/example-chair"
           },
           {
             "role": "director",
-            "name": "Jack Dudley"
+            "name": "Jamie Director"
           },
           {
             "role": "secretary",
-            "name": "Andrew Mark"
+            "name": "Robin Secretary"
           }
         ]
       }
@@ -931,42 +932,42 @@ This section walks through a complete `llmo.json` for Diverse.org, Inc., the non
         "disavowed": [
           {
             "what": "commercial_subsidiary",
-            "detail": "Diverse.org has no commercial subsidiary. Any entity claiming to be a Diverse.org commercial arm is not affiliated."
+            "detail": "Example Standards Foundation has no commercial subsidiary. Any entity claiming to be a Foundation commercial arm is not affiliated."
           },
           {
             "what": "unaffiliated_domain",
-            "detail": "The domain diverse-org.example.com is shaped to imply affiliation with Diverse.org but has no such affiliation. This is an impersonation defense per §3.5."
+            "detail": "The domain example-foundation.example.com is shaped to imply affiliation with Example Standards Foundation but has no such affiliation. This is an impersonation defense per §3.5."
           }
         ]
       },
       "signature": {
-        "protected": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImRpdmVyc2UtMjAyNi0wMSJ9",
+        "protected": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImV4YW1wbGUtMjAyNi0wMSJ9",
         "signature": "PER_CLAIM_SIGNATURE_EXAMPLE_PLACEHOLDER_VALUE_NOT_VERIFIABLE_xxxxxxxxxxxxxxxxxxxxx"
       }
     }
   ],
 
   "signature": {
-    "protected": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImRpdmVyc2UtMjAyNi0wMSJ9",
-    "signature": "<placeholder; the published signed document at diverse.org will use a real ES256 signature over the JCS-canonicalized payload>"
+    "protected": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImV4YW1wbGUtMjAyNi0wMSJ9",
+    "signature": "<placeholder; a real document would carry an ES256 signature over the JCS-canonicalized payload>"
   }
 }
 ```
 
 **Annotations on this example:**
 
-- The entity declares two aliases (`diverse.org`, `emerging.org`) because Diverse.org operates these domains as additional surfaces. Each domain SHOULD serve its own `llmo.json` with `primary_domain` matching the serving domain and `aliases` listing the others. The document published at `https://llmo.org/.well-known/llmo.json` declares `primary_domain: "llmo.org"`; when `diverse.org` launches its own site, the document at `https://diverse.org/.well-known/llmo.json` will declare `primary_domain: "diverse.org"` with aliases pointing at `llmo.org` and the rest. The Standard-tier rule "`entity.primary_domain` matches the domain serving the file" enforces this symmetric structure.
-- `legal_identifiers.registration_number` carries the federal IRS EIN (99-2870125). For US 501(c)(3) entities, the EIN is the most useful registration identifier to consumers; the jurisdiction (`US-CA`) records the state of incorporation.
+- The entity declares one alias (`example.net`) because the Foundation operates it as an additional surface. Each domain SHOULD serve its own `llmo.json` with `primary_domain` matching the serving domain and `aliases` listing the others. The Standard-tier rule "`entity.primary_domain` matches the domain serving the file" enforces this symmetric structure.
+- `legal_identifiers.registration_number` carries a placeholder federal IRS EIN (99-9999999); in a real document this would be the actual EIN. For US 501(c)(3) entities, the EIN is the most useful registration identifier to consumers; the jurisdiction (`US-DE`) records the state of incorporation.
 - `identity.founded` is recorded at year-month granularity (2024-05); the spec also accepts year-only or full RFC 3339 date.
-- `canonical_urls` is intentionally minimal: Diverse.org operates a homepage, points at the LLMO spec as its canonical documentation, and serves a security disclosure document. Future products may add more named URLs (`api`, `status`, etc.) as those surfaces come online.
-- `official_channels` declares the GitHub organization (`openllmo`) and email domains. Spec correspondence at `spec@llmo.org` and security at `security@llmo.org` are reachable through the declared `email_domains`.
-- `product_facts` lists three Diverse.org-stewarded initiatives. The schema permits richer fields per product (`status`, `current_version`); this example carries only `name` and `url` because those are the facts Diverse.org currently asserts. Stewardship status is described in prose at each product's URL.
-- `personnel.spokespeople` enumerates the three officers of Diverse.org. The chairman entry carries `verification: "https://github.com/thegigachav"`, which §5.2 S4 explicitly permits as third-party identity attestation. The director and secretary entries omit `verification` and are surfaced as W2 warnings per §5.4 pending appropriate verification URLs (which may be third-party platforms or first-party leadership pages; both are conforming).
-- `disavowal` pairs a category-level self-statement (`commercial_subsidiary`, asserting Diverse.org has no commercial arm) with an impersonation-defense entry (an unaffiliated domain shaped to imply affiliation). Both fall within the §3.5 disavowal scope. Consumers reasoning about Diverse.org get both a class assertion and a concrete instance to match against.
-- The `disavowal` claim carries its own `signature` field in addition to (and covered by) the document-level signature. Per-claim signing of disavowal claims demonstrates the §4.3 "claim-level signing" pattern, where security-sensitive claims may be cryptographically attested by a different organizational function than the rest of the document. The example here uses the same key as the document-level signature (kid `diverse-2026-01`) for clarity; production deployments may use distinct keys per claim type per §4.4. Per-claim signatures are evaluated under the new §5.3 X6 rule.
-- The document-level signature covers all fields except `signature` itself. A consumer verifies by fetching `https://llmo.org/.well-known/llmo-keys.json`, locating the key with `kid: "diverse-2026-01"`, and verifying the ES256 signature over the JCS-canonicalized payload.
+- `canonical_urls` is intentionally minimal: the Foundation operates a homepage, points at its protocol spec as canonical documentation, and serves a security disclosure document. Future products may add more named URLs (`api`, `status`, etc.) as those surfaces come online.
+- `official_channels` declares the GitHub organization (`example-org`) and email domains. Correspondence routed through the declared `email_domains` is treated as official.
+- `product_facts` lists two Foundation-stewarded initiatives. The schema permits richer fields per product (`status`, `current_version`); this example carries only `name` and `url` because those are the facts the Foundation chooses to assert. Stewardship status is described in prose at each product's URL.
+- `personnel.spokespeople` enumerates three officers. The chairman entry carries `verification: "https://github.com/example-chair"`, which §5.2 S4 explicitly permits as third-party identity attestation. The director and secretary entries omit `verification` and are surfaced as W2 warnings per §5.4 pending appropriate verification URLs (which may be third-party platforms or first-party leadership pages; both are conforming).
+- `disavowal` pairs a category-level self-statement (`commercial_subsidiary`, asserting the Foundation has no commercial arm) with an impersonation-defense entry (an unaffiliated domain shaped to imply affiliation). Both fall within the §3.5 disavowal scope. Consumers reasoning about the Foundation get both a class assertion and a concrete instance to match against.
+- The `disavowal` claim carries its own `signature` field in addition to (and covered by) the document-level signature. Per-claim signing of disavowal claims demonstrates the §4.3 "claim-level signing" pattern, where security-sensitive claims may be cryptographically attested by a different organizational function than the rest of the document. The example here uses the same key as the document-level signature (kid `example-2026-01`) for clarity; production deployments may use distinct keys per claim type per §4.4. Per-claim signatures are evaluated under the new §5.3 X6 rule.
+- The document-level signature covers all fields except `signature` itself. A consumer verifies by fetching `https://example.org/.well-known/llmo-keys.json`, locating the key with `kid: "example-2026-01"`, and verifying the ES256 signature over the JCS-canonicalized payload.
 
-The signed instance of this `llmo.json` is currently published at [`https://llmo.org/.well-known/llmo.json`](https://llmo.org/.well-known/llmo.json), with the corresponding JWKS at [`https://llmo.org/.well-known/llmo-keys.json`](https://llmo.org/.well-known/llmo-keys.json). Diverse.org will mirror at `https://diverse.org/.well-known/llmo.json` once Diverse.org's own site launches. Either copy should validate identically against this spec via [the reference validator](/validator/) or any conforming validator.
+For a live, signed document that validates against this spec, see [`https://llmo.org/.well-known/llmo.json`](https://llmo.org/.well-known/llmo.json) with its JWKS at [`https://llmo.org/.well-known/llmo-keys.json`](https://llmo.org/.well-known/llmo-keys.json). The live document should validate identically against this spec via [the reference validator](/validator/) or any conforming validator.
 
 ---
 

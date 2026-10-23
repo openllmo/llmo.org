@@ -64,4 +64,4 @@ The full schema, signature format, and conformance tiers are specified at [`/spe
 
 The protocol is at version **0.1.8**, with v0.1 first published April 2026 and the current series considered draft-stable. The reference CLI ships on npm as [`llmo`](https://www.npmjs.com/package/llmo). The validator runs at [llmo.org/validator/](/validator/). Proposals to extend the spec follow [LIP-1](/spec/lips/lip-0001/), the protocol's improvement process.
 
-LLMO is stewarded by [Diverse.org, Inc.](https://diverse.org/), a 501(c)(3) nonprofit, and developed in the open at [github.com/openllmo](https://github.com/openllmo).
+LLMO is stewarded by Nicholas Chavez as an individual and developed in the open at [github.com/openllmo](https://github.com/openllmo). See the [governance page](/about/governance/) for the current stewardship model.

@@ -59,17 +59,17 @@ Structural questions about the information layer underlying organizational ident
 
 The work was publicly committed to in November 2025 (see Origin, above).
 
-Diverse.org, a California 501(c)(3) nonprofit, was established to steward the specification and related open-standards work.
-
 Specification v0.1 was published in April 2026. The reference CLI shipped on npm in April 2026. The reference validator was deployed at `/validator/` in April 2026.
+
+In October 2026, the project withdrew its earlier description of being stewarded by Diverse.org, a California 501(c)(3) nonprofit. That stewardship was never formally stood up. Current stewardship is held by Nicholas Chavez as an individual. See [ADR-0014](/adr/0014-single-steward-individual/).
 
 ## Who maintains it
 
-The specification is stewarded by Diverse.org. Nic Chavez authored v0.1 of the specification and is the current editor of the LLMO Improvement Proposal (LIP) process.
+The specification is stewarded by Nicholas Chavez as an individual. There is no stewarding entity at this time. Nic Chavez authored v0.1 of the specification and is the current editor of the LLMO Improvement Proposal (LIP) process.
 
 The editor's responsibilities include drafting changes, reviewing contributions, maintaining the specification registry, and shepherding proposals through the governance window. The editor does not have sole authority over substantive normative changes, which require a public 14-day discussion window and are governed by the LIP process.
 
-See the [governance page](/about/governance) for the full governance model, including the separation between Diverse.org and commercial activity in the broader ecosystem.
+See the [governance page](/about/governance) for the full governance model, including commercial activity around the protocol and the conflict-of-interest surface that implies.
 
 ## Commitments
 
@@ -80,13 +80,13 @@ The specification and its surrounding infrastructure operate under these commitm
 - There are no paid tiers or certification fees for specification access. The specification and validator are freely available.
 - llmo.org does not index publishers and does not maintain a directory of `llmo.json` documents. Publisher discovery is not a function of this site.
 - Substantive changes to the specification go through the LIP process and a public 14-day discussion window.
-- Governance commitments apply to Diverse.org's stewardship of the specification. Commercial entities that implement or build on the specification are subject to their own governance and do not speak for the specification. The protocol is designed to support a plurality of downstream implementers, including moderation systems, reputation layers, trust overlays, and competing commercial services. A healthy ecosystem is one in which multiple implementers compete and cooperate on top of the same open specification.
+- Governance commitments apply to the steward's handling of the specification. Commercial entities that implement or build on the specification are subject to their own governance and do not speak for the specification. The protocol is designed to support a plurality of downstream implementers, including moderation systems, reputation layers, trust overlays, and competing commercial services. A healthy ecosystem is one in which multiple implementers compete and cooperate on top of the same open specification.
 
 ## Future governance
 
-The specification is expected to transition to a broader governance model, potentially including a working group or similar structure, as adoption matures.
+The specification is expected to transition to a broader governance model, potentially including a working group or stewarding entity, as adoption matures.
 
-Until that transition, Diverse.org stewards the specification and Nic Chavez serves as editor. See the [governance page](/about/governance) for the current decision process.
+Until that transition, Nicholas Chavez stewards the specification as an individual and serves as editor. See the [governance page](/about/governance) for the current decision process.
 
 ## Where to read more
 

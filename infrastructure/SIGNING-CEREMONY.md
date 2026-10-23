@@ -1,6 +1,8 @@
 # llmo.json signing ceremony
 
-This document captures the procedure for signing Diverse.org's `llmo.json` under the LLMO v0.1 spec. The ceremony must be re-performed every ~90 days, when the document's `valid_until` date approaches.
+This document captures the procedure for signing llmo.org's `/.well-known/llmo.json` under the LLMO v0.1 spec. The ceremony must be re-performed every ~90 days, when the document's `valid_until` date approaches.
+
+The LLMO protocol is stewarded by Nicholas Chavez as an individual ([ADR-0014](/adr/0014-single-steward-individual/)); the entity named in the signed document is `Nicholas Chavez`. Previously the document named `Diverse.org, Inc.` and was signed under `diverse-2026-01` / `diverse-2026-02` keys; those keys are retired and the new keys are issued under a non-entity-tied `kid` prefix.
 
 ## Key custody
 
@@ -13,33 +15,33 @@ This file MUST be:
 - Never committed to any repository.
 - Never shared via email, chat, or unencrypted channels.
 
-Future plan: migrate to AWS KMS for hardware-backed key custody once Diverse.org's AWS account is provisioned. v0.1 launch uses a local file with password-manager backup as the practical custody mechanism.
+Future plan: migrate to AWS KMS or an equivalent hardware-backed key custody provider once the steward's AWS account is provisioned. v0.1 launch uses a local file with password-manager backup as the practical custody mechanism.
 
 ## Key identity
 
 - **Algorithm:** ES256 (ECDSA on P-256 with SHA-256)
-- **Key ID:** `diverse-2026-01`
-- **Generated:** 2026-04-26
+- **Active `kid` (post-ADR-0014 rotation):** `llmo-steward-2026-10` (to be generated during the ADR-0014 transition ceremony; see "Pending ceremony" below)
+- **Retired `kid`s (kept in JWKS during transition):** `diverse-2026-01`, `diverse-2026-02` (associated with the former Diverse.org-named entity; retired as of 2026-10-22 per ADR-0014)
 - **Public JWKS:** published at `https://llmo.org/.well-known/llmo-keys.json`
 
-When generating the next key (likely `diverse-2026-02` or `diverse-2027-01`), include both keys in the JWKS for a transition period so consumers caching the old `kid` can still verify until they re-fetch.
+Rotation convention: when generating the next key, include both the new and the previous key in the JWKS for a transition period so consumers caching the old `kid` can still verify until they re-fetch. After one full validity window has elapsed with no verifications against the retired `kid`, remove it from the JWKS.
 
-### Public key SHA-256 fingerprint
+### Public key SHA-256 fingerprint (retired keys)
 
-Anyone verifying signed `llmo.json` files can match this fingerprint against the JWKS served at `llmo.org/.well-known/llmo-keys.json`:
+Anyone verifying historical `llmo.json` files signed under the retired `kid`s can match this fingerprint against the entries still carried in the JWKS at `llmo.org/.well-known/llmo-keys.json`:
 
 ```
-e10dee7e0b32406d0222af90e44973aeae65823cd07313f2ce0e6125abbfacba
+e10dee7e0b32406d0222af90e44973aeae65823cd07313f2ce0e6125abbfacba   # diverse-2026-01
 ```
 
-Computed over the canonical JSON serialization of the public JWK (`crv`, `kid`, `kty`, `x`, `y`, sorted keys, no whitespace).
+Computed over the canonical JSON serialization of the public JWK (`crv`, `kid`, `kty`, `x`, `y`, sorted keys, no whitespace). The fingerprint for the new `llmo-steward-2026-10` key will be recorded here after the pending ceremony.
 
 ## Signing procedure (re-running the ceremony)
 
 1. Open Claude Code in this repo.
 2. Refer to this document.
 3. Working directory: `~/llmo-key-ceremony-YYYY-MM-DD/` (a new dated dir for each ceremony).
-4. Copy the existing `private-jwk-diverse-2026-01.json` from the password manager into the new ceremony dir, OR generate a new keypair if rotating.
+4. Copy the active private JWK (currently to be `private-jwk-llmo-steward-2026-10.json` after the ADR-0014 transition) from the password manager into the new ceremony dir, OR generate a new keypair if rotating. For the ADR-0014 transition ceremony, generate a new keypair under a non-Diverse `kid` and retire the former `diverse-2026-01` / `diverse-2026-02` private keys from active use (keep public keys in JWKS for the transition window).
 5. Update `llmo-payload.json` with new `valid_from`, `valid_until`, and any changed claims (board roster, products, etc.). If the ceremony includes per-claim signing, set `TARGETS_FOR_PER_CLAIM_SIGNING` in `sign.py` with the target `claim_id`s (per spec §4.3 / §5.3 X6).
 6. Increment `document_id` (e.g., `2026-q3-routine`).
 7. Run `sign.py` (per-claim signing pass runs first if any targets are listed, then document-level signing covers the augmented payload). Run `verify.py` (verifies per-claim signatures first, then document-level). Confirm verification passes against the public JWKS only.
@@ -66,15 +68,17 @@ This is RFC 8785-compliant for payloads using only strings, integers, booleans, 
 ## Files in this ceremony
 
 ```
-~/llmo-key-ceremony-2026-04-26/
-├── private-jwk-diverse-2026-01.json   (chmod 600; backed up to password manager)
-├── public-jwk-diverse-2026-01.json    (public; identical content to JWKS entry)
+~/llmo-key-ceremony-YYYY-MM-DD/
+├── private-jwk-<kid>.json             (chmod 600; backed up to password manager)
+├── public-jwk-<kid>.json              (public; identical content to JWKS entry)
 ├── jwks.json                          (public; copied to static/.well-known/llmo-keys.json)
 ├── llmo-payload.json                  (unsigned; the document being signed)
 ├── llmo-signed.json                   (signed; copied to static/.well-known/llmo.json)
 ├── sign.py                            (the signing script)
 └── verify.py                          (the public-only verification script)
 ```
+
+For the ADR-0014 transition ceremony, `<kid>` is `llmo-steward-2026-10`. For historical reference, the prior ceremonies used `diverse-2026-01` and `diverse-2026-02`.
 
 The ceremony directory lives outside the repository to keep the private key out of `git` accidentally. Only `jwks.json` and `llmo-signed.json` are copied into the repo.
 
@@ -89,4 +93,17 @@ Editing `static/.well-known/llmo.json` after publication invalidates the signatu
 - **2026-04-30 v3** (`~/llmo-key-ceremony-2026-04-30/`): re-signed to align with v0.1.2 spec changes. `document_id="2026-q2-revision-1"`. Validity window unchanged (2026-04-26 → 2026-07-26). Changes: kbp.org removed from `entity.aliases` (now `["diverse.org", "emerging.org"]`); KBP product entry removed from `products-current` (LLMO and Emerging.org Podcast remain); `personnel.spokespeople` chairman entry gains `verification: "https://github.com/thegigachav"`; disavowal `unaffiliated_domain` detail string updated to v0.1.2 impersonation-defense wording per §3.5. Same key (`diverse-2026-01`), same validity window. Canonical payload size: 1850 bytes.
 - **v4 (2026-05-05)** (`~/llmo-key-ceremony-2026-05-01/`): out-of-cadence ceremony driven by v0.1.5 spec changes. `document_id="2026-q2-revision-2"`, `valid_from="2026-05-01"`, `valid_until="2026-07-26"` (preserves v3 cadence). The validity window's `valid_from` is intentionally backdated to the start of the month, four days before the ceremony executed; this is permitted under §3.3 and means the document is more conservative about its own freshness, not less. The ceremony directory name `~/llmo-key-ceremony-2026-05-01/` reflects the date the ceremony was originally planned to start; the actual signing executed 2026-05-05. `disavowal-affiliations` claim gains a per-claim signature, demonstrating the new X6 strict-tier rule end-to-end against the live document. Same key as v1-v3 (no rotation). Canonical payload sizes: 2032 bytes (document-level), 442 bytes (disavowal claim per-claim signature).
 
-When re-signing in 90 days for the next quarterly window, copy the most recent ceremony's `sign.py`/`verify.py` (currently `~/llmo-key-ceremony-2026-05-01/`) into a new dated ceremony directory, retarget the `CEREMONY_DIR` constant, and update `valid_from`/`valid_until` and `document_id` in the new payload.
+### Pending ceremony: v5 (ADR-0014 transition, 2026-10)
+
+The document's `valid_until` expired 2026-07-26. The next ceremony is overdue and must execute the ADR-0014 transition:
+
+- New ceremony dir: `~/llmo-key-ceremony-2026-10/`.
+- **Rotate keys.** Generate a fresh ES256 keypair under `kid: "llmo-steward-2026-10"`. The retired `diverse-2026-01` and `diverse-2026-02` private keys MUST NOT be used to sign any new document. Keep both retired public keys in `static/.well-known/llmo-keys.json` for a transition window (one validity cycle, i.e. until the next ceremony); then remove them.
+- **New entity block.** `entity.name = "Nicholas Chavez"`. Drop `legal_identifiers` (there is no 501(c)(3) EIN or state registration to list under the individual steward). Drop `aliases` naming diverse.org / emerging.org from the entity block; those domains are not aliases of the LLMO steward going forward.
+- **Supersedes.** Add a `supersedes` claim pointing at the prior `document_id` (`2026-q2-revision-4`) and the key that signed it (`diverse-2026-02`), so consumers walking the chain see the retirement explicitly.
+- **Claims cleanup.** Drop `personnel.spokespeople` (no officer roster under individual stewardship) or reduce to a single spokesperson entry naming Nicholas Chavez. Drop the `disavowal.commercial_subsidiary` claim about Diverse.org (no longer applicable). Keep the impersonation-defense disavowal if a current analog exists; otherwise drop.
+- `document_id = "2026-q4-revision-1"` or similar; `valid_from = 2026-10-22` (ADR-0014 adoption); `valid_until = 2027-01-20` (90-day window).
+
+The draft payload under `static/.well-known/llmo.json` provided in the same PR as ADR-0014 is unsigned and includes `"signature": null` placeholders; the live ceremony replaces that file with the signed artifact.
+
+When re-signing after the ADR-0014 transition is complete, copy the ceremony's `sign.py`/`verify.py` into a new dated ceremony directory, retarget the `CEREMONY_DIR` constant, and update `valid_from`/`valid_until` and `document_id` in the new payload.

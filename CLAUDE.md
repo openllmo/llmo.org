@@ -16,11 +16,11 @@ For deeper context (history, decision rationale, strategic backlog), see:
 
 **LLMO** is an open protocol for organizational identity in the AI era. Organizations publish signed JSON claims at `/.well-known/llmo.json`. AI agents and LLMs read them directly.
 
-**Stewardship:** Diverse.org, Inc. (CA 501(c)(3), EIN 99-2870125)
+**Stewardship:** Nicholas Chavez (individual). Earlier materials described Diverse.org, Inc. (CA 501(c)(3)) as steward; that stewardship was never formally stood up and is withdrawn as of 2026-10-22. See [ADR-0014](/adr/0014-single-steward-individual/) and governance page.
 
-**Commercial vehicle:** Greyfront, Inc. (DE C-corp); separate entity, future llmo.com
+**Commercial vehicle:** Greyfront, Inc. (DE C-corp), operates at llmo.com. The individual steward also operates Greyfront, so the stewardship-vs-commercial separation is behavioral, not structural. See ADR-0014.
 
-**Repo:** This is the spec/site repo (openllmo/llmo.org). Validator is at openllmo/llmo-validator. Diverse.org's own site is planned separately (Priority 14c, see BACKLOG.md).
+**Repo:** This is the spec/site repo (openllmo/llmo.org). Validator is at openllmo/llmo-validator.
 
 **Current state:** Site live at https://llmo.org, signed `llmo.json` published at `/.well-known/llmo.json` passing Strict tier conformance, LIP-1 and LIP-3 Bitcoin-anchored.
 
@@ -256,10 +256,12 @@ The digest is a tripwire, not a deliverable: when artifact-producing work appear
 
 ## Spec conventions
 
-### Worked example: Diverse.org (self-referential)
-Section 7 of v0.1 uses Diverse.org as the worked example. This is intentional: protocol-uses-itself pattern (Bitcoin docs use Bitcoin, Linux docs use Linux).
+### Worked example: Example Standards Foundation (hypothetical)
+Section 7 of v0.1 uses "Example Standards Foundation" as the worked example — a clearly-hypothetical nonprofit stewarding standards. The example illustrates all core claim types without naming a real org. For a live signed document that validates against the spec, the page points at llmo.org's own `/.well-known/llmo.json`.
 
-If you ever see "Serval" anywhere in the repo, it's stale. Replace with Diverse.org. (Serval is also a Greyfront commercial customer name; using it as a fictional example created a customer-relationship issue.)
+Prior to 2026-10-22 the worked example was Diverse.org (the then-claimed steward); that was removed when stewardship was withdrawn. See [ADR-0014](/adr/0014-single-steward-individual/).
+
+If you ever see "Serval" anywhere in the repo, it's stale. Replace with "Example Standards Foundation" or remove. (Serval is also a Greyfront commercial customer name; using it as a fictional example created a customer-relationship issue.)
 
 ### LIP numbering
 - Numbers permanent and append-only
@@ -365,7 +367,7 @@ Long agentic sessions accumulate stale context. Signs of drift:
 - You reference Mintlify as if it's still the publishing platform (it's Hugo)
 - You forget the OTS proofs are already Bitcoin-anchored
 - You confuse llmo.org and llmo.com (org vs. com, different entities)
-- You describe Serval as the worked example (it's Diverse.org now)
+- You describe Serval or Diverse.org as the worked example (it's "Example Standards Foundation" now; Diverse.org was removed in ADR-0014)
 - You assume CI is broken or DNS is wrong without checking
 - You propose deferring something that's actually demo-blocking
 

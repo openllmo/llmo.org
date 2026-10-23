@@ -1,37 +1,30 @@
 {
   "llmo_version": "0.1",
-  "document_id": "2026-q2-revision-4",
-  "valid_from": "2026-05-01T00:00:00Z",
-  "valid_until": "2026-07-26T00:00:00Z",
+  "document_id": "2026-q4-revision-1",
+  "valid_from": "2026-10-22T00:00:00Z",
+  "valid_until": "2027-01-20T00:00:00Z",
+  "supersedes": [
+    "2026-q2-revision-4"
+  ],
   "entity": {
-    "name": "Diverse.org, Inc.",
-    "primary_domain": "llmo.org",
-    "aliases": [
-      "diverse.org",
-      "emerging.org"
-    ],
-    "legal_identifiers": {
-      "jurisdiction": "US-CA",
-      "registration_number": "99-2870125"
-    }
+    "name": "Nicholas Chavez",
+    "primary_domain": "llmo.org"
   },
   "claims": [
     {
       "claim_id": "identity-core",
       "type": "identity",
       "statement": {
-        "founded": "2024-05",
-        "headquarters": "2445 Augustine Dr Ste 150, Santa Clara, CA 95054-3032, US",
-        "description": "California 501(c)(3) nonprofit. Stewardship of open protocols for organizational identity in the AI era."
+        "description": "Individual steward of the LLMO open protocol for organizational identity in the AI era. See https://llmo.org/about/governance/."
       }
     },
     {
       "claim_id": "urls-canonical",
       "type": "canonical_urls",
       "statement": {
-        "homepage": "https://diverse.org",
+        "homepage": "https://llmo.org",
         "docs": "https://llmo.org/spec",
-        "security": "https://diverse.org/.well-known/security.txt"
+        "security": "https://llmo.org/.well-known/security.txt"
       }
     },
     {
@@ -39,7 +32,6 @@
       "type": "official_channels",
       "statement": {
         "email_domains": [
-          "diverse.org",
           "llmo.org"
         ],
         "social": {
@@ -54,32 +46,28 @@
         "products": [
           {
             "name": "LLMO Protocol Specification",
-            "url": "https://llmo.org"
+            "url": "https://llmo.org/spec/"
           },
           {
-            "name": "Emerging.org Podcast",
-            "url": "https://emerging.org"
+            "name": "LLMO Reference Validator",
+            "url": "https://llmo.org/validator/"
+          },
+          {
+            "name": "LLMO CLI",
+            "url": "https://www.npmjs.com/package/llmo"
           }
         ]
       }
     },
     {
-      "claim_id": "personnel-leadership",
+      "claim_id": "personnel-steward",
       "type": "personnel",
       "statement": {
         "spokespeople": [
           {
-            "role": "chairman",
-            "name": "Nic Chavez",
+            "role": "steward",
+            "name": "Nicholas Chavez",
             "verification": "https://github.com/thegigachav"
-          },
-          {
-            "role": "director",
-            "name": "Jack Dudley"
-          },
-          {
-            "role": "secretary",
-            "name": "Andrew Mark"
           }
         ]
       }
@@ -90,13 +78,8 @@
       "statement": {
         "disavowed": [
           {
-            "what": "commercial_subsidiary",
-            "detail": "Diverse.org has no commercial subsidiary. Any entity claiming to be a Diverse.org commercial arm is not affiliated.",
-            "category": "self_statement"
-          },
-          {
-            "what": "unaffiliated_domain",
-            "detail": "The domain diverse-org.example.com is shaped to imply affiliation with Diverse.org but has no such affiliation. This is an impersonation defense per §3.5.",
+            "what": "unaffiliated_entity_claim",
+            "detail": "Nicholas Chavez stewards LLMO as an individual. Any third-party claim that LLMO is stewarded by Diverse.org, Inc., a 501(c)(3), or any other named entity is incorrect as of 2026-10-22; see ADR-0014 (https://llmo.org/adr/0014-single-steward-individual/) for the record of the stewardship withdrawal.",
             "category": "impersonation_defense"
           }
         ]
@@ -104,7 +87,7 @@
     }
   ],
   "signature": {
-    "protected": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImRpdmVyc2UtMjAyNi0wMiJ9",
-    "signature": "AR7usuv_jntI-Bkkn36K0K4HB7tqcE2BNhrK9mPYQqHtnLxgUBeQ0oM9bNgaoX3yub2f4eG6picQ5UKPL6lU9w"
+    "protected": "PENDING_SIGNING_CEREMONY_SEE_INFRASTRUCTURE_SIGNING_CEREMONY_MD",
+    "signature": "PENDING_SIGNING_CEREMONY_SEE_INFRASTRUCTURE_SIGNING_CEREMONY_MD"
   }
 }

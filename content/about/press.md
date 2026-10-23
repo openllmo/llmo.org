@@ -31,11 +31,11 @@ LLMO does not solve the trust problem. It gives organizations a sovereign channe
 
 ## Who maintains it
 
-The LLMO specification is stewarded by **Diverse.org**, a California 501(c)(3) nonprofit public benefit corporation. Diverse.org's programmatic focus is open-standards work for the AI-mediated web; LLMO is the organization's flagship project.
+The LLMO specification is stewarded by **Nicholas Chavez** as an individual. There is no stewarding entity at this time. Earlier materials described LLMO as stewarded by Diverse.org, a California 501(c)(3) nonprofit; that stewardship was never formally stood up and is withdrawn. The decision is recorded in [ADR-0014](/adr/0014-single-steward-individual/), which supersedes [ADR-0001](/adr/0001-two-entity-firewall/).
 
-Nic Chavez is the v0.1 specification author and the current LIP editor. The governance model is documented at [/about/governance/](/about/governance/), including the planned transition from author-decided revisions during pre-release to a broader community process from v0.2 onward.
+Nic Chavez is the v0.1 specification author, the current LIP editor, and the current individual steward. The governance model is documented at [/about/governance/](/about/governance/), including the planned transition from author-decided revisions during pre-release to a broader community process from v0.2 onward.
 
-The specification is stewarded by the nonprofit Diverse.org. Commercial activity around LLMO, including the validator-as-a-service product at llmo.com, is structurally separated and operated by Greyfront, Inc., a Delaware C-corporation, under a documented two-entity firewall recorded in [ADR-0001](/adr/0001-two-entity-firewall/).
+Commercial activity around LLMO, including the validator-as-a-service product at llmo.com, is operated by Greyfront, Inc., a Delaware C-corporation, under separate commercial governance. The individual steward of LLMO also operates Greyfront. This is a conflict-of-interest surface and the separation between protocol stewardship and commercial activity is behavioral (steward's own role discipline) rather than structural. The governance page describes the limitation.
 
 ## Key technical claims
 

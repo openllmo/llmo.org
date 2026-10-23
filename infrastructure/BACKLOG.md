@@ -25,18 +25,17 @@ Existing items predate this convention and do not yet carry Track tags. New item
 
 ## SCHEDULED COMMITMENTS (date-bound, must happen)
 
-### 2026-07-15: Re-sign Diverse.org's llmo.json
+### OVERDUE: Re-sign llmo.org's /.well-known/llmo.json under new steward identity
 
-**What:** Quarterly re-signing of `static/.well-known/llmo.json`. The current signature expires 2026-07-26 (`valid_until` field). Sign at least 7 days before expiry to give consumers time to refetch.
+**What:** The current signed document at `static/.well-known/llmo.json` expired 2026-07-26 (`valid_until` field) and names Diverse.org, Inc. as the entity. [ADR-0014](/adr/0014-single-steward-individual/) (2026-10-22) withdraws Diverse.org as steward. The signed document must be reissued under Nicholas Chavez as individual publisher, with a `supersedes` claim pointing at the prior Diverse.org-named `document_id` and a rotated signing key `kid` that is not Diverse-named.
 
-<!-- Em-dash below retained: faithful transcription of external 1Password label, not project content. Do not "fix". -->
-**How:** Procedure documented in `infrastructure/SIGNING-CEREMONY.md`. The previous v2 ceremony directory at `~/llmo-key-ceremony-2026-04-26-v2/` has working `sign.py` and `verify.py`. Create a new dated ceremony directory; copy the private key from 1Password ("LLMO ES256 signing key — diverse-2026-01"); update `valid_from`, `valid_until`, and `document_id` in payload; run sign + verify; commit signed JSON.
+**How:** Procedure documented in `infrastructure/SIGNING-CEREMONY.md` (being updated in the same PR as ADR-0014). Create a new dated ceremony directory; generate a new keypair under a non-Diverse `kid` (e.g., `llmo-steward-2026-10`); draft the new payload with the new entity block (name "Nicholas Chavez", individual publisher, no 501(c)(3)-tied `legal_identifiers`, no officer roster); update `document_id`, `valid_from`, `valid_until`; include `supersedes` claim pointing at `2026-q2-revision-4`; add the new key to the public JWKS at `static/.well-known/llmo-keys.json` (keep old `diverse-2026-02` key during transition per ADR-0011 rotation rules); run sign + verify; commit signed JSON + updated JWKS.
 
 **Verification step:** After publishing, validate at https://llmo.org/validator/. Must pass Strict tier. If it fails, do not consider the rotation complete until the failure is fixed.
 
-**Calendar reminder set:** Confirm Nic has set this in his calendar. If not, do that as the first action of any post-conference work session.
+**Status:** OVERDUE since 2026-07-26 (prior document expired). ADR-0014 adoption on 2026-10-22 is the trigger to complete this as part of the same PR.
 
-**Same key, same kid:** v0.1 quarterly rotations re-use kid `diverse-2026-01`. The key only rotates when there's a real reason to (compromise, hardware migration, etc.). When it does rotate, both old and new keys go in the JWKS for a transition period.
+**Key rotation rationale:** The former `diverse-` key-ID prefix is retired. A new key under a non-entity-tied `kid` is issued to match the individual-steward model. The old `diverse-2026-02` public key stays in JWKS during the transition window so consumers caching the old `kid` can still verify until they re-fetch.
 
 ---
 
@@ -191,112 +190,15 @@ Vendor-drift CI guard added 2026-05-08 in cli PR #4, SHA f3b41aed377aede1d79f3b3
 
 ## ACTIVE PRIORITIES (sequenced for upcoming work)
 
-### Priority 14c: Diverse.org's own Hugo site
+### ~~Priority 14c: Diverse.org's own Hugo site~~ — OBSOLETE
 
-**Status:** Not started. Diverse.org has no public site of its own; everything currently flows through llmo.org.
-
-**Why it matters:**
-- Diverse.org needs a face. It's the steward of the protocol; visitors should be able to learn about the org, its governance, its mission.
-- The §7 worked example in the spec promises diverse.org/.well-known/llmo.json will eventually exist. Without diverse.org's site, that promise is incomplete.
-- The Greyfront firewall disclosure has to live somewhere. diverse.org/about is the right place.
-- The /about/leadership URL was promised in the spec annotation as the eventual target for the personnel claim's verification URLs. Doesn't exist yet.
-
-**Decision needed:** New repo (e.g., `openllmo/diverse.org`) vs. monorepo with llmo.org. Lean: new repo. Cleaner separation. diverse.org is a separate project from the spec; lumping them together blurs the firewall.
-
-**Scope:**
-
-1. New Cloudflare Pages project (`diverse-org` or similar)
-2. New GitHub repo `openllmo/diverse.org`
-3. Hugo build sharing visual language with llmo.org:
-   - Same palette (#FFFFFF/#0A0A0F light, #100F0D dark)
-   - Same fonts (Inter, JetBrains Mono)
-   - Same component patterns (header, footer, theme toggle)
-   - Same Stripe/Linear/Vercel register
-   - Logo: same mark, perhaps different color treatment if needed (red is reserved for llmo.com, black-on-white for both .org sites is fine)
-4. DNS: diverse.org → diverse-org.pages.dev (whatever the Pages subdomain becomes). **Find out current registrar/DNS provider for diverse.org first**; likely needs to be added to ACCOUNTS.md.
-5. Custom domain on Cloudflare Pages (diverse.org and www.diverse.org)
-6. Content needed:
-
-**About / mission page:**
-> Diverse.org is a California 501(c)(3) nonprofit (EIN 99-2870125) stewarding open protocols for organizational identity in the AI era. Our flagship project is LLMO, the open standard for /.well-known/llmo.json. We believe the AI-mediated web requires verifiable, organization-controlled identity infrastructure that no single vendor controls.
-
-**Governance page:**
-- Board: Nic Chavez (Chairman), Jack Dudley (Director), Andrew Mark (Secretary)
-- Bylaws (link to PDF if available, or "in development")
-- Fiscal classification: 501(c)(3), Charitable + Educational
-- 990-N filing status (most recent: TBD; Diverse.org is new, may not have filed yet)
-- Annual report (when available)
-
-**Greyfront firewall disclosure:**
-> ## Diverse.org and Greyfront, Inc.
->
-> LLMO is stewarded by Diverse.org as an open protocol. Commercial offerings on top of LLMO (including the validator-as-a-service product at llmo.com) are built and operated by Greyfront, Inc., a Delaware C-corporation legally separate from Diverse.org.
->
-> The two entities are governed independently:
-> - Diverse.org is funded by donations and grants. Its decisions are made by its board.
-> - Greyfront is funded by venture capital and revenue. Its decisions are made by its officers.
-> - No officer of Diverse.org is bound by any Greyfront commitment, and vice versa.
-> - Diverse.org may not show preference to Greyfront in protocol decisions.
->
-> The protocol's openness is what enables Greyfront to exist. Greyfront does not control the protocol.
-
-**Leadership page (/about/leadership):**
-- Each board member with name, role, brief bio
-- This URL was promised in the spec; signed llmo.json's personnel claim should eventually point here for verification URLs
-- One-paragraph bios, no photos required for v1
-
-**Donations page:**
-- Diverse.org currently has zero donors (as of 2026-04-27). Real opportunity: visitors at the conference may want to donate to demonstrate support for the open protocol layer.
-- Options: direct donation (Stripe, donorbox), GitHub Sponsors, fiscal sponsor
-- Decision required: how does Diverse.org accept money? Likely starts with a Stripe-based simple form. Add link to Diverse.org's CA charity registration when filed.
-
-**Contact / security:**
-- General inquiries: contact@diverse.org (or similar)
-- Security disclosures: security@llmo.org (PGP fingerprint already published)
-- /.well-known/security.txt (link spec compliance)
-
-**Diverse.org's own /.well-known/llmo.json (Priority 14d):** see below.
-
-**Estimate:** 4-6 hours of focused work. Real risk: the donations infrastructure could spiral into Stripe setup, charity registration paperwork, etc. Defer that; for v1, even just "donations coming soon" or a simple Stripe link is enough.
+**Status:** OBSOLETE as of 2026-10-22 per [ADR-0014](/adr/0014-single-steward-individual/). Diverse.org no longer stewards LLMO and does not need a protocol-facing site. Any future stewarding entity would re-scope this work from scratch under a different name and brief. The item is retained here as a record of the plan that existed before stewardship was withdrawn.
 
 ---
 
-### Priority 14d: Diverse.org's own /.well-known/llmo.json
+### ~~Priority 14d: Diverse.org's own /.well-known/llmo.json~~ — OBSOLETE
 
-**Status:** Not started. Depends on Priority 14c.
-
-**Why it matters:**
-- Completes the §7 worked example's promise: "the signed instance is published at https://diverse.org/.well-known/llmo.json"
-- Demonstrates the alias-symmetric publication pattern the spec describes
-- Doubles the demo loop: now both llmo.org and diverse.org publish under their own protocol
-
-**Scope:**
-
-1. Generate or re-use ES256 keypair. Decision: **same key**. Same legal entity (Diverse.org, Inc.) is signing both documents; using two different keys would imply two different signing authorities. Re-use kid `diverse-2026-01`.
-
-2. Construct payload similar to llmo.org's, but:
-   - `primary_domain`: `"diverse.org"` (matches serving domain; Standard tier S3)
-   - `aliases`: `["llmo.org", "emerging.org"]` (the others)
-   - Same identity claim, leadership claim, disavowal claim
-   - `canonical_urls.docs`: `https://llmo.org/spec` (still points at the spec)
-   - `canonical_urls.homepage`: `https://diverse.org` (now exists per 14c)
-   - `canonical_urls.security`: `https://diverse.org/.well-known/security.txt`
-   - Different `document_id` (e.g., `2026-q2-diverse-initial`)
-   - Same `valid_from`, `valid_until` window as llmo.org's document (consistency for re-sign cadence)
-
-3. Sign with same procedure as llmo.org (jwcrypto + JCS + ES256)
-
-4. Place at `static/.well-known/llmo.json` in diverse.org repo
-
-5. Publish JWKS at `diverse.org/.well-known/llmo-keys.json`. **Same JWKS content** (same public key) as llmo.org's. The JWKS is per-domain by spec convention but the underlying key is the same entity's.
-
-6. Validate at https://llmo.org/validator/. Must pass Strict tier.
-
-7. **Update §7 prose in llmo.org's spec** to reflect both URLs are now live: change "Diverse.org will mirror at https://diverse.org/.well-known/llmo.json once Diverse.org's own site launches" to "The same signed document is also published at https://diverse.org/.well-known/llmo.json."
-
-**Verification:** Both documents must validate at Strict tier independently. Both must verify against their respective JWKS endpoints. Both should reference each other via the aliases mechanism.
-
-**Estimate:** 1-1.5 hours after Priority 14c is done.
+**Status:** OBSOLETE as of 2026-10-22 per [ADR-0014](/adr/0014-single-steward-individual/). There is no diverse.org steward surface to publish from. See the overdue "Re-sign llmo.org's /.well-known/llmo.json under new steward identity" item under SCHEDULED COMMITMENTS for the current steward-doc work.
 
 ---
 
@@ -312,7 +214,7 @@ Vendor-drift CI guard added 2026-05-08 in cli PR #4, SHA f3b41aed377aede1d79f3b3
 
 **Decision required:** Timing (weeks after conference?), venues, what to lead with. Likely "we built X, here's what it solves, here's our own llmo.json passing Strict tier conformance, here's how to validate yours" framing.
 
-**Pre-condition:** Diverse.org site exists (Priority 14c done). Without it, the public launch lacks the steward's face.
+**Pre-condition (updated 2026-10-22):** The former Priority 14c Diverse.org site precondition is OBSOLETE per [ADR-0014](/adr/0014-single-steward-individual/). The individual-steward model means the public launch does not depend on a separate steward site; llmo.org itself carries the steward's face via `/about/`.
 
 ---
 
@@ -360,12 +262,12 @@ Vendor-drift CI guard added 2026-05-08 in cli PR #4, SHA f3b41aed377aede1d79f3b3
 
 **Status:** Open. Currently administered by personal @thegigachav account.
 
-**What:** The openllmo GitHub organization is owned/administered by Nic's personal GitHub account. Long-term, it should be administered by a Diverse.org-tied identity (e.g., `diverse-org` or similar service account, with @thegigachav as a member but not the sole owner).
+**What:** The openllmo GitHub organization is owned/administered by Nic's personal GitHub account. Long-term, if a stewarding entity is ever formed ([ADR-0014](/adr/0014-single-steward-individual/) leaves this open), the org should be administered by that entity's service identity, with @thegigachav as a member but not the sole owner. Until an entity exists, personal ownership is consistent with the individual-steward model.
 
-**Why deferred:** No urgency. Personal-owner-of-org is fine for v0.1 lifecycle. Migration becomes a real concern when:
-- Diverse.org has employees
-- A board member is added as a co-owner
-- Continuity-of-operations becomes a board-level concern
+**Why deferred:** No urgency. Personal-owner-of-org is appropriate under the individual-steward model. Migration becomes a real concern when:
+- A stewarding entity is formed and takes on operational responsibility
+- A collaborator is added as a co-owner
+- Continuity-of-operations becomes a governance concern
 
 **Estimate:** ~30 minutes of admin work. The blocker is identity decisions (what's the service account email? what's the recovery path?), not implementation.
 
@@ -396,7 +298,7 @@ Vendor-drift CI guard added 2026-05-08 in cli PR #4, SHA f3b41aed377aede1d79f3b3
 
 **What's needed:** A consolidated v6 brief document that supersedes v5. Captures pricing tiers, verification semantics, distribution thesis, plugin roadmap.
 
-**Why deferred:** Brand briefs are strategic documents for Greyfront/llmo.com, not for v0.1 spec/Diverse.org work. Tackle in the post-conference Greyfront-stand-up window.
+**Why deferred:** Brand briefs are strategic documents for Greyfront/llmo.com, not for v0.1 spec work. Tackle in the post-conference Greyfront-stand-up window.
 
 ---
 
@@ -422,13 +324,9 @@ Vendor-drift CI guard added 2026-05-08 in cli PR #4, SHA f3b41aed377aede1d79f3b3
 
 ---
 
-### Self-hosted Wikidata QID for Diverse.org
+### ~~Self-hosted Wikidata QID for Diverse.org~~ — OBSOLETE
 
-**Status:** Diverse.org doesn't have a Wikidata entry.
-
-**Context:** Wikidata QIDs are useful as `external_ids.wikidata` in llmo.json. They're cross-references that LLMs increasingly use to resolve entities. Diverse.org doesn't have one because it's a young nonprofit. Anyone can create one; the entity needs to meet Wikidata's notability criteria.
-
-**Why deferred:** Diverse.org probably doesn't meet Wikidata notability yet (very new, no significant press coverage). Revisit after the conference produces some coverage.
+**Status:** OBSOLETE as of 2026-10-22 per [ADR-0014](/adr/0014-single-steward-individual/). Diverse.org no longer stewards LLMO; a QID for it is not useful for the llmo.json publisher chain. If a future stewarding entity is formed, revisit then. A QID for Nicholas Chavez (individual) is not blocked but is a separate decision from LLMO stewardship.
 
 ---
 
@@ -488,7 +386,7 @@ Vendor-drift CI guard added 2026-05-08 in cli PR #4, SHA f3b41aed377aede1d79f3b3
 
 **Estimate:** 2-3 hours.
 
-**Scope:** Register `llmo.dev`, `llmo.io`, `llmo.protocol` (if available), anti-typosquatting variants (`llmoo.org`, `llmo-protocol.org`, etc.). Verify `llmo.com` status (Greyfront-operated). Park under the entity that holds the relevant brand: protocol-name variants under Diverse.org / team@diverse.org; commercial-product variants under Greyfront.
+**Scope:** Register `llmo.dev`, `llmo.io`, `llmo.protocol` (if available), anti-typosquatting variants (`llmoo.org`, `llmo-protocol.org`, etc.). Verify `llmo.com` status (Greyfront-operated). Park under the party that holds the relevant brand: protocol-name variants under the LLMO steward (Nicholas Chavez, individual); commercial-product variants under Greyfront.
 
 ---
 
@@ -759,7 +657,7 @@ These items were captured in the original repo-root `BACKLOG.md` on 2026-04-20 a
 
 - **CAA records on llmo.org** (H): Restrict TLS certificate issuance to specific CAs (Let's Encrypt, Google Trust Services, DigiCert). Defensive hardening, ~2 minutes of work. Added 2026-04-20.
 - **Registrar transfer from GoDaddy to Cloudflare** (M): Consolidate DNS and registration under team@diverse.org. Unlocks programmatic domain management. Requires GoDaddy EPP auth code + 5-7 day waiting period. Added 2026-04-20.
-- **Diverse.org production signing infrastructure** (M, partly addressed): When the `/.well-known/llmo.json` re-signing process matures, migrate from local-file-plus-1Password key custody to a KMS-managed ES256 signing key with rotation policy, access controls, and documented key ceremony. v0.1 ships under operator-custody local file (acceptable). Workerd is the intended runtime when serving moves to a worker. Added 2026-04-20.
+- **Steward production signing infrastructure** (M, partly addressed): When the `/.well-known/llmo.json` re-signing process matures, migrate from local-file-plus-1Password key custody to a KMS-managed ES256 signing key with rotation policy, access controls, and documented key ceremony. v0.1 ships under operator-custody local file (acceptable). Workerd is the intended runtime when serving moves to a worker. Added 2026-04-20.
 
 **Validator**
 
@@ -768,7 +666,7 @@ These items were captured in the original repo-root `BACKLOG.md` on 2026-04-20 a
 
 **Spec**
 
-- **Authorship provenance for the LLMO specification** (M, partly addressed): Establish durable, independently-verifiable proof that Nic Chavez of Diverse.org authored the LLMO specification. Already partly satisfied by OpenTimestamps anchoring of LIP-1 and LIP-3 against Bitcoin block 946781. Remaining: GPG-sign commits on the spec repo with a key published on keybase.io, keys.openpgp.org, and a personal domain. Added 2026-04-20.
+- **Authorship provenance for the LLMO specification** (M, partly addressed): Establish durable, independently-verifiable proof that Nicholas Chavez authored the LLMO specification. Already partly satisfied by OpenTimestamps anchoring of LIP-1 and LIP-3 against Bitcoin block 946781. Remaining: GPG-sign commits on the spec repo with a key published on keybase.io, keys.openpgp.org, and a personal domain. Added 2026-04-20.
 
 ---
 
@@ -814,18 +712,9 @@ Concept: a cryptographic proof (zero-knowledge or equivalent) that a real transa
 
 ## OPEN QUESTIONS / DECISIONS PENDING
 
-### Diverse.org fundraising strategy
+### ~~Diverse.org fundraising strategy~~ — OBSOLETE
 
-**Open:** How does Diverse.org accept donations? Direct via Stripe? Fiscal sponsor (e.g., Open Collective, Hack Club Bank)? GitHub Sponsors?
-
-**Trade-offs:**
-- Direct Stripe: full control, but requires charity registration, tax compliance, financial reporting
-- Fiscal sponsor: faster setup, but takes a percentage and ties Diverse.org to sponsor's infrastructure
-- GitHub Sponsors: easy setup, but skews toward developers (smaller audience for nonprofit donations)
-
-**Decision needed before:** Diverse.org goes live (Priority 14c). The donations page needs a path.
-
-**Recommendation pending:** Stripe + simple form. Diverse.org is a real org with real legal status. Take the path that gives full control and reflects that.
+**Status:** OBSOLETE as of 2026-10-22 per [ADR-0014](/adr/0014-single-steward-individual/). There is no 501(c)(3) steward; tax-deductible donations are not currently available. If a future stewarding entity is formed and seeks donations, revisit then. For now, LLMO operates on the individual steward's personal funds (see governance page).
 
 ### When to open up LIP authoring beyond Nic
 
@@ -834,8 +723,8 @@ Concept: a cryptographic proof (zero-knowledge or equivalent) that a real transa
 **Real triggers to consider:**
 - A community member submits a high-quality LIP draft via Discussions
 - A founding board meeting establishes a formal LIP review process
-- Diverse.org has a paid editor on staff
-- Any of the three above plus general "Diverse.org has more than one active maintainer"
+- A stewarding entity (if any is formed per [ADR-0014](/adr/0014-single-steward-individual/)) has a paid editor on staff
+- Any of the three above plus general "LLMO has more than one active maintainer"
 
 **Don't open it prematurely.** Editorial control concentrated in one person is fine for v0.1 lifecycle. Distributing editorial authority before the org has more bandwidth creates a bottleneck somewhere else.
 
@@ -847,7 +736,7 @@ Concept: a cryptographic proof (zero-knowledge or equivalent) that a real transa
 - Pro: starts brand awareness, captures email signups for launch
 - Con: empty page is worse than no page; "coming soon" pages are read as "vaporware"
 
-**Recommendation:** Don't launch llmo.com publicly until there's a real product. If pre-launch interest is desired, capture it via diverse.org or llmo.org (the protocol stewards) rather than a placeholder commercial page.
+**Recommendation:** Don't launch llmo.com publicly until there's a real product. If pre-launch interest is desired, capture it via llmo.org (the protocol surface) rather than a placeholder commercial page.
 
 ---
 

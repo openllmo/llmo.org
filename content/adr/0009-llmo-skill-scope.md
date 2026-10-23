@@ -9,11 +9,11 @@ status: Accepted
 
 ## Status
 
-Accepted. Records the scope decision made at the point the `/llmo` Claude Code skill was bundled into the npm CLI (v0.1.9, 2026-05-11) and operationalizes the two-entity firewall from [ADR-0001](/adr/0001-two-entity-firewall/) for this specific tooling surface.
+Accepted. Records the scope decision made at the point the `/llmo` Claude Code skill was bundled into the npm CLI (v0.1.9, 2026-05-11) and operationalizes the stewardship-vs-commercial boundary from [ADR-0001](/adr/0001-two-entity-firewall/) (as superseded by [ADR-0014](/adr/0014-single-steward-individual/)) for this specific tooling surface.
 
 ## Context
 
-The LLMO open spec at llmo.org is stewarded by Diverse.org, a California 501(c)(3) nonprofit. Commercial activity adjacent to the protocol is conducted by Greyfront, a Delaware C-corporation, through the llmo.com surface. The two-entity firewall is structural, not aspirational ([ADR-0001](/adr/0001-two-entity-firewall/)).
+The LLMO open spec at llmo.org is stewarded by Nicholas Chavez as an individual ([ADR-0014](/adr/0014-single-steward-individual/)). Commercial activity adjacent to the protocol is conducted by Greyfront, Inc., a Delaware C-corporation, through the llmo.com surface. The individual steward also operates Greyfront, so the separation between open-spec tooling and commercial product tooling is enforced behaviorally rather than at the entity boundary. This ADR records how that boundary is maintained inside the tooling.
 
 In May 2026 the open spec gained two new surfaces that together change the publisher's experience:
 
@@ -32,9 +32,9 @@ Producing any of these is trivial mechanically. The temptation to bundle them in
 Two forces in tension:
 
 1. **The publisher's experience is best served by one wizard that handles everything.** From the publisher's perspective, "set my domain up for AI consumption" is one job; splitting it across `/llmo`, "go run security.txt-builder", and "remember to lint robots.txt" fragments the experience and reduces the chance that any of the secondary surfaces actually get done.
-2. **The open spec's tooling must stay scoped to the open spec.** The `/llmo` skill ships in the llmo.org repo, is vendored into the `llmo` npm package (an OSS artifact maintained by Diverse.org), and is invoked by a slash-command that uses the LLMO name. If that skill produces files outside the LLMO v0.1 specification, it implicitly extends the spec's perceived scope and pulls the open-stewardship surface into territory that belongs to the commercial side.
+2. **The open spec's tooling must stay scoped to the open spec.** The `/llmo` skill ships in the llmo.org repo, is vendored into the `llmo` npm package (an OSS artifact maintained by the LLMO steward), and is invoked by a slash-command that uses the LLMO name. If that skill produces files outside the LLMO v0.1 specification, it implicitly extends the spec's perceived scope and pulls the open-stewardship surface into territory that belongs to the commercial side.
 
-The firewall question is not whether building security.txt and llms.txt as well is useful (it is) but **which entity should build that bundle**. Diverse.org cannot ship a "general AI-era publisher onboarding wizard" without either (a) expanding the spec to cover security.txt and llms.txt (not under consideration, and not the right design), or (b) blurring the boundary between protocol stewardship and commercial product development.
+The firewall question is not whether building security.txt and llms.txt as well is useful (it is) but **which project should build that bundle**. The LLMO steward cannot ship a "general AI-era publisher onboarding wizard" under the open-spec banner without either (a) expanding the spec to cover security.txt and llms.txt (not under consideration, and not the right design), or (b) blurring the boundary between protocol stewardship and commercial product development.
 
 ## Decision
 
@@ -73,7 +73,7 @@ The following are not emitted by the skill and the skill does not attempt to ass
 - **Multi-domain orchestration** for publishers with `delegates_to` / `delegated_from` chains across multiple primary domains.
 - **Editorial review services** for publisher-supplied claims (e.g., flagging that a category, NAICS code, or canonical URL is suspect or contested).
 
-These belong to a Trust Pack at llmo.com (planned). Diverse.org does not build them. The boundary is verified by reviewing the skill's source: every file the skill writes (or instructs the publisher to publish) is named in the table above; none is a non-LLMO artifact.
+These belong to a Trust Pack at llmo.com (planned). The open-spec project does not build them. The boundary is verified by reviewing the skill's source: every file the skill writes (or instructs the publisher to publish) is named in the table above; none is a non-LLMO artifact.
 
 ### Where the firewall is enforced in the skill itself
 
@@ -86,7 +86,7 @@ Three implementation patterns enforce the scope boundary in code, not only in th
 ## Alternatives considered
 
 - **Build security.txt and llms.txt into the `/llmo` skill itself.** Rejected. The publisher-experience argument (one wizard, one job) is real, but the firewall argument is stronger: the open-spec surface should not produce artifacts outside the open spec, even when the data is on hand and the production is mechanical. The right home for the bundled experience is llmo.com, not llmo.org.
-- **Move the entire `/llmo` skill to llmo.com.** Rejected. The skill produces exactly the artifacts the LLMO v0.1 spec defines; those artifacts are an open standard, and the tooling to produce them is appropriately part of the open-spec ecosystem (Diverse.org). Moving the skill commercial would create a paywall in front of the spec, which is the inverse of what the firewall is meant to protect.
+- **Move the entire `/llmo` skill to llmo.com.** Rejected. The skill produces exactly the artifacts the LLMO v0.1 spec defines; those artifacts are an open standard, and the tooling to produce them is appropriately part of the open-spec ecosystem. Moving the skill commercial would create a paywall in front of the spec, which is the inverse of what the firewall is meant to protect.
 - **Ship the `/llmo` skill at llmo.org and a parallel `/trust` skill at llmo.com.** Plausible future direction, not a current decision. If/when llmo.com builds a Trust Pack, it may or may not take the form of a Claude Code skill. That's a llmo.com product decision; not addressed by this ADR.
 - **Add a spec section covering security.txt and llms.txt so the skill can produce them in-scope.** Rejected. The LLMO spec is a signed-claims protocol with a defined ontology. security.txt is RFC 9116 (a different standards-track artifact with its own evolution); llms.txt is a convention with no normative standardization. Both are valuable and complementary, but folding them into the LLMO spec would conflate three independent specifications and produce a "kitchen-sink protocol" critique that the design does not need.
 

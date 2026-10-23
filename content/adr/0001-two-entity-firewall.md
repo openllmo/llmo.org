@@ -1,15 +1,17 @@
 ---
 title: "ADR-0001: Two-entity firewall between protocol stewardship and commercial activity"
 linkTitle: ADR-0001
-description: Records the structural separation between Diverse.org (501(c)(3) stewarding the LLMO protocol) and Greyfront (Delaware C-corporation pursuing commercial activity).
+description: Records the structural separation between Diverse.org (501(c)(3) stewarding the LLMO protocol) and Greyfront (Delaware C-corporation pursuing commercial activity). Superseded by ADR-0014 — Diverse.org stewardship was never formally stood up and the structure collapses to an individual steward.
 author: Nic Chavez <spec@llmo.org>
 date: 2026-05-06
-status: Accepted
+status: Superseded
 ---
 
 ## Status
 
-Accepted. Backfill: this records a structural decision that predates the ADR practice itself.
+Superseded by [ADR-0014](/adr/0014-single-steward-individual/) on 2026-10-22. The two-entity firewall described below was never operationally realized: Diverse.org never formally took on stewardship of LLMO. The structure collapses to an individual steward. This ADR is preserved as a record of the structure the project claimed between May and October 2026.
+
+Original status (recorded 2026-05-06): Accepted. Backfill: this records a structural decision that predates the ADR practice itself.
 
 ## Context
 

@@ -194,11 +194,11 @@ Each disavowed object requires `what` (a short category or label) and `detail` (
     "disavowed": [
       {
         "what": "commercial_subsidiary",
-        "detail": "Diverse.org has no commercial subsidiary. Any entity claiming to be a Diverse.org commercial arm is not affiliated."
+        "detail": "Example Standards Foundation has no commercial subsidiary. Any entity claiming to be a Foundation commercial arm is not affiliated."
       },
       {
         "what": "unaffiliated_domain",
-        "detail": "The domain diverse-org.example.com is shaped to imply affiliation with Diverse.org but has no such affiliation. This is an impersonation defense per §3.5."
+        "detail": "The domain example-foundation.example.com is shaped to imply affiliation with Example Standards Foundation but has no such affiliation. This is an impersonation defense per §3.5."
       }
     ]
   }
@@ -207,9 +207,9 @@ Each disavowed object requires `what` (a short category or label) and `detail` (
 
 **Common pitfalls.**
 
-- **Disavowals too vague for LLMs to act on.** A disavowal of "all misinformation about us" gives consumers nothing concrete to reason with. The useful pattern is to pair a category-level disavowal (e.g., "no commercial subsidiary") with one or more specific disavowals (e.g., the unaffiliated domain `diverse-org.example.com`), so consumers have both a class and an instance to match against. The worked example in specification [§7](/spec/v0.1#7-worked-example-diverse-org-inc) demonstrates this.
+- **Disavowals too vague for LLMs to act on.** A disavowal of "all misinformation about us" gives consumers nothing concrete to reason with. The useful pattern is to pair a category-level disavowal (e.g., "no commercial subsidiary") with one or more specific disavowals (e.g., the unaffiliated domain `example-foundation.example.com`), so consumers have both a class and an instance to match against. The worked example in specification [§7](/spec/v0.1#7-worked-example-example-standards-foundation) demonstrates this.
 
-**Per-claim signing.** Disavowal claims are a strong candidate for per-claim signing per spec [§4.3](/spec/v0.1#43-document-level-vs-claim-level-signing), since they are often the most security-sensitive assertions in a document and may be cryptographically attested by a different organizational function (e.g., legal) than the rest of the document. The [§7 worked example](/spec/v0.1#7-worked-example-diverse-org-inc) demonstrates this pattern. Per-claim signatures are evaluated under the X6 strict-tier rule ([§5.3](/spec/v0.1#53-strict-conformance)).
+**Per-claim signing.** Disavowal claims are a strong candidate for per-claim signing per spec [§4.3](/spec/v0.1#43-document-level-vs-claim-level-signing), since they are often the most security-sensitive assertions in a document and may be cryptographically attested by a different organizational function (e.g., legal) than the rest of the document. The [§7 worked example](/spec/v0.1#7-worked-example-example-standards-foundation) demonstrates this pattern. Per-claim signatures are evaluated under the X6 strict-tier rule ([§5.3](/spec/v0.1#53-strict-conformance)).
 
 ---
 

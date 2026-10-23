@@ -8,7 +8,7 @@ weight: 7
 
 Implementer-facing API reference for the LLMO Key Transparency (KT) registry. The protocol-level specification is in [LIP-4](/spec/lips/lip-0004/); this page is the concrete wire format and behavior contract that conforming registry implementations and consumers MUST agree on.
 
-The reference operator is Diverse.org, hosting the canonical v0.1.x registry at `https://llmo.org/kt/v1/`. Future operators participating in v0.2 federation MUST serve the same wire format under their own base URL.
+The reference operator is the LLMO steward, hosting the canonical v0.1.x registry at `https://llmo.org/kt/v1/`. Future operators participating in v0.2 federation MUST serve the same wire format under their own base URL.
 
 ## Base path
 
@@ -266,4 +266,4 @@ Operators participating in v0.2 federation MUST:
 - Sign their own snapshots with their own ES384 (or other §4.2-permitted) key, publishing the public JWK at a stable JWKS endpoint.
 - Periodically cross-sign the most recent snapshot of every other federated operator. The cross-signing format and cadence will be defined in the v0.2 LIP.
 
-For v0.1.x, federation is roadmap, not requirement. The Diverse.org-operated registry at `https://llmo.org/kt/v1/` is the canonical and only conforming registry.
+For v0.1.x, federation is roadmap, not requirement. The steward-operated registry at `https://llmo.org/kt/v1/` is the canonical and only conforming registry.
