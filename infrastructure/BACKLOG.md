@@ -25,17 +25,15 @@ Existing items predate this convention and do not yet carry Track tags. New item
 
 ## SCHEDULED COMMITMENTS (date-bound, must happen)
 
-### OVERDUE: Re-sign llmo.org's /.well-known/llmo.json under new steward identity
+### 2027-01-10: Next quarterly re-sign of llmo.org's /.well-known/llmo.json
 
-**What:** The current signed document at `static/.well-known/llmo.json` expired 2026-07-26 (`valid_until` field) and names Diverse.org, Inc. as the entity. [ADR-0014](/adr/0014-single-steward-individual/) (2026-10-22) withdraws Diverse.org as steward. The signed document must be reissued under Nicholas Chavez as individual publisher, with a `supersedes` claim pointing at the prior Diverse.org-named `document_id` and a rotated signing key `kid` that is not Diverse-named.
+**What:** Quarterly re-signing of `static/.well-known/llmo.json`. The current document (v5 ceremony, 2026-10-22) has `valid_until: 2027-01-20T00:00:00Z`. Sign at least 7 days before expiry to give consumers time to refetch.
 
-**How:** Procedure documented in `infrastructure/SIGNING-CEREMONY.md` (being updated in the same PR as ADR-0014). Create a new dated ceremony directory; generate a new keypair under a non-Diverse `kid` (e.g., `llmo-steward-2026-10`); draft the new payload with the new entity block (name "Nicholas Chavez", individual publisher, no 501(c)(3)-tied `legal_identifiers`, no officer roster); update `document_id`, `valid_from`, `valid_until`; include `supersedes` claim pointing at `2026-q2-revision-4`; add the new key to the public JWKS at `static/.well-known/llmo-keys.json` (keep old `diverse-2026-02` key during transition per ADR-0011 rotation rules); run sign + verify; commit signed JSON + updated JWKS.
+**How:** Procedure documented in `infrastructure/SIGNING-CEREMONY.md`. The previous ceremony directory at `~/llmo-key-ceremony-2026-10/` has working `sign.py` and `verify.py`. Copy the private key for `llmo-steward-2026-10` from the operator's password manager into a new dated ceremony dir; update `valid_from`, `valid_until`, `document_id` (e.g., `2027-q1-revision-1`), update `supersedes` to point at the previous `document_id`; run sign + verify; commit signed JSON.
 
 **Verification step:** After publishing, validate at https://llmo.org/validator/. Must pass Strict tier. If it fails, do not consider the rotation complete until the failure is fixed.
 
-**Status:** OVERDUE since 2026-07-26 (prior document expired). ADR-0014 adoption on 2026-10-22 is the trigger to complete this as part of the same PR.
-
-**Key rotation rationale:** The former `diverse-` key-ID prefix is retired. A new key under a non-entity-tied `kid` is issued to match the individual-steward model. The old `diverse-2026-02` public key stays in JWKS during the transition window so consumers caching the old `kid` can still verify until they re-fetch.
+**Pruning the retired diverse-* keys:** By 2027-01-20 one full validity cycle will have elapsed since ADR-0014/0015. If no verifications against `diverse-2026-01` or `diverse-2026-02` have been observed in operational logs, prune both from `static/.well-known/llmo-keys.json` during this ceremony.
 
 ---
 

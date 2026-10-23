@@ -87,7 +87,7 @@
     }
   ],
   "signature": {
-    "protected": "PENDING_SIGNING_CEREMONY_SEE_INFRASTRUCTURE_SIGNING_CEREMONY_MD",
-    "signature": "PENDING_SIGNING_CEREMONY_SEE_INFRASTRUCTURE_SIGNING_CEREMONY_MD"
+    "protected": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImxsbW8tc3Rld2FyZC0yMDI2LTEwIn0",
+    "signature": "jalijYxXu_TptAnIIXXqzO91Y4leAai9AVg4eLhwnC1HfD07qdG9cHVDp9Q3MD1Kz-3JChF4Tkanq4HwWGNXVQ"
   }
 }
