@@ -12,6 +12,14 @@ During v0.1 pre-release, changes are author-decided and no governance window app
 
 ## [Unreleased]
 
+### Project
+
+- **Governance simplified in anticipation of commercialization via llmo.com** ([ADR-0014](/adr/0014-single-steward-individual/), [ADR-0015](/adr/0015-full-collapse-individual/)). The former two-entity structure described by [ADR-0001](/adr/0001-two-entity-firewall/) — Diverse.org, Inc. (CA 501(c)(3)) on the open-spec side and Greyfront, Inc. (DE C-corp) on the commercial side — is retired. The LLMO protocol is now stewarded by Nicholas Chavez as an individual, and any commercial activity at llmo.com is operated by the same individual. The simplification removes an entity-level firewall whose overhead was disproportionate to the current scale of the protocol and clears the way for commercialization of LLMO via llmo.com without an interposing entity structure between protocol decisions and product decisions. External parties relying on vendor-neutrality should read the [governance page](/about/governance/), which documents the known conflict-of-interest surface explicitly.
+- **Signing key rotated.** `kid: llmo-steward-2026-10` (ES256 on P-256) replaces `kid: diverse-2026-02` as the active signing key for `https://llmo.org/.well-known/llmo.json`. Public key SHA-256 fingerprint `d077c92f05eda4a9665e6468969f24ec1129236c078f2807e863fc977c8b6c5f`. The retired `diverse-2026-01` and `diverse-2026-02` public keys remain in the published JWKS for one validity cycle (through 2027-01-20) so consumers caching the old `kid`s can still verify until they re-fetch; both are scheduled for pruning at the next ceremony. See `infrastructure/SIGNING-CEREMONY.md` for the full v5 ceremony log.
+- **Steward document superseded.** `document_id: 2026-q4-revision-1` (valid 2026-10-22 → 2027-01-20) replaces `2026-q2-revision-4` via the top-level `supersedes` field. The new document names Nicholas Chavez as the entity, drops the Diverse.org-tied officer roster, and carries an impersonation-defense disavowal of any third-party claim that LLMO is stewarded by Diverse.org or any other named entity.
+
+No spec text, schema, or rule is changed by this release. The specification body remains at v0.1.10.
+
 ## [0.1.10] - 2026-05-19
 
 v0.1.10 adds a resolver-side fallback location for publishers whose primary-domain serving topology is owned by a hosted-platform edge (Shopify, BigCommerce, Wix, Squarespace, and similar SaaS commerce platforms; certain CMS platforms with restrictive `/.well-known/` policies). The signed document is unchanged; the addition is purely additive per [ADR-0006](/adr/0006-version-bump-and-release-cut/). Rationale, considered alternatives, and security analysis recorded in [ADR-0013](/adr/0013-resolver-fallback-for-saas-hosted-publishers/). Accepted under [ADR-0012](/adr/0012-goldilocks-pre-announcement-authorship-privilege/) pre-launch authorship privilege; no LIP filed.
