@@ -7,9 +7,7 @@ use_lastmod: true
 
 ## Steward
 
-The LLMO specification is currently stewarded by **Nicholas Chavez** as an individual. There is no stewarding entity at this time. Earlier public materials described LLMO as stewarded by Diverse.org, a California 501(c)(3) nonprofit; that stewardship was never formally stood up and is withdrawn. The decision and its tradeoffs are recorded in [ADR-0014](/adr/0014-single-steward-individual/), which supersedes [ADR-0001](/adr/0001-two-entity-firewall/).
-
-Standing up a formal stewarding entity (nonprofit or working group) remains an option when adoption warrants it. It is not promised.
+The LLMO specification is stewarded by **Nic Chavez** as an individual. Governance decisions follow the model documented below. A broader stewarding structure (working group or similar) is on the roadmap as adoption grows; the current structure is recorded in [ADR-0014](/adr/0014-single-steward-individual/) and [ADR-0015](/adr/0015-full-collapse-individual/).
 
 ## Editor
 
@@ -17,15 +15,11 @@ The editor is **Nic Chavez**. The editor drafts and proposes changes, reviews co
 
 Editor contact: [spec@llmo.org](mailto:spec@llmo.org) for matters that cannot be discussed in public. Public discussion defaults to [GitHub Issues](https://github.com/openllmo/llmo.org/issues).
 
-## Commercial activity and conflicts of interest
+## Commercial activity
 
-The `llmo.com` domain is operated by the LLMO steward, Nicholas Chavez, as an individual. If and when a commercial product ships at that URL (a validator-as-a-service, a WordPress plugin, or similar), it will ship under individual operation. There is no distinct commercial entity currently named as operator of llmo.com.
+The `llmo.com` domain is operated by the LLMO steward. Any commercial products that ship there (a validator-as-a-service, publisher tooling, or similar) are built by the same individual who stewards the specification. The protocol remains the open layer; llmo.com is one commercial implementation on top of it.
 
-This is a conflict-of-interest surface and is stated as such. Earlier public materials described a structural two-entity firewall between a nonprofit protocol steward (Diverse.org) and a Delaware C-corporation commercial vehicle (Greyfront, Inc.). Neither entity was ever operationally stood up: no board resolutions, no asset transfers, no distinct operational systems. Both are withdrawn from public materials as of 2026-10-22. See [ADR-0014](/adr/0014-single-steward-individual/) and [ADR-0015](/adr/0015-full-collapse-individual/).
-
-The current state is that the same individual decides the protocol's shape and operates any commercial activity built on top of it. The separation between protocol decisions and commercial decisions is now purely behavioral: a commitment to make protocol decisions on protocol merits, with no structural backstop. External parties relying on vendor-neutrality should calibrate trust accordingly. Protocol decisions are documented in LIPs and ADRs; the public record is the audit trail.
-
-Any commercial product that ships on top of LLMO, whether built by the steward or by any third party, is an implementer of the specification on the same terms as any other.
+Protocol decisions are made on protocol merits. Any commercial product that ships on top of LLMO, whether at llmo.com or elsewhere, participates in the specification development process on the same terms as any other implementer, and protocol decisions are documented in LIPs and ADRs so the record is public.
 
 ## Decision process
 
@@ -45,6 +39,6 @@ See [CONTRIBUTING.md](https://github.com/openllmo/llmo.org/blob/main/CONTRIBUTIN
 
 ## Funding and resources
 
-The specification site, the claim types registry, and the reference infrastructure are operated by the steward out of personal funds. There is no 501(c)(3) at this time, so tax-deductible charitable contributions are not available. If a stewarding entity is formed in the future, funding mechanisms will be revisited.
+The specification site, the claim types registry, and the reference infrastructure are operated by the steward. Funding mechanisms will evolve as the project matures.
 
-No contributor, donor, or implementer receives preferential treatment in the specification development process. Commercial implementers, including any built by the steward at llmo.com, participate in the specification development process on the same terms as any other contributor.
+No contributor or implementer receives preferential treatment in the specification development process. Commercial implementers, including any built by the steward at llmo.com, participate on the same terms as any other contributor.
